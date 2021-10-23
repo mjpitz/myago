@@ -1,6 +1,6 @@
 # myago
 
-My collection of Golang (Go) utilities for building distributed systems
+My collection of Golang (Go) utilities for building distributed systems. Not really intended to be used by others, but feel free to poke around.
 
 - [`cluster`][] contains code for forming pools of nodes into clusters.
 - [`leaderless`][] forms a `farm128` consistent hash ring to coordinate work within a cluster without the need for election.
