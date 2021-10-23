@@ -144,7 +144,7 @@ Time returns the timestamp associated with this ULID.
 ```go
 func (u ULID) Validate() error
 ```
-IsValid returns true if the checksum matches a computed checksum for the ULID.
+Validate returns an error if the checksums do not match.
 
 #### func (ULID) Version
 

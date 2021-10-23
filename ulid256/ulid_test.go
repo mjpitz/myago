@@ -33,7 +33,7 @@ func TestULID(t *testing.T) {
 	require.Equal(t, "AAAAAGFzppKQIM", u.String()[:14])
 
 	require.Equal(t, uint16(0), u.Skew())
-	require.Equal(t, "2021-10-23T01:07:14-05:00", u.Time().Format(time.RFC3339))
+	require.Equal(t, "2021-10-23T06:07:14Z", u.Time().UTC().Format(time.RFC3339))
 	require.Equal(t, byte(0), u.Version())
 	require.Equal(t, fill, u.Payload())
 	require.NoError(t, u.Validate())

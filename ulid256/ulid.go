@@ -62,7 +62,7 @@ func (u ULID) Checksum() uint32 {
 	return binary.BigEndian.Uint32(u[28:32])
 }
 
-// IsValid returns true if the checksum matches a computed checksum for the ULID.
+// Validate returns an error if the checksums do not match.
 func (u ULID) Validate() error {
 	checksum := crc32.NewIEEE()
 	_, err := checksum.Write(u[:28])
