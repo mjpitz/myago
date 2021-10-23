@@ -31,7 +31,7 @@ func Parse(ulid string) (ULID, error) {
 // ULID is a unique, lexigraphic identifier. Unlike the the canonical ULID implementation, this version is 256 bits,
 // holds a version identifier, a programmable the payload, and a CRC32 checksum. The binary format is as follows:
 //
-// [ skew - 2 bytes ][ sec - 6 bytes ][ nsec - 3 bytes ][ version - byte ][ payload - 16 bytes ][ checksum - 4 bytes ]
+// `[ skew - 2 bytes ][ sec - 6 bytes ][ nsec - 3 bytes ][ version - byte ][ payload - 16 bytes ][ checksum - 4 bytes ]`
 //
 type ULID [32]byte
 
