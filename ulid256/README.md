@@ -83,7 +83,7 @@ WithClock allows callers to override the clock implementation being used.
 type ULID [32]byte
 ```
 
-ULID is a unique, lexigraphic identifier. Unlike the the canonical ULID
+ULID is a unique, lexigraphic identifier. Unlike the canonical ULID
 implementation, this version is 256 bits, holds a version identifier, a
 programmable the payload, and a CRC32 checksum. The binary format is as follows:
 
