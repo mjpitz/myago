@@ -111,25 +111,3 @@ func (c *ClientConn) OpenStream(ctx context.Context, method string) (Stream, err
 
 	return rpcStream, err
 }
-
-// TODO: eventually make this public, but it would be nice to support opening a stream from the server.
-func (c *ClientConn) acceptStream(ctx context.Context) (string, Stream, error) {
-	session, err := c.obtainSession(ctx)
-	if err != nil {
-		return "", nil, err
-	}
-
-	stream, err := session.AcceptStream()
-	if err != nil {
-		return "", nil, err
-	}
-
-	rpcStream := wrap(stream,
-		withContext(c.options.context),
-		withEncoding(c.options.encoding))
-
-	invoke := &Invoke{}
-	err = rpcStream.ReadMsg(&invoke)
-
-	return invoke.Method, rpcStream, err
-}

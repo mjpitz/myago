@@ -32,7 +32,7 @@ type Director struct {
 // GetLeader returns the current "leader" for a given key.
 func (d *Director) GetLeader(key string) (string, bool) {
 	d.mu.RLock()
-	d.mu.RUnlock()
+	defer d.mu.RUnlock()
 
 	return d.hashRing.GetNode(key)
 }
@@ -40,7 +40,7 @@ func (d *Director) GetLeader(key string) (string, bool) {
 // GetReplicas returns a list of peers to replicate information to given a key.
 func (d *Director) GetReplicas(key string, replicas int) ([]string, bool) {
 	d.mu.RLock()
-	d.mu.RUnlock()
+	defer d.mu.RUnlock()
 
 	// when replicas > pool size, return the full pool
 	if size := d.hashRing.Size(); replicas > size {

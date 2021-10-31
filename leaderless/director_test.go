@@ -20,7 +20,8 @@ func TestDirector(t *testing.T) {
 	director := leaderless.New()
 
 	{
-		timeoutCtx, _ := context.WithTimeout(ctx, time.Second)
+		timeoutCtx, cancel := context.WithTimeout(ctx, time.Second)
+		defer cancel()
 		err := director.Start(timeoutCtx, membership)
 		require.NoError(t, err)
 	}

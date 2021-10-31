@@ -12,7 +12,7 @@ type Option func(cluster *Cluster)
 // WithDiscovery allows alternative peer discovery mechanisms to be plugged in.
 func WithDiscovery(discovery Discovery) Option {
 	return func(cluster *Cluster) {
-		cluster.discovery = discovery
+		cluster.discovery = append(cluster.discovery, discovery)
 	}
 }
 
@@ -20,7 +20,6 @@ func WithDiscovery(discovery Discovery) Option {
 func New(opts ...Option) *Cluster {
 	cluster := &Cluster{
 		membership: new(Membership),
-		discovery:  &NoDiscovery{},
 	}
 
 	for _, opt := range opts {
@@ -33,7 +32,7 @@ func New(opts ...Option) *Cluster {
 // Cluster handles the discovery and management of cluster members. It uses HashiCorp's Serf and MemberList projects to
 // discover and track active given a join address.
 type Cluster struct {
-	discovery  Discovery
+	discovery  []Discovery
 	membership *Membership
 }
 
@@ -43,14 +42,18 @@ func (c *Cluster) Membership() *Membership {
 	return c.membership
 }
 
-// Start initializes and starts up the cluster. It uses errgroup to spin up the discovery thread and blocks until the
-// parent context is cancelled or one of the grouped functions returns an error.
+// Start initializes and starts up the cluster.
 func (c *Cluster) Start(ctx context.Context) error {
 	group, ctx := errgroup.WithContext(ctx)
+	submitToGroup := func(discovery Discovery) {
+		group.Go(func() error {
+			return discovery.Start(ctx, c.membership)
+		})
+	}
 
-	group.Go(func() error {
-		return c.discovery.Start(ctx, c.membership)
-	})
+	for _, discovery := range c.discovery {
+		submitToGroup(discovery)
+	}
 
 	return group.Wait()
 }

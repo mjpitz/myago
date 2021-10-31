@@ -48,22 +48,23 @@ testing.
 ```go
 func (c *Cluster) Start(ctx context.Context) error
 ```
-Start initializes and starts up the cluster. It uses errgroup to spin up the
-discovery thread and blocks until the parent context is cancelled or one of the
-grouped functions returns an error.
+Start initializes and starts up the cluster.
 
 #### type Discovery
 
 ```go
 type Discovery interface {
-	// Start begins the process of filling the membership with active members. This method should block until the
-	// context is cancelled.
+	// Start runs the discovery process. Implementations should block, regardless if they're filling or subscribing to
+	// the membership pool.
 	Start(ctx context.Context, membership *Membership) error
 }
 ```
 
-Discovery is a generic interface used to manage the membership pool of the
-cluster.
+Discovery provides an abstraction that allows implementers to fill or discover
+changes to the underlying membership pool. For example, GossipDiscovery fills
+the membership pool with members found via HashiCorp's Serf implementation. The
+leaderless.Director package implements this interface to learn about changes in
+the underlying membership pool.
 
 #### type GossipDiscovery
 
@@ -109,6 +110,12 @@ func (m *Membership) Left(peers []string)
 Left allows peers to temporarily leave the cluster, but still be considered part
 of active membership. Operation should be `O( m log(n) )` where `m = len(peers)`
 and `n = len(m.active) + len(m.left)`.
+
+#### func (*Membership) Majority
+
+```go
+func (m *Membership) Majority() int
+```
 
 #### func (*Membership) Remove
 

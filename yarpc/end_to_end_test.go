@@ -38,7 +38,9 @@ func exampleServer(t *testing.T, ctx context.Context, network, address string) e
 }
 
 func exampleClient(t *testing.T, ctx context.Context, network, address string) error {
-	defer yarpc.DefaultServer.Shutdown()
+	defer func() {
+		_ = yarpc.DefaultServer.Shutdown()
+	}()
 
 	conn := yarpc.DialContext(ctx, network, address)
 
