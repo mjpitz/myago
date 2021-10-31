@@ -2,32 +2,28 @@ package paxos
 
 import (
 	"context"
-	"time"
 )
 
-type Stream interface {
-	Context() context.Context
-	SetReadDeadline(deadline time.Time) error
-	ReadMsg(i interface{}) error
-	SetWriteDeadline(deadline time.Time) error
-	WriteMsg(i interface{}) error
-	Close() error
-}
-
+// Bytes contains a value to be accepted via paxos.
 type Bytes struct {
-	Bytes []byte `json:"bytes,omitempty"`
+	Value []byte `json:"value,omitempty"`
 }
 
+// Request is used during the PREPARE and OBSERVE phases of the paxos algorithm. Prepare sends along their ID value and
+// attempt number, where Observe sends along their last accepted id.
 type Request struct {
 	ID      uint64 `json:"id,omitempty"`
 	Attempt uint64 `json:"attempt,omitempty"`
 }
 
+// Proposal is used to propose a log value to system.
 type Proposal struct {
 	ID    uint64 `json:"id,omitempty"`
 	Value []byte `json:"value,omitempty"`
 }
 
+// Promise is returned by an accepted prepare. If more than one attempt was made, and accepted value is returned with
+// the last accepted proposal so clients can catch up.
 type Promise struct {
 	ID       uint64    `json:"id,omitempty"`
 	Accepted *Proposal `json:"accepted,omitempty"`
@@ -58,13 +54,11 @@ func (s *ObserveClientStream) Recv() (*Proposal, error) {
 type AcceptorServer interface {
 	Prepare(ctx context.Context, request *Request) (*Promise, error)
 	Accept(ctx context.Context, proposal *Proposal) (*Proposal, error)
-	Observe(call *ObserveServerStream) error
 }
 
 type AcceptorClient interface {
 	Prepare(ctx context.Context, request *Request) (*Promise, error)
 	Accept(ctx context.Context, proposal *Proposal) (*Proposal, error)
-	Observe(ctx context.Context, request *Request) (*ObserveClientStream, error)
 }
 
 type ProposerServer interface {
@@ -73,4 +67,12 @@ type ProposerServer interface {
 
 type ProposerClient interface {
 	Propose(ctx context.Context, value []byte) ([]byte, error)
+}
+
+type ObserverServer interface {
+	Observe(call *ObserveServerStream) error
+}
+
+type ObserverClient interface {
+	Observe(ctx context.Context, request *Request) (*ObserveClientStream, error)
 }

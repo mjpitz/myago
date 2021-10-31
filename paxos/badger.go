@@ -1,30 +1,40 @@
-package badgerdb
+package paxos
 
 import (
 	"encoding/binary"
 	"reflect"
 
 	"github.com/dgraph-io/badger/v3"
-	"github.com/mjpitz/myago/paxos"
 	"github.com/vmihailenco/msgpack/v5"
 )
 
-type Log struct {
+// Badger implements a Log that wraps an underlying badgerdb instance.
+type Badger struct {
 	DB     *badger.DB
-	Prefix []byte
+	prefix []byte
 }
 
-func (l *Log) key(id uint64) []byte {
-	prefixLen := len(l.Prefix)
+func (l *Badger) key(id uint64) []byte {
+	prefixLen := len(l.prefix)
 	key := make([]byte, prefixLen+8)
 
-	copy(key[:prefixLen], l.Prefix)
+	copy(key[:prefixLen], l.prefix)
 	binary.BigEndian.PutUint64(key[prefixLen:], id)
 
 	return key
 }
 
-func (l *Log) Record(id uint64, msg interface{}) error {
+func (l *Badger) WithPrefix(prefix string) Log {
+	log := &Badger{
+		DB: l.DB,
+	}
+
+	log.prefix = append(log.prefix, l.prefix...)
+	log.prefix = append(log.prefix, []byte(prefix)...)
+	return log
+}
+
+func (l *Badger) Record(id uint64, msg interface{}) error {
 	key := l.key(id)
 	val, err := msgpack.Marshal(msg)
 	if err != nil {
@@ -32,23 +42,28 @@ func (l *Log) Record(id uint64, msg interface{}) error {
 	}
 
 	return l.DB.Update(func(txn *badger.Txn) error {
-		return txn.Set(key, val)
+		_, err := txn.Get(key)
+		if err == badger.ErrKeyNotFound {
+			err = txn.Set(key, val)
+		}
+		return err
 	})
 }
 
-func (l *Log) Last(msg interface{}) error {
+func (l *Badger) Last(msg interface{}) error {
 	txn := l.DB.NewTransaction(false)
 	defer txn.Discard()
 
+	// find a better way to do this...
+
 	iter := txn.NewIterator(badger.IteratorOptions{
-		PrefetchSize:   1,
-		PrefetchValues: true,
-		Reverse:        true,
-		Prefix:         l.Prefix,
+		PrefetchSize: 1,
+		Reverse:      true,
 	})
 	defer iter.Close()
 
-	if !iter.ValidForPrefix(l.Prefix) {
+	iter.Seek(append(l.prefix, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff))
+	if !iter.ValidForPrefix(l.prefix) {
 		return nil
 	}
 
@@ -57,7 +72,7 @@ func (l *Log) Last(msg interface{}) error {
 	})
 }
 
-func (l *Log) Range(start, stop uint64, proto interface{}, fn func(msg interface{}) error) error {
+func (l *Badger) Range(start, stop uint64, proto interface{}, fn func(msg interface{}) error) error {
 	startKey := l.key(start)
 	stopKey := l.key(stop)
 
@@ -71,7 +86,7 @@ func (l *Log) Range(start, stop uint64, proto interface{}, fn func(msg interface
 	defer iter.Close()
 
 	iter.Seek(startKey)
-	for iter.ValidForPrefix(l.Prefix) {
+	for iter.ValidForPrefix(l.prefix) {
 		inst := reflect.New(reflect.TypeOf(proto)).Interface()
 
 		err := iter.Item().Value(func(val []byte) error {
@@ -95,8 +110,4 @@ func (l *Log) Range(start, stop uint64, proto interface{}, fn func(msg interface
 	return nil
 }
 
-func (l *Log) Close() error {
-	return l.DB.Close()
-}
-
-var _ paxos.Log = &Log{}
+var _ Log = &Badger{}

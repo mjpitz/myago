@@ -12,10 +12,10 @@ func TestAcceptor(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	promiseLog := &paxos.MemoryLog{}
-	acceptLog := &paxos.MemoryLog{}
+	promiseLog := &paxos.Memory{}
+	acceptedLog := &paxos.Memory{}
 
-	acceptor, err := paxos.NewAcceptor(promiseLog, acceptLog)
+	acceptor, err := paxos.NewAcceptor(promiseLog, acceptedLog)
 	require.NoError(t, err)
 
 	{

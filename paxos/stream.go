@@ -8,6 +8,17 @@ import (
 	"github.com/mjpitz/myago/yarpc"
 )
 
+// Stream provides an abstract definition of the functionality the underlying stream needs to provide.
+type Stream interface {
+	Context() context.Context
+	SetReadDeadline(deadline time.Time) error
+	ReadMsg(i interface{}) error
+	SetWriteDeadline(deadline time.Time) error
+	WriteMsg(i interface{}) error
+	Close() error
+}
+
+// NewMockStream provides a mock Stream implementation useful for testing. This could be yarpc or paxos related.
 func NewMockStream(size int) *MockStream {
 	return &MockStream{
 		Ctx:      context.Background(),

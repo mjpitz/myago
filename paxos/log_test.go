@@ -1,4 +1,4 @@
-package badgerdb_test
+package paxos_test
 
 import (
 	"context"
@@ -6,29 +6,14 @@ import (
 
 	"github.com/dgraph-io/badger/v3"
 	"github.com/mjpitz/myago/paxos"
-	"github.com/mjpitz/myago/paxos/badgerdb"
 	"github.com/stretchr/testify/require"
 )
 
-func TestAcceptor(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+func testLog(t *testing.T, ctx context.Context, root paxos.Log) {
+	promiseLog := root.WithPrefix("promised/")
+	acceptedLog := root.WithPrefix("accepted/")
 
-	db, err := badger.Open(badger.DefaultOptions("").WithInMemory(true))
-	require.NoError(t, err)
-	defer db.Close()
-
-	promiseLog := &badgerdb.Log{
-		DB:     db,
-		Prefix: []byte("promised/"),
-	}
-
-	acceptLog := &badgerdb.Log{
-		DB:     db,
-		Prefix: []byte("accepted/"),
-	}
-
-	acceptor, err := paxos.NewAcceptor(promiseLog, acceptLog)
+	acceptor, err := paxos.NewAcceptor(promiseLog, acceptedLog)
 	require.NoError(t, err)
 
 	{
@@ -42,6 +27,11 @@ func TestAcceptor(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, uint64(1), promise.ID)
 		require.Nil(t, promise.Accepted)
+
+		lastPromise := &paxos.Promise{}
+		err = promiseLog.Last(lastPromise)
+		require.NoError(t, err)
+		require.Equal(t, uint64(1), lastPromise.ID)
 	}
 
 	{
@@ -55,6 +45,12 @@ func TestAcceptor(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, uint64(1), proposal.ID)
 		require.Equal(t, "hello-paxos", string(proposal.Value))
+
+		lastAccept := &paxos.Proposal{}
+		err = acceptedLog.Last(lastAccept)
+		require.NoError(t, err)
+		require.Equal(t, uint64(1), lastAccept.ID)
+		require.Equal(t, "hello-paxos", string(lastAccept.Value))
 	}
 
 	{
@@ -79,6 +75,15 @@ func TestAcceptor(t *testing.T) {
 
 		require.Equal(t, uint64(1), promise.Accepted.ID)
 		require.Equal(t, "hello-paxos", string(promise.Accepted.Value))
+
+		lastPromise := &paxos.Promise{}
+		err = promiseLog.Last(lastPromise)
+		require.NoError(t, err)
+		require.Equal(t, uint64(2), lastPromise.ID)
+		require.NotNil(t, lastPromise.Accepted)
+
+		require.Equal(t, uint64(1), lastPromise.Accepted.ID)
+		require.Equal(t, "hello-paxos", string(lastPromise.Accepted.Value))
 	}
 
 	{
@@ -92,6 +97,12 @@ func TestAcceptor(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, uint64(2), proposal.ID)
 		require.Equal(t, "hello-paxos", string(proposal.Value))
+
+		lastAccept := &paxos.Proposal{}
+		err = acceptedLog.Last(lastAccept)
+		require.NoError(t, err)
+		require.Equal(t, uint64(2), lastAccept.ID)
+		require.Equal(t, "hello-paxos", string(lastAccept.Value))
 	}
 
 	{
@@ -121,4 +132,24 @@ func TestAcceptor(t *testing.T) {
 			require.Equal(t, "hello-paxos", string(proposal.Value))
 		}
 	}
+}
+
+func TestBadger(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	db, err := badger.Open(badger.DefaultOptions(t.TempDir()).WithSyncWrites(true))
+	require.NoError(t, err)
+	defer db.Close()
+
+	root := &paxos.Badger{DB: db}
+
+	testLog(t, ctx, root)
+}
+
+func TestMemory(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	testLog(t, ctx, &paxos.Memory{})
 }

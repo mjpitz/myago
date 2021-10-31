@@ -7,6 +7,8 @@ import (
 	"github.com/jonboulle/clockwork"
 )
 
+// Proposer can be run either as an embedded client, or as part of a standalone server. Proposers Propose additions to
+// the paxos log and uses the acceptors to get consensus on if the proposed value was accepted.
 type Proposer struct {
 	Clock       clockwork.Clock
 	IDGenerator IDGenerator
@@ -64,3 +66,6 @@ func (p *Proposer) Propose(ctx context.Context, value []byte) (accepted []byte, 
 
 	return accepted, nil
 }
+
+var _ ProposerClient = &Proposer{}
+var _ ProposerServer = &Proposer{}

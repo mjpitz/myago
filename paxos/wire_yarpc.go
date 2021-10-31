@@ -6,8 +6,10 @@ import (
 	"github.com/mjpitz/myago/yarpc"
 )
 
+// RegisterYarpcAcceptorServer registers the provided AcceptorServer implementation with the yarpc.Server to handle
+// requests.
 func RegisterYarpcAcceptorServer(svr *yarpc.Server, impl AcceptorServer) {
-	svr.Handle("/paxos.Acceptor/Prepare", yarpc.HandlerFunc(func(stream yarpc.Stream) error {
+	svr.Handle("/paxos.acceptor/Prepare", yarpc.HandlerFunc(func(stream yarpc.Stream) error {
 		req := &Request{}
 		err := stream.ReadMsg(req)
 		if err != nil {
@@ -22,7 +24,7 @@ func RegisterYarpcAcceptorServer(svr *yarpc.Server, impl AcceptorServer) {
 		return stream.WriteMsg(promise)
 	}))
 
-	svr.Handle("/paxos.Acceptor/Accept", yarpc.HandlerFunc(func(stream yarpc.Stream) error {
+	svr.Handle("/paxos.acceptor/Accept", yarpc.HandlerFunc(func(stream yarpc.Stream) error {
 		req := &Proposal{}
 		err := stream.ReadMsg(req)
 		if err != nil {
@@ -36,12 +38,9 @@ func RegisterYarpcAcceptorServer(svr *yarpc.Server, impl AcceptorServer) {
 
 		return stream.WriteMsg(proposal)
 	}))
-
-	svr.Handle("/paxos.Acceptor/Observe", yarpc.HandlerFunc(func(stream yarpc.Stream) error {
-		return impl.Observe(&ObserveServerStream{stream})
-	}))
 }
 
+// NewYarpcAcceptorClient wraps the provided yarpc.ClientConn with an AcceptorClient implementation.
 func NewYarpcAcceptorClient(cc *yarpc.ClientConn) AcceptorClient {
 	return &yarpcAcceptorClient{
 		cc: cc,
@@ -53,7 +52,7 @@ type yarpcAcceptorClient struct {
 }
 
 func (c *yarpcAcceptorClient) Prepare(ctx context.Context, request *Request) (*Promise, error) {
-	stream, err := c.cc.OpenStream(ctx, "/paxos.Acceptor/Prepare")
+	stream, err := c.cc.OpenStream(ctx, "/paxos.acceptor/Prepare")
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +68,7 @@ func (c *yarpcAcceptorClient) Prepare(ctx context.Context, request *Request) (*P
 }
 
 func (c *yarpcAcceptorClient) Accept(ctx context.Context, proposal *Proposal) (*Proposal, error) {
-	stream, err := c.cc.OpenStream(ctx, "/paxos.Acceptor/Accept")
+	stream, err := c.cc.OpenStream(ctx, "/paxos.acceptor/Accept")
 	if err != nil {
 		return nil, err
 	}
@@ -84,24 +83,10 @@ func (c *yarpcAcceptorClient) Accept(ctx context.Context, proposal *Proposal) (*
 	return proposal, stream.ReadMsg(proposal)
 }
 
-func (c *yarpcAcceptorClient) Observe(ctx context.Context, request *Request) (*ObserveClientStream, error) {
-	stream, err := c.cc.OpenStream(ctx, "/paxos.Acceptor/Observe")
-	if err != nil {
-		return nil, err
-	}
-
-	err = stream.WriteMsg(request)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ObserveClientStream{
-		Stream: stream,
-	}, nil
-}
-
 var _ AcceptorClient = &yarpcAcceptorClient{}
 
+// RegisterYarpcProposerServer registers the provided ProposerServer implementation with the yarpc.Server to handle
+// requests. Typically, proposers aren't embedded as a server and are instead run as client side code.
 func RegisterYarpcProposerServer(svr *yarpc.Server, impl ProposerServer) {
 	svr.Handle("/paxos.Proposer/Propose", yarpc.HandlerFunc(func(stream yarpc.Stream) error {
 		req := &Bytes{}
@@ -110,17 +95,18 @@ func RegisterYarpcProposerServer(svr *yarpc.Server, impl ProposerServer) {
 			return err
 		}
 
-		bytes, err := impl.Propose(stream.Context(), req.Bytes)
+		bytes, err := impl.Propose(stream.Context(), req.Value)
 		if err != nil {
 			return err
 		}
 
 		return stream.WriteMsg(&Bytes{
-			Bytes: bytes,
+			Value: bytes,
 		})
 	}))
 }
 
+// NewYarpcProposerClient wraps the provided yarpc.ClientConn with an ProposerClient implementation.
 func NewYarpcProposerClient(cc *yarpc.ClientConn) ProposerClient {
 	return &yarpcProposerClient{
 		cc: cc,
@@ -139,7 +125,7 @@ func (c *yarpcProposerClient) Propose(ctx context.Context, value []byte) ([]byte
 	defer stream.Close()
 
 	err = stream.WriteMsg(&Bytes{
-		Bytes: value,
+		Value: value,
 	})
 	if err != nil {
 		return nil, err
@@ -151,7 +137,45 @@ func (c *yarpcProposerClient) Propose(ctx context.Context, value []byte) ([]byte
 		return nil, err
 	}
 
-	return bytes.Bytes, nil
+	return bytes.Value, nil
 }
 
 var _ ProposerClient = &yarpcProposerClient{}
+
+// RegisterYarpcObserverServer registers the provided ObserverServer implementation with the yarpc.Server to handle
+// requests. Acceptors should implement the observer server, otherwise other members of the cluster cannot determine
+// what records have been accepted.
+func RegisterYarpcObserverServer(svr *yarpc.Server, impl ObserverServer) {
+	svr.Handle("/paxos.Observer/Observe", yarpc.HandlerFunc(func(stream yarpc.Stream) error {
+		return impl.Observe(&ObserveServerStream{stream})
+	}))
+}
+
+// NewYarpcObserverClient wraps the provided yarpc.ClientConn with an ObserverClient implementation.
+func NewYarpcObserverClient(cc *yarpc.ClientConn) ObserverClient {
+	return &yarpcObserverClient{
+		cc: cc,
+	}
+}
+
+type yarpcObserverClient struct {
+	cc *yarpc.ClientConn
+}
+
+func (c *yarpcObserverClient) Observe(ctx context.Context, request *Request) (*ObserveClientStream, error) {
+	stream, err := c.cc.OpenStream(ctx, "/paxos.Observer/Observe")
+	if err != nil {
+		return nil, err
+	}
+
+	err = stream.WriteMsg(request)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ObserveClientStream{
+		Stream: stream,
+	}, nil
+}
+
+var _ ObserverClient = &yarpcObserverClient{}

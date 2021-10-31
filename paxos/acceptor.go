@@ -7,35 +7,40 @@ import (
 	"github.com/mjpitz/myago/yarpc"
 )
 
-func NewAcceptor(promiseLog, acceptLog Log) (*Acceptor, error) {
+type Acceptor interface {
+	AcceptorServer
+	ObserverServer
+}
+
+func NewAcceptor(promiseLog, acceptedLog Log) (Acceptor, error) {
 	lastPromise, lastAccept := &Promise{}, &Proposal{}
 
 	// read the last entries
 	if err := promiseLog.Last(lastPromise); err != nil {
 		return nil, err
-	} else if err := acceptLog.Last(lastAccept); err != nil {
+	} else if err := acceptedLog.Last(lastAccept); err != nil {
 		return nil, err
 	}
 
-	return &Acceptor{
+	return &acceptor{
 		lastPromise: lastPromise,
 		lastAccept:  lastAccept,
 		promiseLog:  promiseLog,
-		acceptLog:   acceptLog,
+		acceptedLog: acceptedLog,
 		updates:     make(map[yarpc.Stream]chan *Proposal),
 	}, nil
 }
 
-type Acceptor struct {
+type acceptor struct {
 	mu          sync.Mutex
 	lastPromise *Promise
 	lastAccept  *Proposal
 	promiseLog  Log
-	acceptLog   Log
+	acceptedLog Log
 	updates     map[yarpc.Stream]chan *Proposal
 }
 
-func (a *Acceptor) Prepare(ctx context.Context, req *Request) (*Promise, error) {
+func (a *acceptor) Prepare(ctx context.Context, req *Request) (*Promise, error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
@@ -60,7 +65,7 @@ func (a *Acceptor) Prepare(ctx context.Context, req *Request) (*Promise, error) 
 	return promise, nil
 }
 
-func (a *Acceptor) Accept(ctx context.Context, proposal *Proposal) (*Proposal, error) {
+func (a *acceptor) Accept(ctx context.Context, proposal *Proposal) (*Proposal, error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
@@ -68,7 +73,7 @@ func (a *Acceptor) Accept(ctx context.Context, proposal *Proposal) (*Proposal, e
 		return &Proposal{}, nil
 	}
 
-	err := a.acceptLog.Record(proposal.ID, proposal)
+	err := a.acceptedLog.Record(proposal.ID, proposal)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +87,7 @@ func (a *Acceptor) Accept(ctx context.Context, proposal *Proposal) (*Proposal, e
 	return proposal, nil
 }
 
-func (a *Acceptor) Observe(call *ObserveServerStream) error {
+func (a *acceptor) Observe(call *ObserveServerStream) error {
 	var lastAcceptID uint64
 
 	a.mu.Lock()
@@ -102,7 +107,7 @@ func (a *Acceptor) Observe(call *ObserveServerStream) error {
 		return err
 	}
 
-	err = a.acceptLog.Range(req.ID, lastAcceptID, Proposal{}, func(msg interface{}) error {
+	err = a.acceptedLog.Range(req.ID, lastAcceptID, Proposal{}, func(msg interface{}) error {
 		return call.WriteMsg(msg)
 	})
 
@@ -118,4 +123,5 @@ func (a *Acceptor) Observe(call *ObserveServerStream) error {
 	return err
 }
 
-var _ AcceptorServer = &Acceptor{}
+var _ AcceptorServer = &acceptor{}
+var _ ObserverServer = &acceptor{}
