@@ -17,7 +17,7 @@ func format(prefix []string, name string) string {
 	return envVar
 }
 
-func extract(prefix []string, value reflect.Value) []cli.Flag {
+func extract(prefix, envPrefix []string, value reflect.Value) []cli.Flag {
 	flags := make([]cli.Flag, 0)
 
 	for i := 0; i < value.NumField(); i++ {
@@ -41,55 +41,68 @@ func extract(prefix []string, value reflect.Value) []cli.Flag {
 		var err error
 		switch field.Type.Kind() {
 		case reflect.Struct, reflect.Ptr:
-			pre := prefix
+			pre := append([]string{}, prefix...)
+			envPre := append([]string{}, envPrefix...)
+
 			if name != "" {
 				pre = append(pre, name)
+				envPre = append(envPre, name)
 			}
 
-			flags = append(flags, extract(pre, fieldValue)...)
+			flags = append(flags, extract(pre, envPre, fieldValue)...)
 		case reflect.String:
-			flags = append(flags, &cli.StringFlag{
+			flag := &cli.StringFlag{
 				Name:        flagName,
 				Aliases:     aliases,
 				Usage:       field.Tag.Get("usage"),
 				EnvVars:     []string{strings.ToUpper(flagName)},
 				Destination: fieldValue.Addr().Interface().(*string),
 				Value:       defaultTag,
-			})
-		case reflect.Int:
-			i := 0
-			if defaultTag != "" {
-				i, err = strconv.Atoi(defaultTag)
-				if err != nil {
-					panic(fmt.Sprintf("invalid int default: %s", defaultTag))
-				}
 			}
 
-			flags = append(flags, &cli.IntFlag{
+			if !fieldValue.IsZero() {
+				flag.Value = fieldValue.String()
+			}
+
+			flags = append(flags, flag)
+		case reflect.Int:
+			flag := &cli.IntFlag{
 				Name:        flagName,
 				Aliases:     aliases,
 				Usage:       field.Tag.Get("usage"),
 				EnvVars:     []string{strings.ToUpper(flagName)},
 				Destination: fieldValue.Addr().Interface().(*int),
-				Value:       i,
-			})
-		case reflect.Bool:
-			b := false
-			if defaultTag != "" {
-				b, err = strconv.ParseBool(defaultTag)
+			}
+
+			if !fieldValue.IsZero() {
+				flag.Value = int(fieldValue.Int())
+			} else if defaultTag != "" {
+				flag.Value, err = strconv.Atoi(defaultTag)
 				if err != nil {
-					panic(fmt.Sprintf("invalid bool default: %s", field.Tag.Get("default")))
+					panic(fmt.Sprintf("invalid int default: %s", defaultTag))
 				}
 			}
 
-			flags = append(flags, &cli.BoolFlag{
+			flags = append(flags, flag)
+		case reflect.Bool:
+			flag := &cli.BoolFlag{
 				Name:        flagName,
 				Aliases:     aliases,
 				Usage:       field.Tag.Get("usage"),
 				EnvVars:     []string{strings.ToUpper(flagName)},
 				Destination: fieldValue.Addr().Interface().(*bool),
-				Value:       b,
-			})
+			}
+
+			if !fieldValue.IsZero() {
+				flag.Value = fieldValue.Bool()
+			} else if defaultTag != "" {
+				flag.Value, err = strconv.ParseBool(defaultTag)
+				if err != nil {
+					panic(fmt.Sprintf("invalid bool default: %s", defaultTag))
+				}
+			}
+
+			flags = append(flags, flag)
 		}
 	}
 
@@ -98,10 +111,10 @@ func extract(prefix []string, value reflect.Value) []cli.Flag {
 
 // Extract parses the provided object to create a flagset.
 func Extract(v interface{}) []cli.Flag {
-	return extract([]string{}, reflect.Indirect(reflect.ValueOf(v)))
+	return extract(nil, nil, reflect.Indirect(reflect.ValueOf(v)))
 }
 
 // ExtractPrefix parses the provided to create a flagset with the provided prefix.
 func ExtractPrefix(prefix string, v interface{}) []cli.Flag {
-	return extract([]string{prefix}, reflect.Indirect(reflect.ValueOf(v)))
+	return extract(nil, []string{prefix}, reflect.Indirect(reflect.ValueOf(v)))
 }
