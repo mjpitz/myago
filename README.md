@@ -7,7 +7,7 @@ My collection of Golang (Go) utilities for building distributed systems. Not rea
 - [`leaderless`][] forms a `farm128` consistent hash ring to coordinate work within a cluster without the need for election.
 - [`lifecycle`][] provides hooks into the lifecycle of an application.
 - [`paxos`][] provides a paxos implementation.
-- [`ulid256`][] provides code for generating 256bit unique, lexigraphic identifiers (ULID).
+- [`ulid`][] provides code for generating variable length unique, lexigraphic identifiers (ULID) with programmable fills.
 - [`yarpc`][] is yet another RPC framework, built on top of HashiCorp Yamux with the simplicity of `http`.
 
 [`cluster`]: cluster
