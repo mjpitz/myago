@@ -15,5 +15,5 @@ My collection of Golang (Go) utilities for building distributed systems. Not rea
 [`leaderless`]: leaderless
 [`lifecycle`]: lifecycle
 [`paxos`]: paxos
-[`ulid256`]: ulid256
+[`ulid`]: ulid
 [`yarpc`]: yarpc
