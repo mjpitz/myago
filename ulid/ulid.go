@@ -25,13 +25,13 @@ const (
 
 var (
 	crockfordBase32 = base32.
-		NewEncoding("0123456789abcdefghjkmnpqrstvwxyz").
+		NewEncoding("0123456789ABCDEFGHJKMNPQRSTVWXYZ").
 		WithPadding(base32.NoPadding)
 )
 
 // Parse accepts a ULID string and attempts to extract a ULID from the provided string.
 func Parse(ulid string) (ULID, error) {
-	ulid = strings.ToLower(ulid)
+	ulid = strings.ToUpper(ulid)
 
 	bytes, err := crockfordBase32.DecodeString(ulid)
 	switch {

@@ -62,7 +62,10 @@ func (l *Badger) Last(msg interface{}) error {
 	})
 	defer iter.Close()
 
-	iter.Seek(append(l.prefix, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff))
+	prefix := append([]byte{}, l.prefix...)
+	prefix = append(prefix, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff)
+
+	iter.Seek(prefix)
 	if !iter.ValidForPrefix(l.prefix) {
 		return nil
 	}
