@@ -1,7 +1,9 @@
 package ulid
 
 import (
+	"encoding/base32"
 	"encoding/binary"
+	"strings"
 	"time"
 )
 
@@ -20,6 +22,30 @@ const (
 	PayloadOffset = 7
 	// PayloadLength varies by number of bits
 )
+
+var (
+	crockfordBase32 = base32.
+		NewEncoding("0123456789abcdefghjkmnpqrstvwxyz").
+		WithPadding(base32.NoPadding)
+)
+
+// Parse accepts a ULID string and attempts to extract a ULID from the provided string.
+func Parse(ulid string) (ULID, error) {
+	ulid = strings.ToLower(ulid)
+
+	bytes, err := crockfordBase32.DecodeString(ulid)
+	switch {
+	case err != nil:
+		return nil, err
+	case len(bytes) < 8:
+		return nil, ErrNotEnoughBits
+	}
+
+	parsed := make(ULID, len(bytes))
+	copy(parsed[:], bytes)
+
+	return parsed, nil
+}
 
 // ULID is a generalized, unique lexographical identifier. The format is as follows:
 //
@@ -45,4 +71,9 @@ func (ulid ULID) Timestamp() time.Time {
 // Payload returns a copy of the payload bytes.
 func (ulid ULID) Payload() []byte {
 	return append([]byte{}, ulid[PayloadOffset:]...)
+}
+
+// String returns a string representation of the payload. It's encoded using a crockford base32 encoding.
+func (ulid ULID) String() string {
+	return crockfordBase32.EncodeToString(ulid)
 }

@@ -37,6 +37,8 @@ func TestGenerator(t *testing.T) {
 		require.Equal(t, byte(1), ulid.Skew())
 		require.Equal(t, clock.Now().Unix(), ulid.Timestamp().Unix())
 		require.Len(t, ulid.Payload(), 1)
+
+		t.Log("ulid(64): ", ulid.String())
 	}
 
 	{
@@ -45,6 +47,8 @@ func TestGenerator(t *testing.T) {
 		require.Equal(t, byte(1), ulid.Skew())
 		require.Equal(t, clock.Now().Unix(), ulid.Timestamp().Unix())
 		require.Len(t, ulid.Payload(), 5)
+
+		t.Log("ulid(96): ", ulid.String())
 	}
 
 	{
@@ -53,6 +57,8 @@ func TestGenerator(t *testing.T) {
 		require.Equal(t, byte(1), ulid.Skew())
 		require.Equal(t, clock.Now().Unix(), ulid.Timestamp().Unix())
 		require.Len(t, ulid.Payload(), 9)
+
+		t.Log("ulid(128): ", ulid.String())
 	}
 
 	{
@@ -61,5 +67,7 @@ func TestGenerator(t *testing.T) {
 		require.Equal(t, byte(1), ulid.Skew())
 		require.Equal(t, clock.Now().Unix(), ulid.Timestamp().Unix())
 		require.Len(t, ulid.Payload(), 25)
+
+		t.Log("ulid(256): ", ulid.String())
 	}
 }
