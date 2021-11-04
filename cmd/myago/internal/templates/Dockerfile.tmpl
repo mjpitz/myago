@@ -1,0 +1,11 @@
+FROM alpine:3.12
+
+WORKDIR /opt/{{ .Name }}
+RUN apk add -U tzdata ca-certificates
+
+ARG TARGETOS
+ARG TARGETARCH
+COPY dist/{{ .Name }}_${TARGETOS}_${TARGETARCH}/{{ .Name }} /opt/{{ .Name }}/bin/{{ .Name }}
+COPY LICENSE /opt/{{ .Name }}/LICENSE
+
+ENTRYPOINT [ "/opt/{{ .Name }}/bin/{{ .Name }}" ]

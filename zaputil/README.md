@@ -49,3 +49,12 @@ type Config struct {
 ```
 
 Config encapsulates the configurable elements of the logger.
+
+#### func  DefaultConfig
+
+```go
+func DefaultConfig() Config
+```
+DefaultConfig returns the default configuration for zap to use. By default, it
+logs at an info level and infers the log format based on the stdout device. If
+it looks like a terminal session, then it uses the console format.

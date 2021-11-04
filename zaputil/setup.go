@@ -2,10 +2,25 @@ package zaputil
 
 import (
 	"context"
+	"os"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
+
+// DefaultConfig returns the default configuration for zap to use. By default, it logs at an info level and infers the
+// log format based on the stdout device. If it looks like a terminal session, then it uses the console format.
+func DefaultConfig() Config {
+	format := "json"
+	if fileInfo, _ := os.Stdout.Stat(); (fileInfo.Mode() & os.ModeCharDevice) != 0 {
+		format = "console" // looks like terminal session, use console logging
+	}
+
+	return Config{
+		Level:  "info",
+		Format: format,
+	}
+}
 
 // Config encapsulates the configurable elements of the logger.
 type Config struct {

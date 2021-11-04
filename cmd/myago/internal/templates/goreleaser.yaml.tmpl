@@ -1,0 +1,30 @@
+project_name: {{ .Name }}
+
+snapshot:
+  name_template: "{{ print "{{ .ShortCommit }}" }}"
+
+builds:
+  - id: {{ .Name }}
+    main: ./cmd/{{ .Name }}/main.go
+    binary: {{ .Name }}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - id: {{ .Name }}
+    name_template: "{{ .Name }}_{{ print "{{ .Os }}_{{ .Arch }}" }}"
+    builds:
+      - {{ .Name }}
+
+checksum:
+  name_template: '{{ .Name }}_checksums.txt'
+
+release:
+  header: ""
+  footer: ""

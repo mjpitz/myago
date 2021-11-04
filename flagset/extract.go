@@ -36,6 +36,7 @@ func extract(prefix, envPrefix []string, value reflect.Value) []cli.Flag {
 		}
 
 		flagName := format(prefix, name)
+		envName := strings.ToUpper(format(envPrefix, name))
 		defaultTag := field.Tag.Get("default")
 
 		var err error
@@ -55,7 +56,7 @@ func extract(prefix, envPrefix []string, value reflect.Value) []cli.Flag {
 				Name:        flagName,
 				Aliases:     aliases,
 				Usage:       field.Tag.Get("usage"),
-				EnvVars:     []string{strings.ToUpper(flagName)},
+				EnvVars:     []string{envName},
 				Destination: fieldValue.Addr().Interface().(*string),
 				Value:       defaultTag,
 			}
@@ -70,7 +71,7 @@ func extract(prefix, envPrefix []string, value reflect.Value) []cli.Flag {
 				Name:        flagName,
 				Aliases:     aliases,
 				Usage:       field.Tag.Get("usage"),
-				EnvVars:     []string{strings.ToUpper(flagName)},
+				EnvVars:     []string{envName},
 				Destination: fieldValue.Addr().Interface().(*int),
 			}
 
@@ -89,7 +90,7 @@ func extract(prefix, envPrefix []string, value reflect.Value) []cli.Flag {
 				Name:        flagName,
 				Aliases:     aliases,
 				Usage:       field.Tag.Get("usage"),
-				EnvVars:     []string{strings.ToUpper(flagName)},
+				EnvVars:     []string{envName},
 				Destination: fieldValue.Addr().Interface().(*bool),
 			}
 

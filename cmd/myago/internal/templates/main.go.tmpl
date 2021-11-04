@@ -1,0 +1,70 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"runtime"
+	"strings"
+	"time"
+
+	"github.com/urfave/cli/v2"
+
+	"github.com/mjpitz/{{ .Name }}/internal/commands"
+	"github.com/mjpitz/myago/flagset"
+	"github.com/mjpitz/myago/lifecycle"
+	"github.com/mjpitz/myago/zaputil"
+)
+
+var version = ""
+var commit = ""
+var date = time.Now().Format(time.RFC3339)
+
+type GlobalConfig struct {
+	Log zaputil.Config `json:"log"`
+}
+
+func main() {
+	compiled, _ := time.Parse(time.RFC3339, date)
+
+	cfg := &GlobalConfig{
+		Log: zaputil.DefaultConfig(),
+	}
+
+	app := &cli.App{
+		Name:      "{{ .Name }}",
+		Usage:     "",
+		UsageText: "{{ .Name }} [options] <command>",
+		Version:   fmt.Sprintf("%s (%s)", version, commit),
+		Flags:     flagset.Extract(cfg),
+		Commands: []*cli.Command{
+			commands.VersionCommand,
+		},
+		Before: func(ctx *cli.Context) error {
+			ctx.Context = zaputil.Setup(ctx.Context, cfg.Log)
+			ctx.Context = lifecycle.Setup(ctx.Context)
+
+			return nil
+		},
+		After: func(ctx *cli.Context) error {
+			lifecycle.Resolve(ctx.Context)
+
+			return nil
+		},
+		Compiled:             compiled,
+		Copyright:            fmt.Sprintf("Copyright %d The {{ .Name }} Authors - All Rights Reserved\n", compiled.Year()),
+		HideVersion:          true,
+		HideHelpCommand:      true,
+		EnableBashCompletion: true,
+		BashComplete:         cli.DefaultAppComplete,
+		Metadata: map[string]interface{}{
+			"arch":       runtime.GOARCH,
+			"compiled":   date,
+			"go_version": strings.TrimPrefix(runtime.Version(), "go"),
+			"os":         runtime.GOOS,
+		},
+	}
+
+	if err := app.Run(os.Args); err != nil {
+		fmt.Println(err)
+	}
+}
