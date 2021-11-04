@@ -101,6 +101,14 @@ follows:
 6 bytes of a unix timestamp (should give us until the year 10k or so) -
 `payload` - N bytes for the payload
 
+#### func  Parse
+
+```go
+func Parse(ulid string) (ULID, error)
+```
+Parse accepts a ULID string and attempts to extract a ULID from the provided
+string.
+
 #### func (ULID) Payload
 
 ```go
@@ -114,6 +122,14 @@ Payload returns a copy of the payload bytes.
 func (ulid ULID) Skew() byte
 ```
 Skew returns the current skew used to correct massive time skews.
+
+#### func (ULID) String
+
+```go
+func (ulid ULID) String() string
+```
+String returns a string representation of the payload. It's encoded using a
+crockford base32 encoding.
 
 #### func (ULID) Timestamp
 
