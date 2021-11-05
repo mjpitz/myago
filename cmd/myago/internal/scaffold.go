@@ -50,53 +50,53 @@ type Rendering struct {
 	Render     func(t *Template, out io.Writer) error
 }
 
-var renderings = []*Rendering{
-	{
-		OutputFile: "cmd/{{ .Name }}/docker-compose.yaml",
-		Render:     renderTemplateFile("docker-compose.yaml.tmpl"),
-	},
-	{
-		OutputFile: "cmd/{{ .Name }}/Dockerfile",
-		Render:     renderTemplateFile("Dockerfile.tmpl"),
-	},
-	{
-		OutputFile: "cmd/{{ .Name }}/main.go",
-		Render:     renderTemplateFile("main.go.tmpl"),
-	},
-	{
-		OutputFile: "internal/commands/version.go",
-		Render:     renderTemplateFile("version.go.tmpl"),
-	},
-	{
-		OutputFile: "legal/header.txt",
-		Render:     renderTemplateFile("header.txt.tmpl"),
-	},
-	{
-		OutputFile: "go.mod",
-		Render:     renderTemplateFile("go.mod.tmpl"),
-	},
-	{
-		OutputFile: "goreleaser.yaml",
-		Render:     renderTemplateFile("goreleaser.yaml.tmpl"),
-	},
-	{
-		OutputFile: "LICENSE",
-		Render: func(t *Template, out io.Writer) error {
-			resp, err := http.Get(fmt.Sprintf(licenseTemplate, t.Config.License))
-			if err != nil {
-				return err
-			}
-			defer resp.Body.Close()
-
-			_, err = io.Copy(out, resp.Body)
-			return err
-		},
-	},
-}
-
 const licenseTemplate = `https://raw.githubusercontent.com/licenses/license-templates/master/templates/%s.txt`
 
 var (
+	renderings = []*Rendering{
+		{
+			OutputFile: "cmd/{{ .Name }}/docker-compose.yaml",
+			Render:     renderTemplateFile("docker-compose.yaml.tmpl"),
+		},
+		{
+			OutputFile: "cmd/{{ .Name }}/Dockerfile",
+			Render:     renderTemplateFile("Dockerfile.tmpl"),
+		},
+		{
+			OutputFile: "cmd/{{ .Name }}/main.go",
+			Render:     renderTemplateFile("main.go.tmpl"),
+		},
+		{
+			OutputFile: "internal/commands/version.go",
+			Render:     renderTemplateFile("version.go.tmpl"),
+		},
+		{
+			OutputFile: "legal/header.txt",
+			Render:     renderTemplateFile("header.txt.tmpl"),
+		},
+		{
+			OutputFile: "go.mod",
+			Render:     renderTemplateFile("go.mod.tmpl"),
+		},
+		{
+			OutputFile: "goreleaser.yaml",
+			Render:     renderTemplateFile("goreleaser.yaml.tmpl"),
+		},
+		{
+			OutputFile: "LICENSE",
+			Render: func(t *Template, out io.Writer) error {
+				resp, err := http.Get(fmt.Sprintf(licenseTemplate, t.Config.License))
+				if err != nil {
+					return err
+				}
+				defer resp.Body.Close()
+
+				_, err = io.Copy(out, resp.Body)
+				return err
+			},
+		},
+	}
+
 	scaffoldConfig = &ScaffoldConfig{}
 
 	ScaffoldCommand = &cli.Command{
