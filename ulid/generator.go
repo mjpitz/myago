@@ -36,13 +36,13 @@ func (g *BaseGenerator) Generate(bits int) (ULID, error) {
 		return nil, ErrInvalidBitCount
 	}
 
-	unix := uint64(g.Clock.Now().Unix())
-	seconds := make([]byte, 8)
-	binary.BigEndian.PutUint64(seconds, unix)
+	unixmillis := uint64(g.Clock.Now().UnixMilli())
+	millis := make([]byte, 8)
+	binary.BigEndian.PutUint64(millis, unixmillis)
 
 	ulid := make(ULID, bits/8)
 	ulid[SkewOffset] = g.Skew
-	copy(ulid[UnixOffset:PayloadOffset], seconds[2:8])
+	copy(ulid[UnixOffset:PayloadOffset], millis[2:8])
 
 	return ulid, nil
 }

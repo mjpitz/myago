@@ -4,8 +4,9 @@ import (
 	"testing"
 
 	"github.com/jonboulle/clockwork"
-	"github.com/mjpitz/myago/ulid"
 	"github.com/stretchr/testify/require"
+
+	"github.com/mjpitz/myago/ulid"
 )
 
 func TestGenerator(t *testing.T) {
@@ -17,57 +18,74 @@ func TestGenerator(t *testing.T) {
 		},
 	}
 
-	{
-		ulid, err := generator.Generate(32)
-		require.Error(t, err)
-		require.Equal(t, "must be at least 64 bits", err.Error())
-		require.Nil(t, ulid)
+	testCases := []struct {
+		name string
+		bits int
+		// expectations
+		error      bool
+		errorMsg   string
+		skew       byte
+		millis     int64
+		payloadLen int
+	}{
+		{
+			name:     "32 bit ulid",
+			bits:     32,
+			error:    true,
+			errorMsg: "must be at least 64 bits",
+		},
+		{
+			name:     "67 bit ulid",
+			bits:     67,
+			error:    true,
+			errorMsg: "bits must be divisible by 8",
+		},
+		{
+			name:       "64 bit ulid",
+			bits:       64,
+			skew:       1,
+			millis:     clock.Now().UnixMilli(),
+			payloadLen: 1,
+		},
+		{
+			name:       "96 bit ulid",
+			bits:       96,
+			skew:       1,
+			millis:     clock.Now().UnixMilli(),
+			payloadLen: 5,
+		},
+		{
+			name:       "128 bit ulid",
+			bits:       128,
+			skew:       1,
+			millis:     clock.Now().UnixMilli(),
+			payloadLen: 9,
+		},
+		{
+			name:       "256 bit ulid",
+			bits:       256,
+			skew:       1,
+			millis:     clock.Now().UnixMilli(),
+			payloadLen: 25,
+		},
 	}
 
-	{
-		ulid, err := generator.Generate(67)
-		require.Error(t, err)
-		require.Equal(t, "bits must be divisible by 8", err.Error())
-		require.Nil(t, ulid)
-	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			ulid, err := generator.Generate(testCase.bits)
 
-	{
-		ulid, err := generator.Generate(64)
-		require.NoError(t, err)
-		require.Equal(t, byte(1), ulid.Skew())
-		require.Equal(t, clock.Now().Unix(), ulid.Timestamp().Unix())
-		require.Len(t, ulid.Payload(), 1)
+			if testCase.error {
+				require.Error(t, err)
+				require.Equal(t, testCase.errorMsg, err.Error())
+				require.Nil(t, ulid)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, testCase.skew, ulid.Skew())
+				require.Equal(t, testCase.millis, ulid.Timestamp().UnixMilli())
+				require.Len(t, ulid.Payload(), testCase.payloadLen)
 
-		t.Log("ulid(64): ", ulid.String())
-	}
-
-	{
-		ulid, err := generator.Generate(96)
-		require.NoError(t, err)
-		require.Equal(t, byte(1), ulid.Skew())
-		require.Equal(t, clock.Now().Unix(), ulid.Timestamp().Unix())
-		require.Len(t, ulid.Payload(), 5)
-
-		t.Log("ulid(96): ", ulid.String())
-	}
-
-	{
-		ulid, err := generator.Generate(128)
-		require.NoError(t, err)
-		require.Equal(t, byte(1), ulid.Skew())
-		require.Equal(t, clock.Now().Unix(), ulid.Timestamp().Unix())
-		require.Len(t, ulid.Payload(), 9)
-
-		t.Log("ulid(128): ", ulid.String())
-	}
-
-	{
-		ulid, err := generator.Generate(256)
-		require.NoError(t, err)
-		require.Equal(t, byte(1), ulid.Skew())
-		require.Equal(t, clock.Now().Unix(), ulid.Timestamp().Unix())
-		require.Len(t, ulid.Payload(), 25)
-
-		t.Log("ulid(256): ", ulid.String())
+				t.Log("ulid", testCase.bits, ulid.String())
+			}
+		})
 	}
 }

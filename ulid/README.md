@@ -9,6 +9,14 @@ provide a custom payload, simply extend the BaseGenerator, and override the
 Generate method. It's important to call the BaseGenerator's Generate method,
 otherwise the skew and timestamp bits won't be set properly.
 
+Unlike the canonical [ULID](https://github.com/ulid/spec), this version holds a
+placeholder byte for major clock skews which can often occur in distributed
+systems. The wire format is as follows: `[ skew ][ millis ][ payload ]`
+
+    - `skew` - 1 byte used to handle major clock skews (reserved, unused)
+    - `millis` - 6 bytes of a unix timestamp (should give us until the year 10k or so)
+    - `payload` - N bytes for the payload
+
 ## Usage
 
 ```go
@@ -92,14 +100,7 @@ func (g *RandomGenerator) Generate(bits int) (ULID, error)
 type ULID []byte
 ```
 
-ULID is a generalized, unique lexographical identifier. The format is as
-follows:
-
-`[ skew ][ sec ][ payload ]`
-
-- `skew` - 1 byte used to handle major clock skews (reserved, unused) - `sec` -
-6 bytes of a unix timestamp (should give us until the year 10k or so) -
-`payload` - N bytes for the payload
+ULID is a variable-length, generalized, unique lexographical identifier.
 
 #### func  Parse
 
@@ -108,6 +109,13 @@ func Parse(ulid string) (ULID, error)
 ```
 Parse accepts a ULID string and attempts to extract a ULID from the provided
 string.
+
+#### func (ULID) Bytes
+
+```go
+func (ulid ULID) Bytes() []byte
+```
+Bytes returns a copy of the underlying byte array backing the ulid.
 
 #### func (ULID) Payload
 
