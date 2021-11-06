@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/rand"
-	"encoding/binary"
 	"fmt"
 	"io"
 	"os"
@@ -113,12 +112,10 @@ func TestPaxos(t *testing.T) {
 	waitForStartup.Wait()
 
 	t.Log("picking random proposer")
-	data := make([]byte, 8)
+	data := make([]byte, 1)
 	_, err := io.ReadFull(rand.Reader, data)
 	require.NoError(t, err)
-
-	val := binary.BigEndian.Uint64(data)
-	idx := int(val % uint64(len(paxi)))
+	idx := int(data[0]) % len(paxi)
 
 	t.Log("proposing value")
 	request := []byte("hello paxos")
