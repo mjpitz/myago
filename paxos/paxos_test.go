@@ -14,11 +14,12 @@ import (
 	"time"
 
 	"github.com/jonboulle/clockwork"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/sync/errgroup"
+
 	"github.com/mjpitz/myago/cluster"
 	"github.com/mjpitz/myago/paxos"
 	"github.com/mjpitz/myago/yarpc"
-	"github.com/stretchr/testify/require"
-	"golang.org/x/sync/errgroup"
 )
 
 func TestPaxos(t *testing.T) {
@@ -87,7 +88,7 @@ func TestPaxos(t *testing.T) {
 	membership.Add(socks)
 
 	waitForStartup := sync.WaitGroup{}
-	waitForStartup.Add(len(paxi))
+	waitForStartup.Add(len(paxi) + 1)
 
 	// spin up observers and acceptors
 	group, ctx := errgroup.WithContext(ctx)
@@ -103,13 +104,13 @@ func TestPaxos(t *testing.T) {
 	}
 
 	go func() {
+		waitForStartup.Done()
 		err := group.Wait()
 		require.NoError(t, err)
 	}()
 
 	t.Log("waiting for startup")
 	waitForStartup.Wait()
-	time.Sleep(5 * time.Second)
 
 	t.Log("picking random proposer")
 	data := make([]byte, 8)

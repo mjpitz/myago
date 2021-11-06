@@ -44,7 +44,7 @@ func (p *Proposer) Propose(ctx context.Context, value []byte) (accepted []byte, 
 		}
 
 		accepted = value
-		if promise.Accepted != nil {
+		if promise.Accepted != nil && len(promise.Accepted.Value) > 0 {
 			accepted = promise.Accepted.Value
 		}
 

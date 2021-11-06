@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/cenkalti/backoff/v4"
+
 	"github.com/mjpitz/myago/cluster"
 )
 
@@ -117,15 +118,15 @@ func (o *Observer) Start(ctx context.Context, membership *cluster.Membership) er
 			}
 
 			for _, left := range change.Left {
-				if c, ok := idx[left]; ok {
-					c()
+				if cancel, ok := idx[left]; ok {
+					cancel()
 					delete(idx, left)
 				}
 			}
 
 			for _, removed := range change.Removed {
-				if c, ok := idx[removed]; ok {
-					c()
+				if cancel, ok := idx[removed]; ok {
+					cancel()
 					delete(idx, removed)
 				}
 			}

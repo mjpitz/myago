@@ -7,6 +7,7 @@ import (
 	"sync/atomic"
 
 	"github.com/cenkalti/backoff/v4"
+
 	"github.com/mjpitz/myago/cluster"
 )
 
@@ -26,7 +27,7 @@ func (m *MultiAcceptorClient) Prepare(ctx context.Context, request *Request) (*P
 	majority := int(atomic.LoadInt32(&(m.majority)))
 	size := int(atomic.LoadInt32(&(m.size)))
 
-	if size == 0 {
+	if size == 0 || size < majority {
 		return &Promise{}, nil
 	}
 
