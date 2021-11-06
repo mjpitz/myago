@@ -85,8 +85,8 @@ github.com/mitchellh/cli v1.1.0/go.mod h1:xcISNoH86gajksDmfB23e/pu+B+GeFRMYmoHXx
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
 github.com/mitchellh/mapstructure v0.0.0-20160808181253-ca63d7c062ee/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
-github.com/mjpitz/myago v0.0.0-20211104051316-a7cbbf1f8822 h1:grqNYUMFoX7TJbCLDffQOpW3JwlO7Wa7J6ln4b1O0gk=
-github.com/mjpitz/myago v0.0.0-20211104051316-a7cbbf1f8822/go.mod h1:BOf0+QROH7398pkY1N36FdoUx2bWPm6XByNgY2NRjKc=
+github.com/mjpitz/myago v0.0.0-20211105193444-06c4049d442e h1:FBwiZihcEOn18UBKI/s5r1d04LccM8SD6IPbqa4k99c=
+github.com/mjpitz/myago v0.0.0-20211105193444-06c4049d442e/go.mod h1:ejWv6BCaj7tzv24oCNlMn/bNUhPh6LKr6LyV7Hlz0XQ=
 github.com/panjf2000/ants/v2 v2.4.6/go.mod h1:f6F0NZVFsGCp5A7QW/Zj/m92atWwOkY0OIhFxRNFr4A=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
