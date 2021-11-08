@@ -2,6 +2,8 @@
 
 My collection of Golang (Go) utilities for building distributed systems. Not really intended to be used by others, but feel free to poke around.
 
+- [`authors`][] contains code for parsing `AUTHORS` file contents.
+- [`clocks`][] contains code for managing clocks on contexts.
 - [`cluster`][] contains code for forming pools of nodes into clusters.
 - [`flagset`][] contains opinionated code for parsing Go structs into urfave/cli flags.
 - [`leaderless`][] forms a `farm128` consistent hash ring to coordinate work within a cluster without the need for election.
@@ -10,6 +12,8 @@ My collection of Golang (Go) utilities for building distributed systems. Not rea
 - [`ulid`][] provides code for generating variable length unique, lexigraphic identifiers (ULID) with programmable fills.
 - [`yarpc`][] is yet another RPC framework, built on top of HashiCorp Yamux with the simplicity of `http`.
 
+[`authors`]: authors
+[`clocks`]: clocks
 [`cluster`]: cluster
 [`flagset`]: flagset
 [`leaderless`]: leaderless
