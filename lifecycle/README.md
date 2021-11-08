@@ -29,3 +29,41 @@ this point.
 func Setup(ctx context.Context) context.Context
 ```
 Setup initializes a shutdown hook that cancels the underlying context.
+
+#### type LifeCycle
+
+```go
+type LifeCycle struct {
+}
+```
+
+LifeCycle hooks into various lifecycle events. It allows functions to be
+deferred en masse.
+
+#### func (*LifeCycle) Defer
+
+```go
+func (lc *LifeCycle) Defer(fn func(ctx context.Context))
+```
+Defer will enqueue a function that will be invoked by Resolve.
+
+#### func (*LifeCycle) Resolve
+
+```go
+func (lc *LifeCycle) Resolve(ctx context.Context)
+```
+Resolve will process all functions that have been enqueued by Defer up until
+this point.
+
+#### func (*LifeCycle) Setup
+
+```go
+func (lc *LifeCycle) Setup(ctx context.Context) context.Context
+```
+Setup initializes a shutdown hook that cancels the underlying context.
+
+#### func (*LifeCycle) Shutdown
+
+```go
+func (lc *LifeCycle) Shutdown(ctx context.Context)
+```
