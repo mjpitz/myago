@@ -10,7 +10,9 @@ My collection of Golang (Go) utilities for building distributed systems. Not rea
 - [`lifecycle`][] provides hooks into the lifecycle of an application.
 - [`paxos`][] provides a paxos implementation.
 - [`ulid`][] provides code for generating variable length unique, lexigraphic identifiers (ULID) with programmable fills.
+- [`vfs`][] provides code for managing file systems through afero.
 - [`yarpc`][] is yet another RPC framework, built on top of HashiCorp Yamux with the simplicity of `http`.
+- [`zaputil`][] is a collection of logging utilities for zap.
 
 [`authors`]: authors
 [`clocks`]: clocks
@@ -20,4 +22,6 @@ My collection of Golang (Go) utilities for building distributed systems. Not rea
 [`lifecycle`]: lifecycle
 [`paxos`]: paxos
 [`ulid`]: ulid
+[`vfs`]: vfs
 [`yarpc`]: yarpc
+[`zaputil`]: zaputil
