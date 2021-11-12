@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/urfave/cli/v2"
 )
@@ -41,7 +42,7 @@ func extract(prefix, envPrefix []string, value reflect.Value) []cli.Flag {
 
 		var err error
 		switch field.Type.Kind() {
-		case reflect.Struct, reflect.Ptr:
+		case reflect.Struct:
 			pre := append([]string{}, prefix...)
 			envPre := append([]string{}, envPrefix...)
 
@@ -51,59 +52,85 @@ func extract(prefix, envPrefix []string, value reflect.Value) []cli.Flag {
 			}
 
 			flags = append(flags, extract(pre, envPre, fieldValue)...)
-		case reflect.String:
-			flag := &cli.StringFlag{
+			continue
+		}
+
+		switch fieldValue.Interface().(type) {
+		case time.Duration:
+			flag := &cli.DurationFlag{
 				Name:        flagName,
 				Aliases:     aliases,
 				Usage:       field.Tag.Get("usage"),
 				EnvVars:     []string{envName},
-				Destination: fieldValue.Addr().Interface().(*string),
-				Value:       defaultTag,
+				Destination: fieldValue.Addr().Interface().(*time.Duration),
 			}
 
 			if !fieldValue.IsZero() {
-				flag.Value = fieldValue.String()
-			}
-
-			flags = append(flags, flag)
-		case reflect.Int:
-			flag := &cli.IntFlag{
-				Name:        flagName,
-				Aliases:     aliases,
-				Usage:       field.Tag.Get("usage"),
-				EnvVars:     []string{envName},
-				Destination: fieldValue.Addr().Interface().(*int),
-			}
-
-			if !fieldValue.IsZero() {
-				flag.Value = int(fieldValue.Int())
+				flag.Value = fieldValue.Interface().(time.Duration)
 			} else if defaultTag != "" {
-				flag.Value, err = strconv.Atoi(defaultTag)
+				flag.Value, err = time.ParseDuration(defaultTag)
 				if err != nil {
-					panic(fmt.Sprintf("invalid int default: %s", defaultTag))
+					panic(fmt.Sprintf("invalid duration default: %s", defaultTag))
 				}
 			}
 
 			flags = append(flags, flag)
-		case reflect.Bool:
-			flag := &cli.BoolFlag{
-				Name:        flagName,
-				Aliases:     aliases,
-				Usage:       field.Tag.Get("usage"),
-				EnvVars:     []string{envName},
-				Destination: fieldValue.Addr().Interface().(*bool),
-			}
-
-			if !fieldValue.IsZero() {
-				flag.Value = fieldValue.Bool()
-			} else if defaultTag != "" {
-				flag.Value, err = strconv.ParseBool(defaultTag)
-				if err != nil {
-					panic(fmt.Sprintf("invalid bool default: %s", defaultTag))
+		default:
+			switch field.Type.Kind() {
+			case reflect.String:
+				flag := &cli.StringFlag{
+					Name:        flagName,
+					Aliases:     aliases,
+					Usage:       field.Tag.Get("usage"),
+					EnvVars:     []string{envName},
+					Destination: fieldValue.Addr().Interface().(*string),
+					Value:       defaultTag,
 				}
-			}
 
-			flags = append(flags, flag)
+				if !fieldValue.IsZero() {
+					flag.Value = fieldValue.String()
+				}
+
+				flags = append(flags, flag)
+			case reflect.Int:
+				flag := &cli.IntFlag{
+					Name:        flagName,
+					Aliases:     aliases,
+					Usage:       field.Tag.Get("usage"),
+					EnvVars:     []string{envName},
+					Destination: fieldValue.Addr().Interface().(*int),
+				}
+
+				if !fieldValue.IsZero() {
+					flag.Value = int(fieldValue.Int())
+				} else if defaultTag != "" {
+					flag.Value, err = strconv.Atoi(defaultTag)
+					if err != nil {
+						panic(fmt.Sprintf("invalid int default: %s", defaultTag))
+					}
+				}
+
+				flags = append(flags, flag)
+			case reflect.Bool:
+				flag := &cli.BoolFlag{
+					Name:        flagName,
+					Aliases:     aliases,
+					Usage:       field.Tag.Get("usage"),
+					EnvVars:     []string{envName},
+					Destination: fieldValue.Addr().Interface().(*bool),
+				}
+
+				if !fieldValue.IsZero() {
+					flag.Value = fieldValue.Bool()
+				} else if defaultTag != "" {
+					flag.Value, err = strconv.ParseBool(defaultTag)
+					if err != nil {
+						panic(fmt.Sprintf("invalid bool default: %s", defaultTag))
+					}
+				}
+
+				flags = append(flags, flag)
+			}
 		}
 	}
 
