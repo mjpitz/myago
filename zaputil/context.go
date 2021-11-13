@@ -4,9 +4,11 @@ import (
 	"context"
 
 	"go.uber.org/zap"
+
+	"github.com/mjpitz/myago"
 )
 
-var contextKey = &struct{}{}
+var contextKey = myago.ContextKey("zap")
 
 var defaultLogger = zap.NewNop()
 

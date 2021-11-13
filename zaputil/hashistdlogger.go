@@ -49,7 +49,9 @@ var _ io.Writer = &hashiWriter{}
 // HashicorpStdLogger wraps the provided logger with a golang logger to log messages at the appropriate level using the
 // Hashicorp log format. Useful for replacing serf and membership loggers.
 func HashicorpStdLogger(logger *zap.Logger) *log.Logger {
-	return log.New(&hashiWriter{
+	w := &hashiWriter{
 		logger: logger.WithOptions(zap.AddCallerSkip(3)),
-	}, "", 0)
+	}
+
+	return log.New(w, "", 0)
 }
