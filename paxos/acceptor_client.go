@@ -23,6 +23,7 @@ func sendPrepare(ctx context.Context, member string, client AcceptorClient, requ
 	ch <- &Vote{Member: member, Payload: promise}
 }
 
+// nolint:cyclop
 func (m *MultiAcceptorClient) Prepare(ctx context.Context, request *Request) (*Promise, error) {
 	majority := int(atomic.LoadInt32(&(m.majority)))
 	size := int(atomic.LoadInt32(&(m.size)))
@@ -39,6 +40,7 @@ func (m *MultiAcceptorClient) Prepare(ctx context.Context, request *Request) (*P
 		client := value.(AcceptorClient)
 
 		go sendPrepare(ctx, member, client, request, votes)
+
 		return true
 	})
 
@@ -116,6 +118,7 @@ func (m *MultiAcceptorClient) Accept(ctx context.Context, in *Proposal) (*Propos
 
 		go sendAccept(ctx, member, client, in, votes)
 		sent++
+
 		return true
 	})
 
@@ -163,6 +166,7 @@ func (m *MultiAcceptorClient) add(ctx context.Context, member string) {
 	var err error
 	err = backoff.Retry(func() error {
 		client, err = m.Dialer(ctx, member)
+
 		return err
 	}, backoff.WithContext(backoff.NewExponentialBackOff(), ctx))
 
@@ -177,7 +181,7 @@ func (m *MultiAcceptorClient) add(ctx context.Context, member string) {
 	}
 }
 
-func (m *MultiAcceptorClient) remove(ctx context.Context, member string) {
+func (m *MultiAcceptorClient) remove(_ context.Context, member string) {
 	_, loaded := m.cache.LoadAndDelete(member)
 	if loaded {
 		atomic.AddInt32(&(m.size), -1)

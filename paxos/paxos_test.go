@@ -21,7 +21,10 @@ import (
 	"github.com/mjpitz/myago/yarpc"
 )
 
+// nolint:funlen // idc about length for tests
 func TestPaxos(t *testing.T) {
+	t.Parallel()
+
 	network := "unix"
 	clock := clockwork.NewFakeClock()
 
@@ -57,6 +60,7 @@ func TestPaxos(t *testing.T) {
 
 	paxi := make([]*paxos.Paxos, 0, numServers)
 	svrs := make([]*yarpc.Server, 0, numServers)
+
 	defer func() {
 		for _, svr := range svrs {
 			_ = svr.Shutdown()
@@ -75,6 +79,7 @@ func TestPaxos(t *testing.T) {
 		paxos.RegisterYarpcObserverServer(svr, pax)
 
 		svrContext := yarpc.WithContext(ctx)
+
 		go func() {
 			_ = svr.ListenAndServe(network, sock, svrContext)
 		}()
@@ -97,6 +102,7 @@ func TestPaxos(t *testing.T) {
 	submitToGroup := func(pax *paxos.Paxos) {
 		group.Go(func() error {
 			waitForStartup.Done()
+
 			return pax.Start(ctx, membership)
 		})
 	}
@@ -107,8 +113,7 @@ func TestPaxos(t *testing.T) {
 
 	go func() {
 		waitForStartup.Done()
-		err := group.Wait()
-		require.NoError(t, err)
+		_ = group.Wait()
 	}()
 
 	t.Log("waiting for startup")
@@ -132,6 +137,7 @@ func TestPaxos(t *testing.T) {
 
 	proposal := &paxos.Proposal{}
 	attempt := 1
+
 	for proposal.ID == 0 {
 		t.Log("awaiting observer log attempt: ", attempt)
 		time.Sleep(time.Second)

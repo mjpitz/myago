@@ -57,6 +57,7 @@ func (p *Proposer) Propose(ctx context.Context, value []byte) (accepted []byte, 
 		}
 
 		accepted = proposal.Value
+
 		return nil
 	}, backoff.NewExponentialBackOff())
 
@@ -67,5 +68,7 @@ func (p *Proposer) Propose(ctx context.Context, value []byte) (accepted []byte, 
 	return accepted, nil
 }
 
-var _ ProposerClient = &Proposer{}
-var _ ProposerServer = &Proposer{}
+var (
+	_ ProposerClient = &Proposer{}
+	_ ProposerServer = &Proposer{}
+)

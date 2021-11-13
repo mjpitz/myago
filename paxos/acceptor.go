@@ -123,5 +123,7 @@ func (a *acceptor) Observe(call *ObserveServerStream) error {
 	return err
 }
 
-var _ AcceptorServer = &acceptor{}
-var _ ObserverServer = &acceptor{}
+var (
+	_ AcceptorServer = &acceptor{}
+	_ ObserverServer = &acceptor{}
+)

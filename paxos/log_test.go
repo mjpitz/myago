@@ -5,11 +5,15 @@ import (
 	"testing"
 
 	"github.com/dgraph-io/badger/v3"
-	"github.com/mjpitz/myago/paxos"
 	"github.com/stretchr/testify/require"
+
+	"github.com/mjpitz/myago/paxos"
 )
 
-func testLog(t *testing.T, ctx context.Context, root paxos.Log) {
+// nolint:funlen // idc about length for tests
+func testLog(ctx context.Context, t *testing.T, root paxos.Log) {
+	t.Helper()
+
 	promiseLog := root.WithPrefix("promised/")
 	acceptedLog := root.WithPrefix("accepted/")
 
@@ -105,6 +109,7 @@ func testLog(t *testing.T, ctx context.Context, root paxos.Log) {
 		require.Equal(t, "hello-paxos", string(lastAccept.Value))
 	}
 
+	// nolint:dupl
 	{
 		t.Log("verifying observations")
 		observeStream := paxos.NewMockStream(5)
@@ -135,21 +140,26 @@ func testLog(t *testing.T, ctx context.Context, root paxos.Log) {
 }
 
 func TestBadger(t *testing.T) {
+	t.Parallel()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	db, err := badger.Open(badger.DefaultOptions(t.TempDir()).WithSyncWrites(true))
 	require.NoError(t, err)
+
 	defer db.Close()
 
 	root := &paxos.Badger{DB: db}
 
-	testLog(t, ctx, root)
+	testLog(ctx, t, root)
 }
 
 func TestMemory(t *testing.T) {
+	t.Parallel()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	testLog(t, ctx, &paxos.Memory{})
+	testLog(ctx, t, &paxos.Memory{})
 }

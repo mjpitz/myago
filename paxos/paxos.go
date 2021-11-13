@@ -6,8 +6,9 @@ import (
 	"sync"
 
 	"github.com/jonboulle/clockwork"
-	"github.com/mjpitz/myago/cluster"
 	"golang.org/x/sync/errgroup"
+
+	"github.com/mjpitz/myago/cluster"
 )
 
 // Config contains configurable elements of Paxos.
@@ -41,6 +42,7 @@ func (c *Config) Validate() error {
 	case c.ObserverDialer == nil:
 		return fmt.Errorf("missing observer dialer")
 	}
+
 	return nil
 }
 

@@ -46,5 +46,6 @@ type serverIDGenerator struct {
 func (s *serverIDGenerator) Next() (uint64, error) {
 	millisecond := s.clock.Now().UnixNano() / int64(time.Millisecond)
 	id := (uint64(millisecond) << 8) | uint64(s.serverID)
+
 	return id, nil
 }

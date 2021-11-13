@@ -64,6 +64,7 @@ func (c *yarpcAcceptorClient) Prepare(ctx context.Context, request *Request) (*P
 	}
 
 	promise := &Promise{}
+
 	return promise, stream.ReadMsg(promise)
 }
 
@@ -80,6 +81,7 @@ func (c *yarpcAcceptorClient) Accept(ctx context.Context, proposal *Proposal) (*
 	}
 
 	proposal = &Proposal{}
+
 	return proposal, stream.ReadMsg(proposal)
 }
 

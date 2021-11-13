@@ -23,6 +23,7 @@ func (m *mockAcceptor) Prepare(ctx context.Context, request *paxos.Request) (*pa
 	}
 
 	promise := &paxos.Promise{}
+
 	return promise, m.mockStream.ReadMsg(promise)
 }
 
@@ -33,6 +34,7 @@ func (m *mockAcceptor) Accept(ctx context.Context, proposal *paxos.Proposal) (*p
 	}
 
 	proposal = &paxos.Proposal{}
+
 	return proposal, m.mockStream.ReadMsg(proposal)
 }
 
@@ -47,8 +49,10 @@ func (m *mockAcceptor) Observe(ctx context.Context, request *paxos.Request) (*pa
 
 var _ paxos.AcceptorClient = &mockAcceptor{}
 
-// TestProposer_Simple runs a typical paxos run where the value proposed is the value
+// TestProposer_Simple runs a typical paxos run where the value proposed is the value.
 func TestProposer_Simple(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	clock := clockwork.NewFakeClockAt(time.Now())
 

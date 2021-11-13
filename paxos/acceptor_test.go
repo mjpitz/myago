@@ -4,11 +4,15 @@ import (
 	"context"
 	"testing"
 
-	"github.com/mjpitz/myago/paxos"
 	"github.com/stretchr/testify/require"
+
+	"github.com/mjpitz/myago/paxos"
 )
 
+// nolint:funlen // idc about length for tests
 func TestAcceptor(t *testing.T) {
+	t.Parallel()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -81,6 +85,7 @@ func TestAcceptor(t *testing.T) {
 		require.Equal(t, "hello-paxos", string(proposal.Value))
 	}
 
+	// nolint:dupl // idc about length for tests
 	{
 		t.Log("verifying observations")
 		observeStream := paxos.NewMockStream(5)

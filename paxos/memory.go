@@ -44,6 +44,7 @@ func (m *Memory) Record(id uint64, msg interface{}) error {
 		m.idLog = append(m.idLog[:idx], append([]uint64{id}, m.idLog[idx:]...)...)
 		m.msgLog = append(m.msgLog[:idx], append([][]byte{data}, m.msgLog[idx:]...)...)
 	}
+
 	return nil
 }
 

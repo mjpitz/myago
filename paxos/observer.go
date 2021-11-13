@@ -14,6 +14,7 @@ type Observer struct {
 	Log    Log
 }
 
+// nolint:cyclop
 func (o *Observer) observe(ctx context.Context, member string, lastAccepted *Proposal, votes chan *Vote) {
 	var client ObserverClient
 	var observations *ObserveClientStream
@@ -21,6 +22,7 @@ func (o *Observer) observe(ctx context.Context, member string, lastAccepted *Pro
 	var err error
 	err = backoff.Retry(func() error {
 		client, err = o.Dialer(ctx, member)
+
 		return err
 	}, backoff.WithContext(backoff.NewExponentialBackOff(), ctx))
 
@@ -34,6 +36,7 @@ func (o *Observer) observe(ctx context.Context, member string, lastAccepted *Pro
 			observations, err = client.Observe(ctx, &Request{
 				ID: lastAccepted.ID,
 			})
+
 			return err
 		}, backoff.WithContext(backoff.NewExponentialBackOff(), ctx))
 
@@ -68,6 +71,7 @@ func (o *Observer) observe(ctx context.Context, member string, lastAccepted *Pro
 	}
 }
 
+// nolint:gocognit,cyclop
 func (o *Observer) Start(ctx context.Context, membership *cluster.Membership) error {
 	lastAccepted := &Proposal{}
 	err := o.Log.Last(lastAccepted)
@@ -87,7 +91,7 @@ func (o *Observer) Start(ctx context.Context, membership *cluster.Membership) er
 	for {
 		select {
 		case <-ctx.Done():
-			return nil
+			return ctx.Err()
 		case vote := <-votes:
 			proposal := vote.Payload.(*Proposal)
 			id := proposal.ID
@@ -112,7 +116,9 @@ func (o *Observer) Start(ctx context.Context, membership *cluster.Membership) er
 			for _, active := range change.Active {
 				if _, ok := idx[active]; !ok {
 					child, childCancel := context.WithCancel(ctx)
+
 					go o.observe(child, active, lastAccepted, votes)
+
 					idx[active] = childCancel
 				}
 			}

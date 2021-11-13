@@ -307,6 +307,7 @@ func (m *MultiAcceptorClient) Accept(ctx context.Context, in *Proposal) (*Propos
 ```go
 func (m *MultiAcceptorClient) Prepare(ctx context.Context, request *Request) (*Promise, error)
 ```
+nolint:cyclop
 
 #### func (*MultiAcceptorClient) Start
 
@@ -366,6 +367,7 @@ Observer watches the Acceptors to learn about what values have been accepted.
 ```go
 func (o *Observer) Start(ctx context.Context, membership *cluster.Membership) error
 ```
+nolint:gocognit,cyclop
 
 #### type ObserverClient
 

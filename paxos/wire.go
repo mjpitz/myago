@@ -35,6 +35,7 @@ type ObserveServerStream struct {
 
 func (s *ObserveServerStream) Recv() (*Request, error) {
 	msg := &Request{}
+
 	return msg, s.ReadMsg(msg)
 }
 
@@ -48,6 +49,7 @@ type ObserveClientStream struct {
 
 func (s *ObserveClientStream) Recv() (*Proposal, error) {
 	msg := &Proposal{}
+
 	return msg, s.ReadMsg(msg)
 }
 

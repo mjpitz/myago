@@ -2,6 +2,7 @@ package paxos
 
 import (
 	"encoding/binary"
+	"errors"
 	"reflect"
 
 	"github.com/dgraph-io/badger/v3"
@@ -31,6 +32,7 @@ func (l *Badger) WithPrefix(prefix string) Log {
 
 	log.prefix = append(log.prefix, l.prefix...)
 	log.prefix = append(log.prefix, []byte(prefix)...)
+
 	return log
 }
 
@@ -43,9 +45,10 @@ func (l *Badger) Record(id uint64, msg interface{}) error {
 
 	return l.DB.Update(func(txn *badger.Txn) error {
 		_, err := txn.Get(key)
-		if err == badger.ErrKeyNotFound {
+		if errors.Is(err, badger.ErrKeyNotFound) {
 			err = txn.Set(key, val)
 		}
+
 		return err
 	})
 }
