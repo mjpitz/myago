@@ -12,6 +12,7 @@ type NoDiscovery struct {
 func (n *NoDiscovery) Start(ctx context.Context, membership *Membership) error {
 	membership.Add(n.Peers)
 	<-ctx.Done()
+
 	return nil
 }
 

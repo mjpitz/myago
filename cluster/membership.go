@@ -125,6 +125,7 @@ func (m *Membership) Remove(peers []string) {
 func (m *Membership) Majority() int {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+
 	return (len(m.active) + len(m.left) + 1) / 2
 }
 

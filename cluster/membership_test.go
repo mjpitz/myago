@@ -9,6 +9,8 @@ import (
 )
 
 func TestMembership(t *testing.T) {
+	t.Parallel()
+
 	membership := &cluster.Membership{}
 
 	{
