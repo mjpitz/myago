@@ -4,12 +4,14 @@ import (
 	"context"
 
 	"github.com/spf13/afero"
+
+	"github.com/mjpitz/myago"
 )
 
 // FS provides a file system abstraction.
 type FS = afero.Fs
 
-var contextKey = &struct{}{}
+var contextKey = myago.ContextKey("vfs")
 
 var defaultFS = afero.NewOsFs()
 

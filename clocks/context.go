@@ -4,9 +4,11 @@ import (
 	"context"
 
 	"github.com/jonboulle/clockwork"
+
+	"github.com/mjpitz/myago"
 )
 
-var contextKey = &struct{}{}
+var contextKey = myago.ContextKey("clocks")
 
 var defaultClock = clockwork.NewRealClock()
 
