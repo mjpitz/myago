@@ -1,0 +1,30 @@
+run:
+  concurrency: 2
+  timeout: 5m
+output:
+  format: line-number
+linters-settings:
+  funlen:
+    lines: 100
+    statements: 50
+linters:
+  enable-all: true
+  disable:
+    - tagliatelle
+    - gomnd
+    - gochecknoglobals
+    - exhaustive
+    - lll
+    - exhaustivestruct
+    - gci
+    - wsl
+    # eventually re-enable
+    - staticcheck
+    - forcetypeassert
+    - wrapcheck
+    - goerr113
+    # deprecated
+    - scopelint
+    - interfacer
+    - maligned
+    - golint
