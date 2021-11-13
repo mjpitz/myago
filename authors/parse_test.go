@@ -20,6 +20,8 @@ First Last <noreply@example.com>
 `
 
 func TestParse(t *testing.T) {
+	t.Parallel()
+
 	emptyAuthors := authors.Parse("")
 	require.Len(t, emptyAuthors, 0)
 
