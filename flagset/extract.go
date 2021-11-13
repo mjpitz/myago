@@ -11,138 +11,252 @@ import (
 )
 
 func format(prefix []string, name string) string {
-	envVar := name
+	val := name
 	for i := 1; i <= len(prefix); i++ {
-		envVar = prefix[len(prefix)-i] + "_" + envVar
+		val = prefix[len(prefix)-i] + "_" + val
 	}
-	return envVar
+
+	return val
 }
 
-func extract(prefix, envPrefix []string, value reflect.Value) []cli.Flag {
-	flags := make([]cli.Flag, 0)
+// Common encapsulates common elements across all flag types.
+type Common struct {
+	Name     string
+	FlagName string
+	Aliases  []string
+	Usage    string
+	EnvVars  []string
+	Default  string
+}
 
-	for i := 0; i < value.NumField(); i++ {
-		fieldValue := reflect.Indirect(value.Field(i))
-		field := value.Type().Field(i)
+// Extractor extracts flags from provided interfaces.
+type Extractor struct {
+	Prefix    []string
+	EnvPrefix []string
+}
 
-		name := strings.Split(field.Tag.Get("json"), ",")[0]
-		if name == "-" {
-			continue
+// Clone creates a copy of the current Extractor.
+func (f Extractor) Clone() Extractor {
+	nf := Extractor{}
+	nf.Prefix = append(nf.Prefix, f.Prefix...)
+	nf.EnvPrefix = append(nf.EnvPrefix, f.EnvPrefix...)
+
+	return nf
+}
+
+// Child creates a new Extractor and adds name to the end of the current Prefix.
+func (f Extractor) Child(name string) Extractor {
+	nf := f.Clone()
+	nf.Prefix = append(nf.Prefix, name)
+	nf.EnvPrefix = append(nf.EnvPrefix, name)
+
+	return nf
+}
+
+// Common returns the common metadata between all fields.
+func (f Extractor) Common(field reflect.StructField) *Common {
+	name := strings.Split(field.Tag.Get("json"), ",")[0]
+	if name == "-" {
+		return nil
+	}
+
+	common := &Common{
+		Name:     name,
+		FlagName: format(f.Prefix, name),
+		Usage:    field.Tag.Get("usage"),
+		EnvVars: []string{
+			strings.ToUpper(format(f.EnvPrefix, name)),
+		},
+		Default: field.Tag.Get("default"),
+	}
+
+	if alias := field.Tag.Get("aliases"); alias != "" {
+		common.Aliases = strings.Split(alias, ",")
+	} else if alias := field.Tag.Get("alias"); alias != "" {
+		common.Aliases = strings.Split(alias, ",")
+	}
+
+	if env := field.Tag.Get("env"); env != "" {
+		common.EnvVars = append(common.EnvVars, strings.Split(env, ",")...)
+	}
+
+	return common
+}
+
+// FormatDurationFlag creates a cli.DurationFlag for the given common configuration and value.
+func (f Extractor) FormatDurationFlag(common *Common, fieldValue reflect.Value) (flag *cli.DurationFlag, err error) {
+	flag = &cli.DurationFlag{
+		Name:        common.FlagName,
+		Aliases:     common.Aliases,
+		Usage:       common.Usage,
+		EnvVars:     common.EnvVars,
+		Destination: fieldValue.Addr().Interface().(*time.Duration),
+	}
+
+	if !fieldValue.IsZero() {
+		flag.Value = fieldValue.Interface().(time.Duration)
+	} else if common.Default != "" {
+		flag.Value, err = time.ParseDuration(common.Default)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return flag, nil
+}
+
+// FormatStringSliceFlag creates a cli.StringSliceFlag for the given common configuration and value.
+func (f Extractor) FormatStringSliceFlag(common *Common, fieldValue reflect.Value) (flag *cli.StringSliceFlag, err error) {
+	flag = &cli.StringSliceFlag{
+		Name:        common.FlagName,
+		Aliases:     common.Aliases,
+		Usage:       common.Usage,
+		EnvVars:     common.EnvVars,
+		Destination: fieldValue.Interface().(*cli.StringSlice),
+	}
+
+	if !fieldValue.IsZero() {
+		flag.Value = fieldValue.Interface().(*cli.StringSlice)
+	}
+
+	return flag, nil
+}
+
+// FormatStringFlag creates a cli.StringFlag for the given common configuration and value.
+func (f Extractor) FormatStringFlag(common *Common, fieldValue reflect.Value) (flag *cli.StringFlag, err error) {
+	flag = &cli.StringFlag{
+		Name:        common.FlagName,
+		Aliases:     common.Aliases,
+		Usage:       common.Usage,
+		EnvVars:     common.EnvVars,
+		Destination: fieldValue.Addr().Interface().(*string),
+		Value:       common.Default,
+	}
+
+	if !fieldValue.IsZero() {
+		flag.Value = fieldValue.String()
+	}
+
+	return flag, nil
+}
+
+// FormatIntFlag creates a cli.IntFlag for the given common configuration and value.
+func (f Extractor) FormatIntFlag(common *Common, fieldValue reflect.Value) (flag *cli.IntFlag, err error) {
+	flag = &cli.IntFlag{
+		Name:        common.FlagName,
+		Aliases:     common.Aliases,
+		Usage:       common.Usage,
+		EnvVars:     common.EnvVars,
+		Destination: fieldValue.Addr().Interface().(*int),
+	}
+
+	if !fieldValue.IsZero() {
+		flag.Value = int(fieldValue.Int())
+	} else if common.Default != "" {
+		flag.Value, err = strconv.Atoi(common.Default)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return flag, nil
+}
+
+// FormatBoolFlag creates a cli.BoolFlag for the given common configuration and value.
+func (f Extractor) FormatBoolFlag(common *Common, fieldValue reflect.Value) (flag *cli.BoolFlag, err error) {
+	flag = &cli.BoolFlag{
+		Name:        common.FlagName,
+		Aliases:     common.Aliases,
+		Usage:       common.Usage,
+		EnvVars:     common.EnvVars,
+		Destination: fieldValue.Addr().Interface().(*bool),
+	}
+
+	if !fieldValue.IsZero() {
+		flag.Value = fieldValue.Bool()
+	} else if common.Default != "" {
+		flag.Value, err = strconv.ParseBool(common.Default)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return flag, nil
+}
+
+func (f Extractor) extractField(fieldValue reflect.Value, field reflect.StructField) (flags []cli.Flag) {
+	// nolint:ifshort
+	common := f.Common(field)
+	if common == nil {
+		return
+	}
+
+	switch field.Type.Kind() {
+	case reflect.Struct:
+		formatter := f
+		if common.Name != "" {
+			formatter = f.Child(common.Name)
 		}
 
-		// all other data types
-		var aliases []string
-		if alias := field.Tag.Get("aliases"); alias != "" {
-			aliases = strings.Split(alias, ",")
+		return append(flags, formatter.extract(fieldValue)...)
+	case reflect.Ptr:
+		if fieldValue.IsNil() {
+			fieldValue.Set(reflect.New(field.Type.Elem()))
 		}
+	}
 
-		flagName := format(prefix, name)
-		envName := strings.ToUpper(format(envPrefix, name))
-		defaultTag := field.Tag.Get("default")
+	var flag cli.Flag
+	var err error
 
-		var err error
+	switch fieldValue.Interface().(type) {
+	case time.Duration:
+		flag, err = f.FormatDurationFlag(common, fieldValue)
+	case *cli.StringSlice:
+		flag, err = f.FormatStringSliceFlag(common, fieldValue)
+	default:
 		switch field.Type.Kind() {
-		case reflect.Struct:
-			pre := append([]string{}, prefix...)
-			envPre := append([]string{}, envPrefix...)
-
-			if name != "" {
-				pre = append(pre, name)
-				envPre = append(envPre, name)
-			}
-
-			flags = append(flags, extract(pre, envPre, fieldValue)...)
-			continue
+		case reflect.String:
+			flag, err = f.FormatStringFlag(common, fieldValue)
+		case reflect.Int:
+			flag, err = f.FormatIntFlag(common, fieldValue)
+		case reflect.Bool:
+			flag, err = f.FormatBoolFlag(common, fieldValue)
 		}
+	}
 
-		switch fieldValue.Interface().(type) {
-		case time.Duration:
-			flag := &cli.DurationFlag{
-				Name:        flagName,
-				Aliases:     aliases,
-				Usage:       field.Tag.Get("usage"),
-				EnvVars:     []string{envName},
-				Destination: fieldValue.Addr().Interface().(*time.Duration),
-			}
-
-			if !fieldValue.IsZero() {
-				flag.Value = fieldValue.Interface().(time.Duration)
-			} else if defaultTag != "" {
-				flag.Value, err = time.ParseDuration(defaultTag)
-				if err != nil {
-					panic(fmt.Sprintf("invalid duration default: %s", defaultTag))
-				}
-			}
-
-			flags = append(flags, flag)
-		default:
-			switch field.Type.Kind() {
-			case reflect.String:
-				flag := &cli.StringFlag{
-					Name:        flagName,
-					Aliases:     aliases,
-					Usage:       field.Tag.Get("usage"),
-					EnvVars:     []string{envName},
-					Destination: fieldValue.Addr().Interface().(*string),
-					Value:       defaultTag,
-				}
-
-				if !fieldValue.IsZero() {
-					flag.Value = fieldValue.String()
-				}
-
-				flags = append(flags, flag)
-			case reflect.Int:
-				flag := &cli.IntFlag{
-					Name:        flagName,
-					Aliases:     aliases,
-					Usage:       field.Tag.Get("usage"),
-					EnvVars:     []string{envName},
-					Destination: fieldValue.Addr().Interface().(*int),
-				}
-
-				if !fieldValue.IsZero() {
-					flag.Value = int(fieldValue.Int())
-				} else if defaultTag != "" {
-					flag.Value, err = strconv.Atoi(defaultTag)
-					if err != nil {
-						panic(fmt.Sprintf("invalid int default: %s", defaultTag))
-					}
-				}
-
-				flags = append(flags, flag)
-			case reflect.Bool:
-				flag := &cli.BoolFlag{
-					Name:        flagName,
-					Aliases:     aliases,
-					Usage:       field.Tag.Get("usage"),
-					EnvVars:     []string{envName},
-					Destination: fieldValue.Addr().Interface().(*bool),
-				}
-
-				if !fieldValue.IsZero() {
-					flag.Value = fieldValue.Bool()
-				} else if defaultTag != "" {
-					flag.Value, err = strconv.ParseBool(defaultTag)
-					if err != nil {
-						panic(fmt.Sprintf("invalid bool default: %s", defaultTag))
-					}
-				}
-
-				flags = append(flags, flag)
-			}
-		}
+	if err != nil {
+		panic(fmt.Sprintf("failed to format flag: %v", err))
+	} else if flag != nil {
+		flags = append(flags, flag)
 	}
 
 	return flags
 }
 
-// Extract parses the provided object to create a flagset.
-func Extract(v interface{}) []cli.Flag {
-	return extract(nil, nil, reflect.Indirect(reflect.ValueOf(v)))
+func (f Extractor) extract(value reflect.Value) (flags []cli.Flag) {
+	for i := 0; i < value.NumField(); i++ {
+		fieldValue := value.Field(i)
+		field := value.Type().Field(i)
+
+		flags = append(flags, f.extractField(fieldValue, field)...)
+	}
+
+	return flags
 }
 
-// ExtractPrefix parses the provided to create a flagset with the provided prefix.
+// Extract returns the set of flags associated with the provided structure.
+func (f Extractor) Extract(v interface{}) []cli.Flag {
+	return f.extract(reflect.Indirect(reflect.ValueOf(v)))
+}
+
+// Extract parses the provided object to create a flagset.
+func Extract(v interface{}) []cli.Flag {
+	return Extractor{}.Extract(v)
+}
+
+// ExtractPrefix parses the provided to create a flagset with the provided Prefix.
 func ExtractPrefix(prefix string, v interface{}) []cli.Flag {
-	return extract(nil, []string{prefix}, reflect.Indirect(reflect.ValueOf(v)))
+	return Extractor{
+		EnvPrefix: []string{prefix},
+	}.Extract(v)
 }
