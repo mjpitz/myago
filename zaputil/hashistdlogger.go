@@ -9,7 +9,7 @@ import (
 )
 
 // hashiWriter parses lines written from the Hashicorp ecosystem to proper log levels for zap. The format is as follows:
-// [LEVEL] system: message
+// [LEVEL] system: message.
 type hashiWriter struct {
 	logger *zap.Logger
 }
@@ -49,6 +49,7 @@ var _ io.Writer = &hashiWriter{}
 // HashicorpStdLogger wraps the provided logger with a golang logger to log messages at the appropriate level using the
 // Hashicorp log format. Useful for replacing serf and membership loggers.
 func HashicorpStdLogger(logger *zap.Logger) *log.Logger {
-	logger = logger.WithOptions(zap.AddCallerSkip(3))
-	return log.New(&hashiWriter{logger}, "", 0)
+	return log.New(&hashiWriter{
+		logger: logger.WithOptions(zap.AddCallerSkip(3)),
+	}, "", 0)
 }

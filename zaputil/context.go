@@ -16,6 +16,7 @@ func Extract(ctx context.Context) *zap.Logger {
 	if log == nil {
 		return defaultLogger
 	}
+
 	return log.(*zap.Logger)
 }
 
