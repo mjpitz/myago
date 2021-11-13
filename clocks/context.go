@@ -18,6 +18,7 @@ func Extract(ctx context.Context) clockwork.Clock {
 	if clock == nil {
 		return defaultClock
 	}
+
 	return clock.(clockwork.Clock)
 }
 
