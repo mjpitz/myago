@@ -20,14 +20,12 @@ const (
 
 	// PayloadOffset is the starting byte position for the payload data.
 	PayloadOffset = 7
-	// PayloadLength varies by number of bits
+	// PayloadLength varies by number of bits.
 )
 
-var (
-	crockfordBase32 = base32.
-		NewEncoding("0123456789ABCDEFGHJKMNPQRSTVWXYZ").
-		WithPadding(base32.NoPadding)
-)
+var crockfordBase32 = base32.
+	NewEncoding("0123456789ABCDEFGHJKMNPQRSTVWXYZ").
+	WithPadding(base32.NoPadding)
 
 // Parse accepts a ULID string and attempts to extract a ULID from the provided string.
 func Parse(ulid string) (ULID, error) {
@@ -58,6 +56,7 @@ func (ulid ULID) Skew() byte {
 // Timestamp returns the timestamp portion of the identifier.
 func (ulid ULID) Timestamp() time.Time {
 	millis := binary.BigEndian.Uint64(append(make([]byte, 2), ulid[UnixOffset:UnixOffset+UnixLength]...))
+
 	return time.UnixMilli(int64(millis))
 }
 

@@ -79,5 +79,6 @@ func (g *RandomGenerator) Generate(bits int) (ULID, error) {
 	}
 
 	copy(base[PayloadOffset:], random)
+
 	return base, nil
 }

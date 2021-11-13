@@ -9,6 +9,8 @@ import (
 )
 
 func TestParse(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		name string
 		ulid string
@@ -48,13 +50,13 @@ func TestParse(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			u, err := ulid.Parse(testCase.ulid)
-			require.NoError(t, err)
+		t.Log(testCase.name)
 
-			require.Equal(t, testCase.skew, u.Skew())
-			require.Equal(t, testCase.millis, u.Timestamp().UnixMilli())
-			require.Len(t, u.Payload(), testCase.payloadLen)
-		})
+		u, err := ulid.Parse(testCase.ulid)
+		require.NoError(t, err)
+
+		require.Equal(t, testCase.skew, u.Skew())
+		require.Equal(t, testCase.millis, u.Timestamp().UnixMilli())
+		require.Len(t, u.Payload(), testCase.payloadLen)
 	}
 }

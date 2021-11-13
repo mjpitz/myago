@@ -10,6 +10,8 @@ import (
 )
 
 func TestGenerator(t *testing.T) {
+	t.Parallel()
+
 	clock := clockwork.NewFakeClock()
 	generator := &ulid.RandomGenerator{
 		BaseGenerator: ulid.BaseGenerator{
@@ -71,21 +73,21 @@ func TestGenerator(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			ulid, err := generator.Generate(testCase.bits)
+		t.Log(testCase.name)
 
-			if testCase.error {
-				require.Error(t, err)
-				require.Equal(t, testCase.errorMsg, err.Error())
-				require.Nil(t, ulid)
-			} else {
-				require.NoError(t, err)
-				require.Equal(t, testCase.skew, ulid.Skew())
-				require.Equal(t, testCase.millis, ulid.Timestamp().UnixMilli())
-				require.Len(t, ulid.Payload(), testCase.payloadLen)
+		ulid, err := generator.Generate(testCase.bits)
 
-				t.Log("ulid", testCase.bits, ulid.String())
-			}
-		})
+		if testCase.error {
+			require.Error(t, err)
+			require.Equal(t, testCase.errorMsg, err.Error())
+			require.Nil(t, ulid)
+		} else {
+			require.NoError(t, err)
+			require.Equal(t, testCase.skew, ulid.Skew())
+			require.Equal(t, testCase.millis, ulid.Timestamp().UnixMilli())
+			require.Len(t, ulid.Payload(), testCase.payloadLen)
+
+			t.Log("ulid", testCase.bits, ulid.String())
+		}
 	}
 }
