@@ -58,7 +58,7 @@ func TestLoadCertPool(t *testing.T) {
 				Name: "invalid",
 				Config: &livetls.Config{
 					CertPath: "sslconf",
-					CAFile:   "invalid.pem",
+					CAFile:   "invalid.crt",
 				},
 				NilResult: true,
 				NilErr:    true,
@@ -67,7 +67,7 @@ func TestLoadCertPool(t *testing.T) {
 				Name: "valid",
 				Config: &livetls.Config{
 					CertPath: "sslconf",
-					CAFile:   "ca.pem",
+					CAFile:   "ca.crt",
 				},
 				NilErr: true,
 			},
@@ -89,7 +89,7 @@ func TestLoadCertificate(t *testing.T) {
 				Name: "missing cert",
 				Config: &livetls.Config{
 					CertPath: "sslconf",
-					KeyFile:  "key.pem",
+					KeyFile:  "tls.key",
 				},
 				NilResult: true,
 				NilErr:    true,
@@ -99,7 +99,7 @@ func TestLoadCertificate(t *testing.T) {
 				Config: &livetls.Config{
 					CertPath: "sslconf",
 					CertFile: "invalid.pem",
-					KeyFile:  "key.pem",
+					KeyFile:  "tls.key",
 				},
 				NilErr:    true,
 				NilResult: true,
@@ -108,7 +108,7 @@ func TestLoadCertificate(t *testing.T) {
 				Name: "missing key",
 				Config: &livetls.Config{
 					CertPath: "sslconf",
-					CertFile: "cert.pem",
+					CertFile: "tls.crt",
 				},
 				NilResult: true,
 				NilErr:    true,
@@ -117,8 +117,8 @@ func TestLoadCertificate(t *testing.T) {
 				Name: "invalid key",
 				Config: &livetls.Config{
 					CertPath: "sslconf",
-					CertFile: "cert.pem",
-					KeyFile:  "invalid.pem",
+					CertFile: "tls.crt",
+					KeyFile:  "invalid.key",
 				},
 				NilErr:    true,
 				NilResult: true,
@@ -127,8 +127,8 @@ func TestLoadCertificate(t *testing.T) {
 				Name: "valid",
 				Config: &livetls.Config{
 					CertPath: "sslconf",
-					CertFile: "cert.pem",
-					KeyFile:  "key.pem",
+					CertFile: "tls.crt",
+					KeyFile:  "tls.key",
 				},
 				NilErr: true,
 			},

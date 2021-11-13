@@ -33,9 +33,9 @@ func TestNew(t *testing.T) {
 		tlsConfig, err := livetls.New(ctx, livetls.Config{
 			Enable:         true,
 			CertPath:       "sslconf",
-			CAFile:         "ca.pem",
-			CertFile:       "cert.pem",
-			KeyFile:        "key.pem",
+			CAFile:         "ca.crt",
+			CertFile:       "tls.crt",
+			KeyFile:        "tls.key",
 			ReloadInterval: time.Second,
 		})
 		require.NoError(t, err)
