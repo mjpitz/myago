@@ -12,6 +12,8 @@ import (
 )
 
 func TestDirector(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 
 	membership := new(cluster.Membership)

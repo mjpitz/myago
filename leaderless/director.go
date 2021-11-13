@@ -15,6 +15,7 @@ func New() *Director {
 	return &Director{
 		hashRing: hashring.NewWithHash([]string{}, func(data []byte) hashring.HashKey {
 			low, high := farm.Hash128(data)
+
 			return &hashring.Int64PairHashKey{
 				High: int64(high),
 				Low:  int64(low),
