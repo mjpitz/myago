@@ -8,13 +8,15 @@ import (
 	"github.com/mjpitz/myago/clocks"
 )
 
-func New(ctx context.Context, config ReloadingConfig) (*tls.Config, error) {
+// New construct a tls.Config that will periodically reload the configured certificate.
+// nolint:cyclop
+func New(ctx context.Context, config Config) (*tls.Config, error) {
 	if !config.Enable {
 		return nil, nil
 	}
 
-	certPool, certPoolErr := LoadCertPool(ctx, &(config.Config))
-	cert, certErr := LoadCertificate(ctx, &(config.Config))
+	certPool, certPoolErr := LoadCertPool(ctx, &config)
+	cert, certErr := LoadCertificate(ctx, &config)
 
 	switch {
 	case certPoolErr != nil:
@@ -22,7 +24,10 @@ func New(ctx context.Context, config ReloadingConfig) (*tls.Config, error) {
 	case certErr != nil:
 		return nil, certErr
 	case certPool == nil && cert == nil:
-		return &tls.Config{}, nil
+		return &tls.Config{
+			MinVersion: tls.VersionTLS12,
+			MaxVersion: tls.VersionTLS13,
+		}, nil
 	}
 
 	certCh := make(chan *tls.Certificate, 1)
@@ -40,7 +45,7 @@ func New(ctx context.Context, config ReloadingConfig) (*tls.Config, error) {
 			reloader.Stop()
 			defer func() { reloader = clock.NewTicker(config.ReloadInterval) }()
 
-			newCert, certErr := LoadCertificate(ctx, &(config.Config))
+			newCert, certErr := LoadCertificate(ctx, &config)
 			cert := <-certCh
 
 			if certErr == nil && newCert != nil {
@@ -48,6 +53,7 @@ func New(ctx context.Context, config ReloadingConfig) (*tls.Config, error) {
 			}
 
 			certCh <- cert
+
 			return cert, nil
 
 		case <-timeout.Chan():
@@ -55,13 +61,16 @@ func New(ctx context.Context, config ReloadingConfig) (*tls.Config, error) {
 
 		case cert := <-certCh:
 			certCh <- cert
+
 			return cert, nil
 		}
 	}
 
 	return &tls.Config{
-		RootCAs:   certPool,
-		ClientCAs: certPool,
+		MinVersion: tls.VersionTLS12,
+		MaxVersion: tls.VersionTLS13,
+		RootCAs:    certPool,
+		ClientCAs:  certPool,
 		GetCertificate: func(_ *tls.ClientHelloInfo) (*tls.Certificate, error) {
 			return getCertificate()
 		},

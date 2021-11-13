@@ -19,26 +19,29 @@ type TestCase struct {
 type Callback func(cfg *livetls.Config) (interface{}, error)
 
 func run(t *testing.T, testCases []TestCase, cb Callback) {
+	t.Helper()
+
 	for _, testCase := range testCases {
-		t.Run(testCase.Name, func(t *testing.T) {
-			result, err := cb(testCase.Config)
+		t.Log(testCase.Name)
+		result, err := cb(testCase.Config)
 
-			if testCase.NilErr {
-				require.NoError(t, err)
-			} else {
-				require.Error(t, err)
-			}
+		if testCase.NilErr {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
 
-			if testCase.NilResult {
-				require.Nil(t, result)
-			} else {
-				require.NotNil(t, result)
-			}
-		})
+		if testCase.NilResult {
+			require.Nil(t, result)
+		} else {
+			require.NotNil(t, result)
+		}
 	}
 }
 
 func TestLoadCertPool(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 
 	run(
@@ -76,6 +79,8 @@ func TestLoadCertPool(t *testing.T) {
 }
 
 func TestLoadCertificate(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 
 	run(
@@ -87,7 +92,7 @@ func TestLoadCertificate(t *testing.T) {
 					KeyFile:  "key.pem",
 				},
 				NilResult: true,
-				NilErr: true,
+				NilErr:    true,
 			},
 			{
 				Name: "invalid cert",
@@ -96,7 +101,7 @@ func TestLoadCertificate(t *testing.T) {
 					CertFile: "invalid.pem",
 					KeyFile:  "key.pem",
 				},
-				NilErr: true,
+				NilErr:    true,
 				NilResult: true,
 			},
 			{
@@ -106,7 +111,7 @@ func TestLoadCertificate(t *testing.T) {
 					CertFile: "cert.pem",
 				},
 				NilResult: true,
-				NilErr: true,
+				NilErr:    true,
 			},
 			{
 				Name: "invalid key",
@@ -115,7 +120,7 @@ func TestLoadCertificate(t *testing.T) {
 					CertFile: "cert.pem",
 					KeyFile:  "invalid.pem",
 				},
-				NilErr: true,
+				NilErr:    true,
 				NilResult: true,
 			},
 			{

@@ -32,6 +32,7 @@ func LoadCertPool(ctx context.Context, cfg *Config) (*x509.CertPool, error) {
 
 	certPool := x509.NewCertPool()
 	certPool.AppendCertsFromPEM(caData)
+
 	return certPool, nil
 }
 
