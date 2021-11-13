@@ -21,6 +21,7 @@ func Extract(ctx context.Context) FS {
 	if val == nil {
 		return defaultFS
 	}
+
 	return val.(FS)
 }
 
