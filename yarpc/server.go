@@ -48,9 +48,7 @@ func (s *Server) handleStream(stream *yamux.Stream) func() {
 		defer func() {
 			if err != nil {
 				// log
-
-				err := stream.Close()
-				if err != nil {
+				if err := stream.Close(); err != nil {
 					// log
 				}
 			}
@@ -80,13 +78,13 @@ func (s *Server) handleSession(session *yamux.Session) func() {
 				// log
 			}
 
-			err = session.Close()
-			if err != nil {
+			if err = session.Close(); err != nil {
 				// log
 			}
 		}()
 
 		var stream *yamux.Stream
+
 		for {
 			stream, err = session.AcceptStream()
 			if err != nil {
@@ -103,8 +101,6 @@ func (s *Server) handleSession(session *yamux.Session) func() {
 }
 
 /* all public functions must start with s.once.Do(s.init) */
-// todo: figure out how to support opening a stream from the server
-//   need to track sessions by host?
 
 func (s *Server) Handle(pattern string, handler Handler) {
 	s.init()
@@ -119,12 +115,12 @@ func (s *Server) Shutdown() error {
 		return errors.New("server not started")
 	}
 
-	defer s.pool.Release()
+	defer func() {
+		s.pool.Release()
+		s.listener = nil
+	}()
 
-	listener := s.listener
-	s.listener = nil
-
-	if listener != nil {
+	if listener := s.listener; listener != nil {
 		return listener.Close()
 	}
 
@@ -160,7 +156,6 @@ func (s *Server) Serve(listener net.Listener, opts ...Option) error {
 		pool, err := ants.NewPool(3000, ants.WithOptions(ants.Options{
 			// Logger: zap.NewStdLog(logger),
 		}))
-
 		if err != nil {
 			return errors.Wrap(err, "failed to construct ant pool")
 		}

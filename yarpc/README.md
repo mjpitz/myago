@@ -84,7 +84,7 @@ type ClientConn struct {
 }
 ```
 
-ClientConn
+ClientConn.
 
 #### func  DialContext
 

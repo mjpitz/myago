@@ -20,7 +20,9 @@ type Stat struct {
 	Value float64 `json:"value"`
 }
 
-func exampleServer(t *testing.T, ctx context.Context, network, address string) error {
+func exampleServer(ctx context.Context, t *testing.T, network, address string) error {
+	t.Helper()
+
 	start := time.Now()
 
 	yarpc.HandleFunc(method, func(stream yarpc.Stream) error {
@@ -34,10 +36,13 @@ func exampleServer(t *testing.T, ctx context.Context, network, address string) e
 
 	// ignore this error as it's likely a "socket closing" type of thing
 	_ = yarpc.ListenAndServe(network, address, yarpc.WithContext(ctx))
+
 	return nil
 }
 
-func exampleClient(t *testing.T, ctx context.Context, network, address string) error {
+func exampleClient(ctx context.Context, t *testing.T, network, address string) error {
+	t.Helper()
+
 	defer func() {
 		_ = yarpc.DefaultServer.Shutdown()
 	}()
@@ -62,6 +67,8 @@ func exampleClient(t *testing.T, ctx context.Context, network, address string) e
 }
 
 func TestEndToEnd(t *testing.T) {
+	t.Parallel()
+
 	sock := path.Join(t.TempDir(), t.Name()+".sock")
 	defer os.Remove(sock)
 
@@ -69,11 +76,11 @@ func TestEndToEnd(t *testing.T) {
 	group, ctx := errgroup.WithContext(ctx)
 
 	group.Go(func() error {
-		return exampleServer(t, ctx, "unix", sock)
+		return exampleServer(ctx, t, "unix", sock)
 	})
 
 	group.Go(func() error {
-		return exampleClient(t, ctx, "unix", sock)
+		return exampleClient(ctx, t, "unix", sock)
 	})
 
 	require.NoError(t, group.Wait())

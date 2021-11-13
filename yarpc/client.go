@@ -46,7 +46,7 @@ func DialContext(ctx context.Context, network, target string, opts ...Option) *C
 	}
 }
 
-// ClientConn
+// ClientConn.
 type ClientConn struct {
 	dialer  Dialer
 	network string
@@ -80,7 +80,6 @@ func (c *ClientConn) obtainSession(ctx context.Context) (*yamux.Session, error) 
 			},
 			backoffConfig,
 		)
-
 		if err != nil {
 			return nil, err
 		}

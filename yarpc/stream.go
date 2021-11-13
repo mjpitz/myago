@@ -12,10 +12,11 @@ import (
 
 func nonce() string {
 	nonce := make([]byte, 16)
-	_, err := rand.Read(nonce)
-	if err != nil {
+
+	if _, err := rand.Read(nonce); err != nil {
 		panic(err)
 	}
+
 	return hex.EncodeToString(nonce)
 }
 
@@ -67,8 +68,7 @@ func (j *rpcStream) ReadMsg(i interface{}) error {
 		Body: i,
 	}
 
-	err := j.decoder.Decode(frame)
-	if err != nil {
+	if err := j.decoder.Decode(frame); err != nil {
 		return err
 	}
 

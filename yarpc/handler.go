@@ -12,6 +12,7 @@ func (fn HandlerFunc) Handle(stream Stream) error {
 	if fn == nil {
 		return nil
 	}
+
 	return fn(stream)
 }
 
