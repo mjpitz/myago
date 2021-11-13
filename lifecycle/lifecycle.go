@@ -31,6 +31,7 @@ func (lc *LifeCycle) Resolve(ctx context.Context) {
 
 		fn := append([]func(ctx context.Context){}, lc.funcs...)
 		lc.funcs = lc.funcs[len(fn):]
+
 		return fn
 	}()
 

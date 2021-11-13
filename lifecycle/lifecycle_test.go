@@ -9,6 +9,8 @@ import (
 )
 
 func TestLifeCycle(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 
 	lc := &lifecycle.LifeCycle{}
