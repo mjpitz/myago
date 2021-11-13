@@ -90,6 +90,9 @@ func TestPaxos(t *testing.T) {
 	waitForStartup.Add(len(paxi) + 1)
 
 	// spin up observers and acceptors
+	ctx, shutdown := context.WithCancel(ctx)
+	defer shutdown()
+
 	group, ctx := errgroup.WithContext(ctx)
 	submitToGroup := func(pax *paxos.Paxos) {
 		group.Go(func() error {
