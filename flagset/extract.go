@@ -184,8 +184,28 @@ func (f Extractor) FormatBoolFlag(common *Common, fieldValue reflect.Value) (fla
 	return flag, nil
 }
 
-func (f Extractor) extractField(fieldValue reflect.Value, field reflect.StructField) (flags []cli.Flag) {
-	// nolint:ifshort
+// FormatFlag attempts to create a cli.Flag based on the type of the value
+func (f Extractor) FormatFlag(common *Common, value reflect.Value) (flag cli.Flag, err error) {
+	switch value.Interface().(type) {
+	case time.Duration:
+		return f.FormatDurationFlag(common, value)
+	case *cli.StringSlice:
+		return f.FormatStringSliceFlag(common, value)
+	default:
+		switch value.Type().Kind() {
+		case reflect.String:
+			return f.FormatStringFlag(common, value)
+		case reflect.Int:
+			return f.FormatIntFlag(common, value)
+		case reflect.Bool:
+			return f.FormatBoolFlag(common, value)
+		}
+	}
+
+	return nil, nil
+}
+
+func (f Extractor) extractField(value reflect.Value, field reflect.StructField) (flags []cli.Flag) {
 	common := f.Common(field)
 	if common == nil {
 		return
@@ -198,35 +218,18 @@ func (f Extractor) extractField(fieldValue reflect.Value, field reflect.StructFi
 			formatter = f.Child(common.Name)
 		}
 
-		return append(flags, formatter.extract(fieldValue)...)
+		return append(flags, formatter.extract(value)...)
 	case reflect.Ptr:
-		if fieldValue.IsNil() {
-			fieldValue.Set(reflect.New(field.Type.Elem()))
+		if value.IsNil() {
+			value.Set(reflect.New(field.Type.Elem()))
 		}
 	}
 
-	var flag cli.Flag
-	var err error
-
-	switch fieldValue.Interface().(type) {
-	case time.Duration:
-		flag, err = f.FormatDurationFlag(common, fieldValue)
-	case *cli.StringSlice:
-		flag, err = f.FormatStringSliceFlag(common, fieldValue)
-	default:
-		switch field.Type.Kind() {
-		case reflect.String:
-			flag, err = f.FormatStringFlag(common, fieldValue)
-		case reflect.Int:
-			flag, err = f.FormatIntFlag(common, fieldValue)
-		case reflect.Bool:
-			flag, err = f.FormatBoolFlag(common, fieldValue)
-		}
-	}
-
-	if err != nil {
+	flag, err := f.FormatFlag(common, value)
+	switch {
+	case err != nil:
 		panic(fmt.Sprintf("failed to format flag: %v", err))
-	} else if flag != nil {
+	case flag != nil:
 		flags = append(flags, flag)
 	}
 
