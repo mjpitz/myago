@@ -90,6 +90,13 @@ func (f Extractor) FormatDurationFlag(common *Common, fieldValue reflect.Value) 
 FormatDurationFlag creates a cli.DurationFlag for the given common configuration
 and value.
 
+#### func (Extractor) FormatFlag
+
+```go
+func (f Extractor) FormatFlag(common *Common, value reflect.Value) (flag cli.Flag, err error)
+```
+FormatFlag attempts to create a cli.Flag based on the type of the value
+
 #### func (Extractor) FormatIntFlag
 
 ```go
