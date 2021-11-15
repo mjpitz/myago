@@ -100,16 +100,6 @@ func (c *ClientConn) OpenStream(ctx context.Context, method string) (Stream, err
 ```
 OpenStream starts a stream for a given RPC.
 
-#### type Decoder
-
-```go
-type Decoder interface {
-	Decode(i interface{}) error
-}
-```
-
-Decoder reads message from the underlying stream.
-
 #### type Dialer
 
 ```go
@@ -120,28 +110,6 @@ type Dialer interface {
 
 Dialer provides a common interface for obtaining a net.Conn. This makes it easy
 to handle TLS transparently.
-
-#### type Encoder
-
-```go
-type Encoder interface {
-	Encode(i interface{}) error
-}
-```
-
-Encoder writes provided structures to the underlying stream.
-
-#### type Encoding
-
-```go
-type Encoding interface {
-	NewEncoder(io.Writer) Encoder
-	NewDecoder(io.Reader) Decoder
-}
-```
-
-Encoding describes a generalization used to create encoders and decoders for new
-streams.
 
 #### type Frame
 
@@ -188,29 +156,6 @@ type Invoke struct {
 ```
 
 
-#### type MSGPackEncoding
-
-```go
-type MSGPackEncoding struct{}
-```
-
-MSGPackEncoding uses msgpack out of box for a better balance of read/write
-performance. JSON serialization is fast, but deserialization is much slower in
-comparison (over 3x). While msgpack isn't as fast as protobuf, it offers
-reasonable read/write performance.
-
-#### func (*MSGPackEncoding) NewDecoder
-
-```go
-func (j *MSGPackEncoding) NewDecoder(reader io.Reader) Decoder
-```
-
-#### func (*MSGPackEncoding) NewEncoder
-
-```go
-func (j *MSGPackEncoding) NewEncoder(writer io.Writer) Encoder
-```
-
 #### type Option
 
 ```go
@@ -230,7 +175,7 @@ servers.
 #### func  WithEncoding
 
 ```go
-func WithEncoding(encoding Encoding) Option
+func WithEncoding(encoding *encoding.Encoding) Option
 ```
 WithEncoding configures how messages are serialized.
 

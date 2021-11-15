@@ -9,6 +9,8 @@ import (
 	"github.com/cenkalti/backoff/v4"
 	"github.com/hashicorp/yamux"
 	"github.com/jonboulle/clockwork"
+
+	"github.com/mjpitz/myago/encoding"
 )
 
 // Dialer provides a common interface for obtaining a net.Conn. This makes it easy to handle TLS transparently.
@@ -21,7 +23,7 @@ func DialContext(ctx context.Context, network, target string, opts ...Option) *C
 	o := &options{
 		context:  ctx,
 		yamux:    yamux.DefaultConfig(),
-		encoding: &MSGPackEncoding{},
+		encoding: encoding.MsgPack,
 		clock:    clockwork.NewRealClock(),
 	}
 

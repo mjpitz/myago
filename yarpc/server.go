@@ -10,6 +10,8 @@ import (
 	"github.com/jonboulle/clockwork"
 	"github.com/panjf2000/ants/v2"
 	"github.com/pkg/errors"
+
+	"github.com/mjpitz/myago/encoding"
 )
 
 const (
@@ -137,7 +139,7 @@ func (s *Server) Serve(listener net.Listener, opts ...Option) error {
 	o := &options{
 		context:  context.Background(),
 		yamux:    yamux.DefaultConfig(),
-		encoding: &MSGPackEncoding{},
+		encoding: encoding.MsgPack,
 		clock:    clockwork.NewRealClock(),
 	}
 

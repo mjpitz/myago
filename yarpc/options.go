@@ -6,6 +6,8 @@ import (
 
 	"github.com/hashicorp/yamux"
 	"github.com/jonboulle/clockwork"
+
+	"github.com/mjpitz/myago/encoding"
 )
 
 // Option defines an generic way to configure clients and servers.
@@ -15,7 +17,7 @@ type options struct {
 	context  context.Context
 	yamux    *yamux.Config
 	tls      *tls.Config
-	encoding Encoding
+	encoding *encoding.Encoding
 	clock    clockwork.Clock
 }
 
@@ -47,7 +49,7 @@ func WithContext(ctx context.Context) Option {
 }
 
 // WithEncoding configures how messages are serialized.
-func WithEncoding(encoding Encoding) Option {
+func WithEncoding(encoding *encoding.Encoding) Option {
 	return func(opt *options) {
 		if encoding != nil {
 			opt.encoding = encoding
@@ -67,7 +69,7 @@ func withContext(context context.Context) streamOption {
 	}
 }
 
-func withEncoding(encoding Encoding) streamOption {
+func withEncoding(encoding *encoding.Encoding) streamOption {
 	return func(stream *rpcStream) {
 		if encoding != nil {
 			stream.encoding = encoding

@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/hashicorp/yamux"
+
+	"github.com/mjpitz/myago/encoding"
 )
 
 func nonce() string {
@@ -32,7 +34,7 @@ type Stream interface {
 func wrap(ys *yamux.Stream, opts ...streamOption) *rpcStream {
 	rs := &rpcStream{
 		context:  context.Background(),
-		encoding: &MSGPackEncoding{},
+		encoding: encoding.MsgPack,
 		stream:   ys,
 	}
 
@@ -40,19 +42,19 @@ func wrap(ys *yamux.Stream, opts ...streamOption) *rpcStream {
 		opt(rs)
 	}
 
-	rs.encoder = rs.encoding.NewEncoder(ys)
-	rs.decoder = rs.encoding.NewDecoder(ys)
+	rs.encoder = rs.encoding.Encoder(ys)
+	rs.decoder = rs.encoding.Decoder(ys)
 
 	return rs
 }
 
 type rpcStream struct {
 	context  context.Context
-	encoding Encoding
+	encoding *encoding.Encoding
 	stream   *yamux.Stream
 
-	encoder Encoder
-	decoder Decoder
+	encoder encoding.Encoder
+	decoder encoding.Decoder
 }
 
 func (j *rpcStream) Context() context.Context {
