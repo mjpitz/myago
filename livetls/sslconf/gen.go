@@ -10,3 +10,5 @@ package main
 
 // Sign tls.csr using the ca and output to tls.crt
 //go:generate openssl x509 -req -in tls.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 1 -out tls.crt -extfile tls.conf
+
+func main() {}
