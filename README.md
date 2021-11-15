@@ -6,6 +6,7 @@ feel free to poke around.
 - [`authors`](authors) contains code for parsing `AUTHORS` file contents.
 - [`clocks`](clocks) contains code for managing clocks on contexts.
 - [`cluster`](cluster) contains code for forming pools of nodes into clusters.
+- [`config`](config) contains code for working with a variety of configuration file formats.
 - [`encoding`](encoding) contains structures for common encoding schemes.
 - [`flagset`](flagset) contains opinionated code for parsing Go structs into urfave/cli flags.
 - [`leaderless`](leaderless) forms a `farm128` consistent hash ring to coordinate work within a cluster without the need
