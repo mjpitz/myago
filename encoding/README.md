@@ -37,6 +37,7 @@ var (
 				if !ok {
 					return nil, fmt.Errorf("value is not a protobuf")
 				}
+
 				return prototext.Marshal(m)
 			})
 		},
@@ -46,6 +47,7 @@ var (
 				if !ok {
 					return fmt.Errorf("value is not a protobuf")
 				}
+
 				return prototext.Unmarshal(data, m)
 			})
 		},

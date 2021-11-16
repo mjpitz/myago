@@ -55,5 +55,6 @@ func (e *marshaledEncoder) Encode(v interface{}) error {
 	}
 
 	_, err = e.writer.Write(data)
+
 	return err
 }
