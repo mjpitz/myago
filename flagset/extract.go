@@ -184,7 +184,7 @@ func (f Extractor) FormatBoolFlag(common *Common, fieldValue reflect.Value) (fla
 	return flag, nil
 }
 
-// FormatFlag attempts to create a cli.Flag based on the type of the value
+// FormatFlag attempts to create a cli.Flag based on the type of the value.
 func (f Extractor) FormatFlag(common *Common, value reflect.Value) (flag cli.Flag, err error) {
 	switch value.Interface().(type) {
 	case time.Duration:
