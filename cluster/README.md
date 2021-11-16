@@ -50,6 +50,27 @@ func (c *Cluster) Start(ctx context.Context) error
 ```
 Start initializes and starts up the cluster.
 
+#### type Config
+
+```go
+type Config struct {
+	NoDiscovery
+	GossipDiscovery
+}
+```
+
+Config provides a common configuration structure for forming clusters. Either
+through a list of known addresses (peers) or using gossip to form pool
+dynamically.
+
+#### func (*Config) Start
+
+```go
+func (c *Config) Start(ctx context.Context, membership *Membership) error
+```
+Start controls which discovery mechanism is invoked based on the provided
+configuration.
+
 #### type Discovery
 
 ```go
@@ -70,8 +91,8 @@ the underlying membership pool.
 
 ```go
 type GossipDiscovery struct {
-	JoinAddress string
-	Config      *serf.Config
+	JoinAddress string       `json:"join_address" usage:"create a cluster dynamically through a single join address"`
+	Config      *serf.Config `json:"-"`
 }
 ```
 
@@ -116,6 +137,8 @@ and `n = len(m.active) + len(m.left)`.
 ```go
 func (m *Membership) Majority() int
 ```
+Majority computes a cluster majority. This returns a simple majority for the
+cluster.
 
 #### func (*Membership) Remove
 
@@ -157,7 +180,7 @@ observers.
 
 ```go
 type NoDiscovery struct {
-	Peers []string
+	Peers []string `json:"peers" usage:"create a cluster using a static list of addresses"`
 }
 ```
 

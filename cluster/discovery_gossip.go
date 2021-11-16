@@ -4,35 +4,18 @@ import (
 	"context"
 
 	"github.com/hashicorp/serf/serf"
+
+	"github.com/mjpitz/myago/zaputil"
 )
 
 // GossipDiscovery uses HashiCorp's Serf library to discover nodes within the cluster. It requires both TCP and UDP
 // communication to be available.
 type GossipDiscovery struct {
-	JoinAddress string
-	Config      *serf.Config
+	JoinAddress string       `json:"join_address" usage:"create a cluster dynamically through a single join address"`
+	Config      *serf.Config `json:"-"`
 }
 
-func (g *GossipDiscovery) Start(ctx context.Context, membership *Membership) error {
-	eventCh := make(chan serf.Event, 16)
-	defer close(eventCh)
-
-	g.Config.EventCh = eventCh
-
-	serfClient, err := serf.Create(g.Config)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		_ = serfClient.Shutdown()
-	}()
-
-	_, err = serfClient.Join([]string{g.JoinAddress}, false)
-	if err != nil {
-		return err
-	}
-
+func (g *GossipDiscovery) consume(ctx context.Context, membership *Membership, eventCh chan serf.Event) error {
 	for {
 		select {
 		case <-ctx.Done():
@@ -55,6 +38,33 @@ func (g *GossipDiscovery) Start(ctx context.Context, membership *Membership) err
 			}
 		}
 	}
+}
+
+func (g *GossipDiscovery) Start(ctx context.Context, membership *Membership) error {
+	eventCh := make(chan serf.Event, 16)
+	defer close(eventCh)
+
+	logger := zaputil.HashicorpStdLogger(zaputil.Extract(ctx))
+
+	g.Config.EventCh = eventCh
+	g.Config.Logger = logger
+	g.Config.MemberlistConfig.Logger = logger
+
+	serfClient, err := serf.Create(g.Config)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		_ = serfClient.Shutdown()
+	}()
+
+	_, err = serfClient.Join([]string{g.JoinAddress}, false)
+	if err != nil {
+		return err
+	}
+
+	return g.consume(ctx, membership, eventCh)
 }
 
 var _ Discovery = &GossipDiscovery{}

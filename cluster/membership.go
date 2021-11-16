@@ -122,11 +122,14 @@ func (m *Membership) Remove(peers []string) {
 	}
 }
 
+// Majority computes a cluster majority. This returns a simple majority for the cluster.
 func (m *Membership) Majority() int {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	return (len(m.active) + len(m.left) + 1) / 2
+	n := len(m.active) + len(m.left)
+
+	return (n / 2) + 1
 }
 
 // Watch allows others to observe changes in the cluster membership.
