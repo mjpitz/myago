@@ -27,11 +27,13 @@ description = "world"
 `
 
 type TestConfig struct {
-	Name string
+	Name        string
 	Description string
 }
 
 func TestLoader(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 
 	memFs := afero.NewMemMapFs()
