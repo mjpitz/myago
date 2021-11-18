@@ -11,3 +11,7 @@ gen:
 
 test: gen
 	go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+
+legal: .legal
+.legal:
+	addlicense -f ./legal/header.txt -skip yaml -skip yml .
