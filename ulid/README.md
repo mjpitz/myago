@@ -39,60 +39,54 @@ const (
 ```go
 var (
 	// ErrInvalidBitCount is returned when an invalid number of bits is provided to the Generate method of a Generator.
-	ErrInvalidBitCount = fmt.Errorf("bits must be divisible by 8")
+	ErrInvalidBitCount = errors.New("bits must be divisible by 8")
 
 	// ErrNotEnoughBits is returned when fewer than 64 bit ULIDs are requested to be generated.
-	ErrNotEnoughBits = fmt.Errorf("must be at least 64 bits")
+	ErrNotEnoughBits = errors.New("must be at least 64 bits")
+
+	// ErrInsufficientData is returned when the fill fails to return enough fata for the ULID.
+	ErrInsufficientData = errors.New("failed to read sufficient payload data")
 )
 ```
 
-#### type BaseGenerator
+#### func  RandomFill
 
 ```go
-type BaseGenerator struct {
-	Skew  byte
-	Clock clockwork.Clock
-}
+func RandomFill(_ ULID, data []byte) (int, error)
 ```
+RandomFill is a fill that populates the data payload with random data.
 
-BaseGenerator is the common core generator for ULIDs. All ULIDs should extend
-the base Generator. Extensions are free to format the `payload` portion of the
-ULID however they like.
-
-#### func (*BaseGenerator) Generate
+#### type Fill
 
 ```go
-func (g *BaseGenerator) Generate(bits int) (ULID, error)
+type Fill func(ulid ULID, data []byte) (int, error)
 ```
+
+Fill provides an abstraction for filling the data payload of a ULID.
 
 #### type Generator
 
 ```go
-type Generator interface {
-	Generate(bits int) (ULID, error)
+type Generator struct {
 }
 ```
 
 Generator is the base interface defines how to generate ULIDs of varying length.
 
-#### type RandomGenerator
+#### func  NewGenerator
 
 ```go
-type RandomGenerator struct {
-	BaseGenerator
-
-	Reader io.Reader
-}
+func NewGenerator(skew byte, fill Fill) *Generator
 ```
+NewGenerator constructs a generator using the provided skew and fill.
 
-RandomGenerator produces a randomly generated ULID. It fills the payload portion
-of the ULID with random data.
-
-#### func (*RandomGenerator) Generate
+#### func (*Generator) Generate
 
 ```go
-func (g *RandomGenerator) Generate(bits int) (ULID, error)
+func (g *Generator) Generate(ctx context.Context, bits int) (ULID, error)
 ```
+Generate produces a new ULID unless an error occurs. A clock can be provided on
+the context to override how the Generator obtains a timestamp.
 
 #### type ULID
 

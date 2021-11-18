@@ -1,33 +1,30 @@
 package ulid
 
 import (
-	"crypto/rand"
+	"context"
 	"encoding/binary"
-	"io"
-	"sync"
 
-	"github.com/jonboulle/clockwork"
+	"github.com/mjpitz/myago/clocks"
 )
 
+// NewGenerator constructs a generator using the provided skew and fill.
+func NewGenerator(skew byte, fill Fill) *Generator {
+	return &Generator{
+		skew: skew,
+		fill: fill,
+	}
+}
+
 // Generator is the base interface defines how to generate ULIDs of varying length.
-type Generator interface {
-	Generate(bits int) (ULID, error)
+type Generator struct {
+	skew byte
+	fill Fill
 }
 
-// BaseGenerator is the common core generator for ULIDs. All ULIDs should extend the base Generator. Extensions are free
-// to format the `payload` portion of the ULID however they like.
-type BaseGenerator struct {
-	init  sync.Once
-	Skew  byte
-	Clock clockwork.Clock
-}
-
-func (g *BaseGenerator) Generate(bits int) (ULID, error) {
-	g.init.Do(func() {
-		if g.Clock == nil {
-			g.Clock = clockwork.NewRealClock()
-		}
-	})
+// Generate produces a new ULID unless an error occurs. A clock can be provided on the context to override how the
+// Generator obtains a timestamp.
+func (g *Generator) Generate(ctx context.Context, bits int) (ULID, error) {
+	clock := clocks.Extract(ctx)
 
 	switch {
 	case bits < 64:
@@ -36,49 +33,20 @@ func (g *BaseGenerator) Generate(bits int) (ULID, error) {
 		return nil, ErrInvalidBitCount
 	}
 
-	unixmillis := uint64(g.Clock.Now().UnixMilli())
+	unixmillis := uint64(clock.Now().UnixMilli())
 	millis := make([]byte, 8)
 	binary.BigEndian.PutUint64(millis, unixmillis)
 
 	ulid := make(ULID, bits/8)
-	ulid[SkewOffset] = g.Skew
+	ulid[SkewOffset] = g.skew
 	copy(ulid[UnixOffset:PayloadOffset], millis[2:8])
 
+	n, err := g.fill(ulid, ulid[PayloadOffset:])
+	if err != nil {
+		return nil, err
+	} else if n != len(ulid)-PayloadOffset {
+		return nil, ErrInsufficientData
+	}
+
 	return ulid, nil
-}
-
-var _ Generator = &BaseGenerator{}
-
-// RandomGenerator produces a randomly generated ULID. It fills the payload portion of the ULID with random data.
-type RandomGenerator struct {
-	BaseGenerator
-
-	init   sync.Once
-	Reader io.Reader
-}
-
-func (g *RandomGenerator) Generate(bits int) (ULID, error) {
-	g.init.Do(func() {
-		if g.Reader == nil {
-			g.Reader = rand.Reader
-		}
-	})
-
-	base, err := g.BaseGenerator.Generate(bits)
-	if err != nil {
-		return nil, err
-	}
-
-	randomBytes := len(base) - PayloadOffset
-	random := make([]byte, randomBytes)
-	n, err := io.ReadFull(g.Reader, random)
-	if err != nil {
-		return nil, err
-	} else if n != randomBytes {
-		return nil, io.ErrUnexpectedEOF
-	}
-
-	copy(base[PayloadOffset:], random)
-
-	return base, nil
 }

@@ -1,24 +1,24 @@
 package ulid_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/jonboulle/clockwork"
 	"github.com/stretchr/testify/require"
 
+	"github.com/mjpitz/myago/clocks"
 	"github.com/mjpitz/myago/ulid"
 )
 
 func TestGenerator(t *testing.T) {
 	t.Parallel()
 
+	ctx := context.Background()
 	clock := clockwork.NewFakeClock()
-	generator := &ulid.RandomGenerator{
-		BaseGenerator: ulid.BaseGenerator{
-			Skew:  1,
-			Clock: clock,
-		},
-	}
+
+	ctx = clocks.ToContext(ctx, clock)
+	generator := ulid.NewGenerator(1, ulid.RandomFill)
 
 	testCases := []struct {
 		name string
@@ -75,7 +75,7 @@ func TestGenerator(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Log(testCase.name)
 
-		ulid, err := generator.Generate(testCase.bits)
+		ulid, err := generator.Generate(ctx, testCase.bits)
 
 		if testCase.error {
 			require.Error(t, err)
