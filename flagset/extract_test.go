@@ -33,8 +33,9 @@ type Options struct {
 }
 
 type Full struct {
-	Options  Options          `json:"options"`
-	Features *cli.StringSlice `json:"features" alias:"f"`
+	Options     Options          `json:"options"`
+	Features    *cli.StringSlice `json:"features" alias:"f"`
+	Percentiles *cli.IntSlice    `json:"percentiles"`
 }
 
 type Expectation struct {
@@ -93,7 +94,8 @@ func TestExtract(t *testing.T) {
 			Temperature: 100,
 			Interval:    10 * time.Minute,
 		},
-		Features: cli.NewStringSlice("awe yeah"),
+		Features:    cli.NewStringSlice("awe yeah"),
+		Percentiles: cli.NewIntSlice(75, 90, 95, 97, 99),
 	}
 
 	testCases := []struct {
@@ -107,6 +109,7 @@ func TestExtract(t *testing.T) {
 			{"options_temperature", "t", "OPTIONS_TEMPERATURE", "", 50},
 			{"options_interval", "i", "OPTIONS_INTERVAL", "", 5 * time.Minute},
 			{"features", "f", "FEATURES", "", cli.NewStringSlice()},
+			{"percentiles", "", "PERCENTILES", "", cli.NewIntSlice()},
 		}},
 		{"struct", fromStruct, []Expectation{
 			{"options_endpoint", "e", "OPTIONS_ENDPOINT", "the endpoint of the server we're speaking to", "override"},
@@ -114,6 +117,7 @@ func TestExtract(t *testing.T) {
 			{"options_temperature", "t", "OPTIONS_TEMPERATURE", "", 100},
 			{"options_interval", "i", "OPTIONS_INTERVAL", "", 10 * time.Minute},
 			{"features", "f", "FEATURES", "", fromStruct.Features},
+			{"percentiles", "", "PERCENTILES", "", fromStruct.Percentiles},
 		}},
 	}
 

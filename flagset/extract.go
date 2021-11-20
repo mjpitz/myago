@@ -137,6 +137,19 @@ func (f Extractor) FormatStringSliceFlag(common *Common, fieldValue reflect.Valu
 	return flag, nil
 }
 
+// FormatGenericFlag creates a cli.StringSliceFlag for the given common configuration and value.
+func (f Extractor) FormatGenericFlag(common *Common, fieldValue reflect.Value) (flag *cli.GenericFlag, err error) {
+	flag = &cli.GenericFlag{
+		Name:    common.FlagName,
+		Aliases: common.Aliases,
+		Usage:   common.Usage,
+		EnvVars: common.EnvVars,
+		Value:   fieldValue.Interface().(cli.Generic),
+	}
+
+	return flag, nil
+}
+
 // FormatStringFlag creates a cli.StringFlag for the given common configuration and value.
 func (f Extractor) FormatStringFlag(common *Common, fieldValue reflect.Value) (flag *cli.StringFlag, err error) {
 	flag = &cli.StringFlag{
@@ -206,6 +219,8 @@ func (f Extractor) FormatFlag(common *Common, value reflect.Value) (flag cli.Fla
 		return f.FormatDurationFlag(common, value)
 	case *cli.StringSlice:
 		return f.FormatStringSliceFlag(common, value)
+	case cli.Generic:
+		return f.FormatGenericFlag(common, value)
 	default:
 		switch value.Type().Kind() {
 		case reflect.String:
