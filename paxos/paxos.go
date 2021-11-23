@@ -71,7 +71,6 @@ func New(cfg *Config) (*Paxos, error) {
 
 	return &Paxos{
 		Proposer: Proposer{
-			Clock:       cfg.Clock,
 			IDGenerator: cfg.IDGenerator,
 			Acceptor: &MultiAcceptorClient{
 				Dialer: cfg.AcceptorDialer,

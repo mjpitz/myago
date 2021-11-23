@@ -75,7 +75,6 @@ func TestProposer_Simple(t *testing.T) {
 	acceptorStream.Ctx = ctx
 
 	proposer := &paxos.Proposer{
-		Clock:       clock,
 		IDGenerator: paxos.ServerIDGenerator(1, clock),
 		Acceptor: &mockAcceptor{
 			mockStream: acceptorStream,

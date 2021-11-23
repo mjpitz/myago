@@ -17,6 +17,7 @@ package paxos
 
 import (
 	"context"
+	"sync/atomic"
 
 	"github.com/cenkalti/backoff/v4"
 
@@ -49,7 +50,7 @@ func (o *Observer) observe(ctx context.Context, member string, lastAccepted *Pro
 	run := func() error {
 		err = backoff.Retry(func() error {
 			observations, err = client.Observe(ctx, &Request{
-				ID: lastAccepted.ID,
+				ID: atomic.LoadUint64(&lastAccepted.ID),
 			})
 
 			return err
@@ -89,10 +90,13 @@ func (o *Observer) observe(ctx context.Context, member string, lastAccepted *Pro
 // nolint:gocognit,cyclop
 func (o *Observer) Start(ctx context.Context, membership *cluster.Membership) error {
 	lastAccepted := &Proposal{}
+
 	err := o.Log.Last(lastAccepted)
 	if err != nil {
 		return err
 	}
+
+	lastAccepted.Value = nil
 
 	changes, cancel := membership.Watch()
 	defer cancel()
@@ -107,6 +111,7 @@ func (o *Observer) Start(ctx context.Context, membership *cluster.Membership) er
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
+
 		case vote := <-votes:
 			proposal := vote.Payload.(*Proposal)
 			id := proposal.ID
@@ -123,10 +128,10 @@ func (o *Observer) Start(ctx context.Context, membership *cluster.Membership) er
 				}
 
 				if lastAccepted.ID < id {
-					lastAccepted.ID = id
-					lastAccepted.Value = proposal.Value
+					atomic.SwapUint64(&lastAccepted.ID, id)
 				}
 			}
+
 		case change := <-changes:
 			for _, active := range change.Active {
 				if _, ok := idx[active]; !ok {
