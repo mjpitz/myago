@@ -6,6 +6,14 @@ Package flagset provides logic for creating a flagset from a struct.
 
 ## Usage
 
+#### func  ExampleString
+
+```go
+func ExampleString(examples ...string) string
+```
+ExampleString formats a list of examples so that they display properly in the
+terminal. This function just pulls things out into a simple helper.
+
 #### func  Extract
 
 ```go
@@ -96,6 +104,14 @@ and value.
 func (f Extractor) FormatFlag(common *Common, value reflect.Value) (flag cli.Flag, err error)
 ```
 FormatFlag attempts to create a cli.Flag based on the type of the value.
+
+#### func (Extractor) FormatGenericFlag
+
+```go
+func (f Extractor) FormatGenericFlag(common *Common, fieldValue reflect.Value) (flag *cli.GenericFlag, err error)
+```
+FormatGenericFlag creates a cli.StringSliceFlag for the given common
+configuration and value.
 
 #### func (Extractor) FormatIntFlag
 

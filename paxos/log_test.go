@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/mjpitz/myago/paxos"
+	"github.com/mjpitz/myago/zaputil"
 )
 
 // nolint:funlen // idc about length for tests
@@ -160,7 +161,13 @@ func TestBadger(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	db, err := badger.Open(badger.DefaultOptions(t.TempDir()).WithSyncWrites(true))
+	log := zaputil.Extract(ctx)
+
+	opts := badger.DefaultOptions(t.TempDir()).
+		WithSyncWrites(true).
+		WithLogger(zaputil.BadgerLogger(log))
+
+	db, err := badger.Open(opts)
 	require.NoError(t, err)
 
 	defer db.Close()
