@@ -90,12 +90,20 @@ var (
 			Render:     renderTemplateFile("header.txt.tmpl"),
 		},
 		{
-			OutputFile: "go.mod",
-			Render:     renderTemplateFile("go.mod.tmpl"),
+			OutputFile: "scripts/dist-go.sh",
+			Render:     renderTemplateFile("dist-go.sh.tmpl"),
 		},
 		{
-			OutputFile: "goreleaser.yaml",
+			OutputFile: ".gitignore",
+			Render: renderTemplateFile("gitignore.tmpl"),
+		},
+		{
+			OutputFile: ".goreleaser.yaml",
 			Render:     renderTemplateFile("goreleaser.yaml.tmpl"),
+		},
+		{
+			OutputFile: "go.mod",
+			Render:     renderTemplateFile("go.mod.tmpl"),
 		},
 		{
 			OutputFile: "LICENSE",
@@ -109,6 +117,14 @@ var (
 				_, err = io.Copy(out, resp.Body)
 				return err
 			},
+		},
+		{
+			OutputFile: "Makefile",
+			Render: renderTemplateFile("Makefile.tmpl"),
+		},
+		{
+			OutputFile: "package.json",
+			Render: renderTemplateFile("package.json.tmpl"),
 		},
 	}
 
