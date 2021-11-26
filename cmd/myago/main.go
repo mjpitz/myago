@@ -42,6 +42,7 @@ func main() {
 		UsageText: "myago [options] <command>",
 		Flags:     flagset.Extract(config),
 		Commands: []*cli.Command{
+			internal.EncodeCommand,
 			internal.ScaffoldCommand,
 			internal.VersionCommand,
 		},
