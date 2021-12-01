@@ -56,6 +56,13 @@ func RandomFill(_ ULID, data []byte) (int, error)
 ```
 RandomFill is a fill that populates the data payload with random data.
 
+#### func  ToContext
+
+```go
+func ToContext(ctx context.Context, generator *Generator) context.Context
+```
+ToContext appends the provided generator to the provided context.
+
 #### type Fill
 
 ```go
@@ -72,6 +79,14 @@ type Generator struct {
 ```
 
 Generator is the base interface defines how to generate ULIDs of varying length.
+
+#### func  Extract
+
+```go
+func Extract(ctx context.Context) *Generator
+```
+Extract is used to obtain the generator from a context. If none is present, the
+system generator is used.
 
 #### func  NewGenerator
 

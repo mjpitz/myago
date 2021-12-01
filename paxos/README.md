@@ -457,7 +457,6 @@ Proposal is used to propose a log value to system.
 
 ```go
 type Proposer struct {
-	Clock       clockwork.Clock
 	IDGenerator IDGenerator
 	Acceptor    AcceptorClient
 }
