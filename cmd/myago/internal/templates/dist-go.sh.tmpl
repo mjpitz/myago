@@ -16,7 +16,7 @@ rm -rf "$(pwd)/{{ .Name }}"
 os=$(uname | tr '[:upper:]' '[:lower:]')
 arch="$(uname -m)"
 if [[ "$arch" == "x86_64" ]]; then
-	ln -s "$(pwd)/dist/{{ .Name }}_${os}_amd64/emdb" "$(pwd)/{{ .Name }}"
+	ln -s "$(pwd)/dist/{{ .Name }}_${os}_amd64/{{ .Name }}" "$(pwd)/{{ .Name }}"
 elif [[ "$arch" == "aarch64" ]]; then
-	ln -s "$(pwd)/dist/{{ .Name }}_${os}_arm64/emdb" "$(pwd)/{{ .Name }}"
+	ln -s "$(pwd)/dist/{{ .Name }}_${os}_arm64/{{ .Name }}" "$(pwd)/{{ .Name }}"
 fi
