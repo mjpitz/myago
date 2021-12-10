@@ -16,14 +16,21 @@ func Extract(ctx context.Context) *zap.Logger
 Extract pulls the logger from the provided context. If no logger is found, then
 the defaultLogger is returned.
 
+#### func  HashiCorpStdLogger
+
+```go
+func HashiCorpStdLogger(logger *zap.Logger) *log.Logger
+```
+HashiCorpStdLogger wraps the provided logger with a golang logger to log
+messages at the appropriate level using the HashiCorp log format. Useful for
+replacing serf and membership loggers.
+
 #### func  HashicorpStdLogger
 
 ```go
 func HashicorpStdLogger(logger *zap.Logger) *log.Logger
 ```
-HashicorpStdLogger wraps the provided logger with a golang logger to log
-messages at the appropriate level using the Hashicorp log format. Useful for
-replacing serf and membership loggers.
+HashicorpStdLogger Deprecated.
 
 #### func  Setup
 
