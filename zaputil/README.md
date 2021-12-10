@@ -46,6 +46,28 @@ func ToContext(ctx context.Context, logger *zap.Logger) context.Context
 ```
 ToContext sets the logger on the provided context.
 
+#### type BadgerLog
+
+```go
+type BadgerLog interface {
+	Errorf(string, ...interface{})
+	Warningf(string, ...interface{})
+	Infof(string, ...interface{})
+	Debugf(string, ...interface{})
+}
+```
+
+BadgerLog is an interface pulled from the badger library. It defines the
+functionality needed by the badger system to log messages. It supports a variety
+of levels and works similar to the fmt.Printf method.
+
+#### func  BadgerLogger
+
+```go
+func BadgerLogger(log *zap.Logger) BadgerLog
+```
+BadgerLogger wraps the provided logger so badger can log using zap.
+
 #### type Config
 
 ```go
@@ -65,25 +87,3 @@ func DefaultConfig() Config
 DefaultConfig returns the default configuration for zap to use. By default, it
 logs at an info level and infers the log format based on the stdout device. If
 it looks like a terminal session, then it uses the console format.
-
-#### type Logger
-
-```go
-type Logger interface {
-	Errorf(string, ...interface{})
-	Warningf(string, ...interface{})
-	Infof(string, ...interface{})
-	Debugf(string, ...interface{})
-}
-```
-
-Logger is an interface pulled from the badger library. It defines the
-functionality needed by the badger system to log messages. It supports a variety
-of levels and works similar to the fmt.Printf method.
-
-#### func  BadgerLogger
-
-```go
-func BadgerLogger(log *zap.Logger) Logger
-```
-BadgerLogger wraps the provided logger so badger can log using zap.
