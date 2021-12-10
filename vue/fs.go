@@ -16,34 +16,19 @@
 package vue
 
 import (
-	"io"
-	"os"
+	"net/http"
 )
 
-// File describes what operations an associated File should be able to perform.
-type File interface {
-	io.Closer
-	io.Reader
-	io.Seeker
-	Readdir(count int) ([]os.FileInfo, error)
-	Stat() (os.FileInfo, error)
-}
-
-// FileSystem describes what the file system should look like.
-type FileSystem interface {
-	Open(string) (File, error)
-}
-
 // Wrap creates a new FileSystem that supports server side loading for VueJS applications.
-func Wrap(delegate FileSystem) *fs {
+func Wrap(delegate http.FileSystem) http.FileSystem {
 	return &fs{delegate}
 }
 
 type fs struct {
-	delegate FileSystem
+	delegate http.FileSystem
 }
 
-func (v *fs) Open(name string) (File, error) {
+func (v *fs) Open(name string) (http.File, error) {
 	f, err := v.delegate.Open(name)
 
 	// if it doesn't exist on the server, delegate to the front-end
