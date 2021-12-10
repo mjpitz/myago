@@ -61,9 +61,15 @@ func (w *hashiWriter) Write(p []byte) (n int, err error) {
 
 var _ io.Writer = &hashiWriter{}
 
-// HashicorpStdLogger wraps the provided logger with a golang logger to log messages at the appropriate level using the
-// Hashicorp log format. Useful for replacing serf and membership loggers.
+// HashicorpStdLogger
+// Deprecated.
 func HashicorpStdLogger(logger *zap.Logger) *log.Logger {
+	return HashiCorpStdLogger(logger)
+}
+
+// HashiCorpStdLogger wraps the provided logger with a golang logger to log messages at the appropriate level using the
+// HashiCorp log format. Useful for replacing serf and membership loggers.
+func HashiCorpStdLogger(logger *zap.Logger) *log.Logger {
 	w := &hashiWriter{
 		logger: logger.WithOptions(zap.AddCallerSkip(3)),
 	}

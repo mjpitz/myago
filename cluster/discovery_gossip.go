@@ -59,7 +59,7 @@ func (g *GossipDiscovery) Start(ctx context.Context, membership *Membership) err
 	eventCh := make(chan serf.Event, 16)
 	defer close(eventCh)
 
-	logger := zaputil.HashicorpStdLogger(zaputil.Extract(ctx))
+	logger := zaputil.HashiCorpStdLogger(zaputil.Extract(ctx))
 
 	g.Config.EventCh = eventCh
 	g.Config.Logger = logger
