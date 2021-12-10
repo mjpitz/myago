@@ -20,6 +20,7 @@ them.
 - [`paxos`](paxos) provides a paxos implementation.
 - [`ulid`](ulid) provides code for generating variable length unique, lexigraphic identifiers (ULID) with programmable fills.
 - [`vfs`](vfs) provides code for working with file systems on contexts using afero.
+- [`vue`](vue) contains helpers for VueJS applications.
 - [`yarpc`](yarpc) is yet another RPC framework, built on top of Hashicorp Yamux with the simplicity of `http`.
 - [`zaputil`](zaputil) is a collection of logging utilities for zap.
 
