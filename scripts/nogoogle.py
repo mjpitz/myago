@@ -36,6 +36,8 @@ allowed_google_libraries = {
     },
 }
 
+base = subprocess.run(["go", "list", "-m"], stdout=subprocess.PIPE, universal_newlines=True).stdout.strip()
+
 discovered = []
 undocumented = []
 
@@ -49,14 +51,16 @@ for file in glob.iglob("**/go.mod", recursive=True):
     for line in handle:
         line = line.strip()
         if "google" in line:
-            parts = line.split(" ")
-            module = parts[0]
+            dependency = line.split(" ")[0]
 
+            module = base
             cwd = os.getcwd()
-            if key:
+
+            if len(key) > 0:
+                module = module + '/' + key
                 cwd = cwd + '/' + key
 
-            result = subprocess.run(["go", "mod", "why", module], cwd=cwd, stdout=subprocess.PIPE, universal_newlines=True)
+            result = subprocess.run(["go", "mod", "why", dependency], cwd=cwd, stdout=subprocess.PIPE, universal_newlines=True)
 
             usages = []
             current = []
@@ -75,16 +79,16 @@ for file in glob.iglob("**/go.mod", recursive=True):
                 usages.append(" => ".join(current).rstrip(" => "))
 
             if len(usages) > 0:
-                documented = module in allowed
+                documented = dependency in allowed
                 if not documented:
                     undocumented.append({
-                        "key": key,
                         "module": module,
+                        "dependency": dependency,
                     })
 
                 discovered.append({
-                    "key": key,
                     "module": module,
+                    "dependency": dependency,
                     "documented": documented,
                     "usages": usages,
                 })
@@ -97,8 +101,8 @@ for dependency in discovered:
 
     print(
         f"---\n"
-        f"key:    '{dependency['key']}'\n"
-        f"module: '{dependency['module']}'\n"
+        f"module:     '{dependency['module']}'\n"
+        f"dependency: '{dependency['dependency']}'\n"
         f"usages:\n"
         f"{usages}"
     )
@@ -111,7 +115,7 @@ if undocumented:
         print(
             f"---"
             f"undocumented:"
-            f"\tkey:    '{dependency['key']}'"
-            f"\tmodule: '{dependency['module']}'"
+            f"\tmodule:    '{dependency['module']}'"
+            f"\tdependency: '{dependency['dependency']}'"
         )
     exit(1)
