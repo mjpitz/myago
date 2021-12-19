@@ -20,7 +20,6 @@ import (
 	"crypto/tls"
 
 	"github.com/hashicorp/yamux"
-	"github.com/jonboulle/clockwork"
 
 	"github.com/mjpitz/myago/encoding"
 )
@@ -33,7 +32,6 @@ type options struct {
 	yamux    *yamux.Config
 	tls      *tls.Config
 	encoding *encoding.Encoding
-	clock    clockwork.Clock
 }
 
 // WithTLS enables TLS.
@@ -72,22 +70,8 @@ func WithEncoding(encoding *encoding.Encoding) Option {
 	}
 }
 
-// private options used to configure the underlying stream... mainly to keep the wrap() interface reasonable
-
-type streamOption func(stream *rpcStream)
-
-func withContext(context context.Context) streamOption {
-	return func(stream *rpcStream) {
-		if context != nil {
-			stream.context = context
-		}
-	}
-}
-
-func withEncoding(encoding *encoding.Encoding) streamOption {
-	return func(stream *rpcStream) {
-		if encoding != nil {
-			stream.encoding = encoding
-		}
+func withOptions(o *options) Option {
+	return func(opt *options) {
+		*opt = *o
 	}
 }

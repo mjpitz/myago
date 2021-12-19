@@ -23,7 +23,7 @@ import (
 
 // RegisterYarpcAcceptorServer registers the provided AcceptorServer implementation with the yarpc.Server to handle
 // requests.
-func RegisterYarpcAcceptorServer(svr *yarpc.Server, impl AcceptorServer) {
+func RegisterYarpcAcceptorServer(svr *yarpc.ServeMux, impl AcceptorServer) {
 	svr.Handle("/paxos.acceptor/Prepare", yarpc.HandlerFunc(func(stream yarpc.Stream) error {
 		req := &Request{}
 		err := stream.ReadMsg(req)
@@ -104,7 +104,7 @@ var _ AcceptorClient = &yarpcAcceptorClient{}
 
 // RegisterYarpcProposerServer registers the provided ProposerServer implementation with the yarpc.Server to handle
 // requests. Typically, proposers aren't embedded as a server and are instead run as client side code.
-func RegisterYarpcProposerServer(svr *yarpc.Server, impl ProposerServer) {
+func RegisterYarpcProposerServer(svr *yarpc.ServeMux, impl ProposerServer) {
 	svr.Handle("/paxos.Proposer/Propose", yarpc.HandlerFunc(func(stream yarpc.Stream) error {
 		req := &Bytes{}
 		err := stream.ReadMsg(req)
@@ -162,7 +162,7 @@ var _ ProposerClient = &yarpcProposerClient{}
 // RegisterYarpcObserverServer registers the provided ObserverServer implementation with the yarpc.Server to handle
 // requests. Acceptors should implement the observer server, otherwise other members of the cluster cannot determine
 // what records have been accepted.
-func RegisterYarpcObserverServer(svr *yarpc.Server, impl ObserverServer) {
+func RegisterYarpcObserverServer(svr *yarpc.ServeMux, impl ObserverServer) {
 	svr.Handle("/paxos.Observer/Observe", yarpc.HandlerFunc(func(stream yarpc.Stream) error {
 		return impl.Observe(&ObserveServerStream{stream})
 	}))

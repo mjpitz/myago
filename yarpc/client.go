@@ -18,60 +18,66 @@ package yarpc
 import (
 	"context"
 	"crypto/tls"
+	"io"
 	"net"
 	"sync"
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/hashicorp/yamux"
-	"github.com/jonboulle/clockwork"
 
 	"github.com/mjpitz/myago/encoding"
 )
 
-// Dialer provides a common interface for obtaining a net.Conn. This makes it easy to handle TLS transparently.
-type Dialer interface {
-	DialContext(ctx context.Context, network, address string) (net.Conn, error)
-}
-
 // DialContext initializes a new client connection to the target server.
 func DialContext(ctx context.Context, network, target string, opts ...Option) *ClientConn {
-	o := &options{
-		context:  ctx,
-		yamux:    yamux.DefaultConfig(),
-		encoding: encoding.MsgPack,
-		clock:    clockwork.NewRealClock(),
+	c := NewClientConn(ctx).WithOptions(opts...)
+
+	dialer := &NetDialerAdapter{
+		Dialer:  &net.Dialer{},
+		Network: network,
+		Target:  target,
 	}
 
-	for _, opt := range opts {
-		opt(o)
-	}
-
-	var dialer Dialer = &net.Dialer{}
-	if o.tls != nil {
-		dialer = &tls.Dialer{
+	if c.options.tls != nil {
+		dialer.Dialer = &tls.Dialer{
 			NetDialer: &net.Dialer{},
-			Config:    o.tls,
+			Config:    c.options.tls,
 		}
 	}
 
+	c.Dialer = dialer
+	return c
+}
+
+// NewClientConn creates a default ClientConn with an empty dialer implementation. The Dialer must be configured before
+// use. This function is intended to be used in initializer functions such as DialContext.
+func NewClientConn(ctx context.Context) *ClientConn {
 	return &ClientConn{
-		dialer:  dialer,
-		network: network,
-		target:  target,
-		options: o,
-		mu:      sync.Mutex{},
+		Dialer: &emptyDialer{},
+		options: options{
+			context:  ctx,
+			yamux:    yamux.DefaultConfig(),
+			encoding: encoding.MsgPack,
+		},
+		mu: sync.Mutex{},
 	}
 }
 
-// ClientConn.
+// ClientConn defines an abstract connection yarpc clients to use.
 type ClientConn struct {
-	dialer  Dialer
-	network string
-	target  string
-
-	options *options
+	Dialer  Dialer
+	options options
 	mu      sync.Mutex
 	session *yamux.Session
+}
+
+// WithOptions configures the options for the underlying client connection.
+func (c *ClientConn) WithOptions(opts ...Option) *ClientConn {
+	for _, opt := range opts {
+		opt(&(c.options))
+	}
+
+	return c
 }
 
 func (c *ClientConn) obtainSession(ctx context.Context) (*yamux.Session, error) {
@@ -83,7 +89,7 @@ func (c *ClientConn) obtainSession(ctx context.Context) (*yamux.Session, error) 
 
 		err := backoff.Retry(
 			func() error {
-				conn, err := c.dialer.DialContext(ctx, c.network, c.target)
+				conn, err := c.Dialer.DialContext(ctx)
 				if err != nil {
 					return err
 				}
@@ -105,7 +111,7 @@ func (c *ClientConn) obtainSession(ctx context.Context) (*yamux.Session, error) 
 	return c.session, nil
 }
 
-// OpenStream starts a stream for a given RPC.
+// OpenStream starts a stream for the named RPC.
 func (c *ClientConn) OpenStream(ctx context.Context, method string) (Stream, error) {
 	session, err := c.obtainSession(ctx)
 	if err != nil {
@@ -117,13 +123,23 @@ func (c *ClientConn) OpenStream(ctx context.Context, method string) (Stream, err
 		return nil, err
 	}
 
-	rpcStream := wrap(stream,
-		withContext(c.options.context),
-		withEncoding(c.options.encoding))
+	rpcStream := Wrap(stream, withOptions(&c.options))
 
 	err = rpcStream.WriteMsg(&Invoke{
 		Method: method,
 	})
 
 	return rpcStream, err
+}
+
+// Dialer provides a minimal interface needed to establish a client.
+type Dialer interface {
+	DialContext(ctx context.Context) (io.ReadWriteCloser, error)
+}
+
+// emptyDialer is used to signal that the Dialer implementation needs to be provided on the ClientConn.
+type emptyDialer struct{}
+
+func (d *emptyDialer) DialContext(ctx context.Context) (io.ReadWriteCloser, error) {
+	panic("Dialer not provided")
 }

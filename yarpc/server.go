@@ -18,11 +18,12 @@ package yarpc
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
+	"io"
 	"net"
 	"sync/atomic"
 
 	"github.com/hashicorp/yamux"
-	"github.com/jonboulle/clockwork"
 	"github.com/panjf2000/ants/v2"
 	"github.com/pkg/errors"
 
@@ -35,14 +36,20 @@ const (
 	startedState
 )
 
+type Listener interface {
+	Accept() (io.ReadWriteCloser, error)
+	Close() error
+}
+
 type Server struct {
+	Handler Handler
+
 	// set during initialization
-	state    int32
-	handlers map[string]Handler
+	state int32
 
 	// set during serve
-	options  *options
-	listener net.Listener
+	options  options
+	listener Listener
 	pool     *ants.Pool
 }
 
@@ -50,17 +57,13 @@ func (s *Server) init() {
 	if !atomic.CompareAndSwapInt32(&s.state, uninitializedState, stoppedState) {
 		return
 	}
-
-	s.handlers = make(map[string]Handler)
 }
 
 func (s *Server) handleStream(stream *yamux.Stream) func() {
 	return func() {
 		var err error
 
-		rpcStream := wrap(stream,
-			withContext(s.options.context),
-			withEncoding(s.options.encoding))
+		rpcStream := Wrap(stream, withOptions(&s.options))
 
 		defer func() {
 			if err != nil {
@@ -71,18 +74,7 @@ func (s *Server) handleStream(stream *yamux.Stream) func() {
 			}
 		}()
 
-		invoke := &Invoke{}
-		err = rpcStream.ReadMsg(invoke)
-		if err != nil {
-			return
-		}
-
-		handler := s.handlers[invoke.Method]
-		if handler == nil {
-			return
-		}
-
-		err = handler.Handle(rpcStream)
+		err = s.Handler.ServeYARPC(rpcStream)
 	}
 }
 
@@ -119,12 +111,6 @@ func (s *Server) handleSession(session *yamux.Session) func() {
 
 /* all public functions must start with s.once.Do(s.init) */
 
-func (s *Server) Handle(pattern string, handler Handler) {
-	s.init()
-
-	s.handlers[pattern] = handler
-}
-
 func (s *Server) Shutdown() error {
 	s.init()
 
@@ -144,26 +130,32 @@ func (s *Server) Shutdown() error {
 	return nil
 }
 
-func (s *Server) Serve(listener net.Listener, opts ...Option) error {
+func (s *Server) Serve(listener Listener, opts ...Option) error {
 	s.init()
 
 	if !atomic.CompareAndSwapInt32(&s.state, stoppedState, startedState) {
 		return errors.New("server already started")
 	}
 
-	o := &options{
+	o := options{
 		context:  context.Background(),
 		yamux:    yamux.DefaultConfig(),
 		encoding: encoding.MsgPack,
-		clock:    clockwork.NewRealClock(),
 	}
 
 	for _, opt := range opts {
-		opt(o)
+		opt(&o)
 	}
 
 	if o.tls != nil {
-		listener = tls.NewListener(listener, o.tls)
+		ntl, ok := listener.(*NetListenerAdapter)
+		if !ok {
+			return fmt.Errorf("tls not supported on non-net listeners")
+		}
+
+		listener = &NetListenerAdapter{
+			Listener: tls.NewListener(ntl.Listener, o.tls),
+		}
 	}
 
 	s.options = o
@@ -190,7 +182,7 @@ func (s *Server) Serve(listener net.Listener, opts ...Option) error {
 
 		session, err := yamux.Server(conn, o.yamux)
 		if err != nil {
-			return errors.Wrap(err, "failed to wrap connection for yamux")
+			return errors.Wrap(err, "failed to Wrap connection for yamux")
 		}
 
 		err = s.pool.Submit(s.handleSession(session))
@@ -201,9 +193,13 @@ func (s *Server) Serve(listener net.Listener, opts ...Option) error {
 }
 
 func (s *Server) ListenAndServe(network, address string, opts ...Option) error {
-	listener, err := net.Listen(network, address)
+	netListener, err := net.Listen(network, address)
 	if err != nil {
 		return errors.Wrap(err, "failed to bind to network")
+	}
+
+	listener := &NetListenerAdapter{
+		Listener: netListener,
 	}
 
 	return s.Serve(listener, opts...)

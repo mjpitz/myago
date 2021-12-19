@@ -89,9 +89,12 @@ func TestPaxos(t *testing.T) {
 		pax, err := newPaxos(i)
 		require.NoError(t, err)
 
-		svr := &yarpc.Server{}
-		paxos.RegisterYarpcAcceptorServer(svr, pax)
-		paxos.RegisterYarpcObserverServer(svr, pax)
+		mux := &yarpc.ServeMux{}
+		svr := &yarpc.Server{
+			Handler: mux,
+		}
+		paxos.RegisterYarpcAcceptorServer(mux, pax)
+		paxos.RegisterYarpcObserverServer(mux, pax)
 
 		svrContext := yarpc.WithContext(ctx)
 

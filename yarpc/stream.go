@@ -37,6 +37,7 @@ func nonce() string {
 	return hex.EncodeToString(nonce)
 }
 
+// Stream provides an interface for reading and writing message structures from a stream.
 type Stream interface {
 	Context() context.Context
 	SetReadDeadline(deadline time.Time) error
@@ -46,27 +47,31 @@ type Stream interface {
 	Close() error
 }
 
-func wrap(ys *yamux.Stream, opts ...streamOption) *rpcStream {
-	rs := &rpcStream{
+// Wrap converts the provided yamux stream into a yarpc Stream.
+func Wrap(ys *yamux.Stream, opts ...Option) Stream {
+	o := options{
 		context:  context.Background(),
 		encoding: encoding.MsgPack,
-		stream:   ys,
 	}
 
 	for _, opt := range opts {
-		opt(rs)
+		opt(&o)
 	}
 
-	rs.encoder = rs.encoding.Encoder(ys)
-	rs.decoder = rs.encoding.Decoder(ys)
+	rs := &rpcStream{
+		context: o.context,
+		stream:  ys,
+	}
+
+	rs.encoder = o.encoding.Encoder(ys)
+	rs.decoder = o.encoding.Decoder(ys)
 
 	return rs
 }
 
 type rpcStream struct {
-	context  context.Context
-	encoding *encoding.Encoding
-	stream   *yamux.Stream
+	context context.Context
+	stream  *yamux.Stream
 
 	encoder encoding.Encoder
 	decoder encoding.Decoder

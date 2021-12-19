@@ -51,10 +51,16 @@ Example ClientConn:
 ## Usage
 
 ```go
-var DefaultServer = &Server{}
+var (
+	// DefaultServeMux provides a default request multiplexer (router).
+	DefaultServeMux = &ServeMux{}
+
+	// DefaultServer is a global server definition that can be leveraged by hosting program.
+	DefaultServer = &Server{
+		Handler: DefaultServeMux,
+	}
+)
 ```
-DefaultServer is a global server definition that can be leveraged by hosting
-program.
 
 #### func  Handle
 
@@ -77,14 +83,22 @@ func ListenAndServe(network, address string, opts ...Option) error
 ```
 ListenAndServe starts the default server on the provided network and address.
 
+#### func  Serve
+
+```go
+func Serve(listener Listener, opts ...Option) error
+```
+Serve starts the default server using the provided listener.
+
 #### type ClientConn
 
 ```go
 type ClientConn struct {
+	Dialer Dialer
 }
 ```
 
-ClientConn.
+ClientConn defines an abstract connection yarpc clients to use.
 
 #### func  DialContext
 
@@ -93,23 +107,38 @@ func DialContext(ctx context.Context, network, target string, opts ...Option) *C
 ```
 DialContext initializes a new client connection to the target server.
 
+#### func  NewClientConn
+
+```go
+func NewClientConn(ctx context.Context) *ClientConn
+```
+NewClientConn creates a default ClientConn with an empty dialer implementation.
+The Dialer must be configured before use. This function is intended to be used
+in initializer functions such as DialContext.
+
 #### func (*ClientConn) OpenStream
 
 ```go
 func (c *ClientConn) OpenStream(ctx context.Context, method string) (Stream, error)
 ```
-OpenStream starts a stream for a given RPC.
+OpenStream starts a stream for the named RPC.
+
+#### func (*ClientConn) WithOptions
+
+```go
+func (c *ClientConn) WithOptions(opts ...Option) *ClientConn
+```
+WithOptions configures the options for the underlying client connection.
 
 #### type Dialer
 
 ```go
 type Dialer interface {
-	DialContext(ctx context.Context, network, address string) (net.Conn, error)
+	DialContext(ctx context.Context) (io.ReadWriteCloser, error)
 }
 ```
 
-Dialer provides a common interface for obtaining a net.Conn. This makes it easy
-to handle TLS transparently.
+Dialer provides a minimal interface needed to establish a client.
 
 #### type Frame
 
@@ -127,7 +156,7 @@ Frame is the generalized structure passed along the wire.
 
 ```go
 type Handler interface {
-	Handle(Stream) error
+	ServeYARPC(Stream) error
 }
 ```
 
@@ -141,10 +170,10 @@ type HandlerFunc func(Stream) error
 
 HandlerFunc provides users with a simple functional interface for a Handler.
 
-#### func (HandlerFunc) Handle
+#### func (HandlerFunc) ServeYARPC
 
 ```go
-func (fn HandlerFunc) Handle(stream Stream) error
+func (fn HandlerFunc) ServeYARPC(stream Stream) error
 ```
 
 #### type Invoke
@@ -155,6 +184,69 @@ type Invoke struct {
 }
 ```
 
+
+#### type Listener
+
+```go
+type Listener interface {
+	Accept() (io.ReadWriteCloser, error)
+	Close() error
+}
+```
+
+
+#### type NetDialer
+
+```go
+type NetDialer interface {
+	DialContext(ctx context.Context, network, address string) (net.Conn, error)
+}
+```
+
+NetDialer provides a common interface for obtaining a net.Conn. This makes it
+easy to handle TLS transparently.
+
+#### type NetDialerAdapter
+
+```go
+type NetDialerAdapter struct {
+	Dialer  NetDialer
+	Network string
+	Target  string
+}
+```
+
+NetDialerAdapter adapts the provided NetDialer to support io.ReadWriteCloser.
+
+#### func (*NetDialerAdapter) DialContext
+
+```go
+func (a *NetDialerAdapter) DialContext(ctx context.Context) (io.ReadWriteCloser, error)
+```
+DialContext returns a creates a new network connection.
+
+#### type NetListenerAdapter
+
+```go
+type NetListenerAdapter struct {
+	Listener net.Listener
+}
+```
+
+NetListenerAdapter adapts the provided net.Listener to support
+io.ReadWriteCloser.
+
+#### func (*NetListenerAdapter) Accept
+
+```go
+func (n *NetListenerAdapter) Accept() (io.ReadWriteCloser, error)
+```
+
+#### func (*NetListenerAdapter) Close
+
+```go
+func (n *NetListenerAdapter) Close() error
+```
 
 #### type Option
 
@@ -193,19 +285,35 @@ func WithYamux(config *yamux.Config) Option
 ```
 WithYamux configures yamux using the provided configuration.
 
+#### type ServeMux
+
+```go
+type ServeMux struct {
+}
+```
+
+ServeMux provides a router implementation for yarpc calls.
+
+#### func (*ServeMux) Handle
+
+```go
+func (s *ServeMux) Handle(pattern string, handler Handler)
+```
+
+#### func (*ServeMux) ServeYARPC
+
+```go
+func (s *ServeMux) ServeYARPC(stream Stream) (err error)
+```
+
 #### type Server
 
 ```go
 type Server struct {
+	Handler Handler
 }
 ```
 
-
-#### func (*Server) Handle
-
-```go
-func (s *Server) Handle(pattern string, handler Handler)
-```
 
 #### func (*Server) ListenAndServe
 
@@ -216,7 +324,7 @@ func (s *Server) ListenAndServe(network, address string, opts ...Option) error
 #### func (*Server) Serve
 
 ```go
-func (s *Server) Serve(listener net.Listener, opts ...Option) error
+func (s *Server) Serve(listener Listener, opts ...Option) error
 ```
 
 #### func (*Server) Shutdown
@@ -248,3 +356,13 @@ type Stream interface {
 	Close() error
 }
 ```
+
+Stream provides an interface for reading and writing message structures from a
+stream.
+
+#### func  Wrap
+
+```go
+func Wrap(ys *yamux.Stream, opts ...Option) Stream
+```
+Wrap converts the provided yamux stream into a yarpc Stream.
