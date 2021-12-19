@@ -44,13 +44,13 @@ type dialer struct {
 }
 
 func (d *dialer) DialContext(ctx context.Context) (io.ReadWriteCloser, error) {
-	stdin := NewBlockingReadWriteCloser()
-	stdout := NewBlockingReadWriteCloser()
+	stdinReader, stdinWriter := io.Pipe()
+	stdoutReader, stdoutWriter := io.Pipe()
 	stderr := bytes.NewBuffer(nil)
 
 	cmd := exec.CommandContext(ctx, d.Binary, d.Args...)
-	cmd.Stdin = stdin
-	cmd.Stdout = stdout
+	cmd.Stdin = stdinReader
+	cmd.Stdout = stdoutWriter
 	cmd.Stderr = stderr
 
 	err := cmd.Start()
@@ -59,8 +59,8 @@ func (d *dialer) DialContext(ctx context.Context) (io.ReadWriteCloser, error) {
 	}
 
 	return &clientRWC{
-		stdin:  stdin,
-		stdout: stdout,
+		stdin:  stdinWriter,
+		stdout: stdoutReader,
 		stderr: stderr,
 		cmd:    cmd,
 	}, nil

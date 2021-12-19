@@ -26,12 +26,3 @@ func Listen() yarpc.Listener
 ```
 Listen returns a yarpc.Listener that treats a processes stdin and stdout as a
 connection.
-
-#### func  NewBlockingReadWriteCloser
-
-```go
-func NewBlockingReadWriteCloser() *blockingReadWriteCloser
-```
-NewBlockingReadWriteCloser returns a new io.ReadWriteCloser that supports a
-blocking Read operation. Write will push new data into the channel to be added
-to the buffer after.

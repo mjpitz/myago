@@ -26,6 +26,10 @@ import (
 
 //go:generate go install ./examples/myago-plugin-echo
 
+type message struct {
+	Text string
+}
+
 func TestClient(t *testing.T) {
 	t.Parallel()
 
