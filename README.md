@@ -18,6 +18,7 @@ them.
 - [`lifecycle`](lifecycle) provides hooks into the lifecycle of an application.
 - [`livetls`](livetls) provides a `tls.Config` that periodically reloads the underlying configuration.
 - [`paxos`](paxos) provides a paxos implementation.
+- [`plugin`](plugin) provides code for writing command-line based plugins.
 - [`ulid`](ulid) provides code for generating variable length unique, lexigraphic identifiers (ULID) with programmable fills.
 - [`vfs`](vfs) provides code for working with file systems on contexts using afero.
 - [`vue`](vue) contains helpers for VueJS applications.

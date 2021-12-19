@@ -1,0 +1,2 @@
+# myago-plugin-echo
+--
