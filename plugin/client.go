@@ -16,13 +16,19 @@
 package plugin
 
 import (
-	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os/exec"
+	"strings"
+	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/mjpitz/myago/yarpc"
+	"github.com/mjpitz/myago/zaputil"
 )
 
 // DialContext returns a ClientConn whose dialer forks a process for the specified binary.
@@ -44,26 +50,62 @@ type dialer struct {
 }
 
 func (d *dialer) DialContext(ctx context.Context) (io.ReadWriteCloser, error) {
-	stdinReader, stdinWriter := io.Pipe()
-	stdoutReader, stdoutWriter := io.Pipe()
-	stderr := bytes.NewBuffer(nil)
+	stdin := Pipe()
+	stdout := Pipe()
+	stderr := Pipe()
 
 	cmd := exec.CommandContext(ctx, d.Binary, d.Args...)
-	cmd.Stdin = stdinReader
-	cmd.Stdout = stdoutWriter
+	cmd.Stdin = stdin
+	cmd.Stdout = stdout
 	cmd.Stderr = stderr
+
+	rwc := &clientRWC{
+		stdin:  stdin,
+		stdout: stdout,
+		cmd:    cmd,
+		err:    make(chan error, 1),
+	}
 
 	err := cmd.Start()
 	if err != nil {
-		return nil, fmt.Errorf("%v\n%s", err, stderr.String())
+		return nil, fmt.Errorf("failed to locate plugin: %s", d.Binary)
 	}
 
-	return &clientRWC{
-		stdin:  stdinWriter,
-		stdout: stdoutReader,
-		stderr: stderr,
-		cmd:    cmd,
-	}, nil
+	go func() {
+		_ = cmd.Wait()
+	}()
+
+	go func() {
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+
+		var err error
+		for err == nil {
+			select {
+			case <-ctx.Done():
+				err = ctx.Err()
+			case <-ticker.C:
+				if cmd.ProcessState != nil && cmd.ProcessState.Exited() {
+					err = errors.New("plugin exited")
+				}
+				ticker.Reset(time.Second)
+			}
+		}
+
+		// close the pipe to allow io.EOF to be returned
+		_ = stderr.Close()
+		rwc.err <- err
+		_ = rwc.Close()
+
+		body, _ := ioutil.ReadAll(stderr)
+		if len(body) > 0 {
+			zaputil.Extract(ctx).Error("plugin execution failed",
+				zap.String("plugin", d.Binary),
+				zap.String("error", strings.TrimSpace(string(body))))
+		}
+	}()
+
+	return rwc, nil
 }
 
 var _ yarpc.Dialer = &dialer{}
@@ -72,27 +114,52 @@ var _ yarpc.Dialer = &dialer{}
 type clientRWC struct {
 	stdin  io.WriteCloser
 	stdout io.ReadCloser
-	stderr *bytes.Buffer
-	cmd    *exec.Cmd
+
+	cmd *exec.Cmd
+	err chan error
+}
+
+func (c *clientRWC) readError() error {
+	err := <-c.err
+	c.err <- err
+
+	return err
 }
 
 func (c *clientRWC) Read(p []byte) (n int, err error) {
-	return c.stdout.Read(p)
+	n, err = c.stdout.Read(p)
+
+	if err != nil {
+		read := c.readError()
+		if read != nil {
+			err = read
+		}
+	}
+
+	return
 }
 
 func (c *clientRWC) Write(p []byte) (n int, err error) {
-	return c.stdin.Write(p)
+	n, err = c.stdin.Write(p)
+
+	if err != nil {
+		read := c.readError()
+		if read != nil {
+			err = read
+		}
+	}
+
+	return
 }
 
 func (c *clientRWC) Close() (err error) {
 	_ = c.stdin.Close()
-	err = c.cmd.Wait()
-	_ = c.stdout.Close()
 
-	if err != nil {
-		return fmt.Errorf("%v\n%s", err, c.stderr.String())
+	if c.cmd != nil {
+		_ = c.cmd.Wait()
 	}
 
+	_ = c.stdout.Close()
 	return nil
 }
 

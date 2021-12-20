@@ -17,23 +17,30 @@ package plugin_test
 
 import (
 	"context"
+	"io"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
 
+	"github.com/mjpitz/myago/lifecycle"
 	"github.com/mjpitz/myago/plugin"
+	"github.com/mjpitz/myago/zaputil"
 )
 
 //go:generate go install ./examples/myago-plugin-echo
+//go:generate go install ./examples/myago-plugin-failure
 
 type message struct {
 	Text string
 }
 
-func TestClient(t *testing.T) {
-	t.Parallel()
+func TestEchoClient(t *testing.T) {
+	ctx := lifecycle.Setup(context.Background())
+	defer lifecycle.Resolve(ctx)
 
-	ctx := context.Background()
+	log, _ := zap.NewDevelopment()
+	ctx = zaputil.ToContext(ctx, log)
 
 	clientConn := plugin.DialContext(ctx, "myago-plugin-echo")
 
@@ -54,4 +61,33 @@ func TestClient(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, "hello world", msg.Text)
+}
+
+func TestFailureClient(t *testing.T) {
+	ctx := lifecycle.Setup(context.Background())
+	defer lifecycle.Resolve(ctx)
+
+	log, _ := zap.NewDevelopment()
+	ctx = zaputil.ToContext(ctx, log)
+
+	clientConn := plugin.DialContext(ctx, "myago-plugin-failure")
+
+	// this is a bit of a schrödinger's cat situation so we conditionally check the error at each step
+	// I suspect the write path is less-likely to be blocked by the error since yamux uses an async approach
+
+	stream, err := clientConn.OpenStream(ctx, "/echo")
+	require.NoError(t, err)
+
+	err = stream.WriteMsg(message{
+		Text: "hello world",
+	})
+	require.NoError(t, err)
+
+	msg := &message{}
+	err = stream.ReadMsg(msg)
+	require.Error(t, err)
+
+	// yamux returns an EOF when the stream is closed
+	// this doesn't seem to be something we can easily work around.
+	require.Equal(t, io.EOF, err)
 }

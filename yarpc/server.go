@@ -21,19 +21,15 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"sync/atomic"
+	"net/http"
+	"sync"
 
 	"github.com/hashicorp/yamux"
 	"github.com/panjf2000/ants/v2"
 	"github.com/pkg/errors"
 
 	"github.com/mjpitz/myago/encoding"
-)
-
-const (
-	uninitializedState int32 = iota
-	stoppedState
-	startedState
+	"github.com/mjpitz/myago/zaputil"
 )
 
 type Listener interface {
@@ -44,37 +40,35 @@ type Listener interface {
 type Server struct {
 	Handler Handler
 
-	// set during initialization
-	state int32
-
 	// set during serve
+	mu       sync.Mutex
 	options  options
 	listener Listener
 	pool     *ants.Pool
 }
 
-func (s *Server) init() {
-	if !atomic.CompareAndSwapInt32(&s.state, uninitializedState, stoppedState) {
-		return
-	}
-}
-
 func (s *Server) handleStream(stream *yamux.Stream) func() {
 	return func() {
-		var err error
-
 		rpcStream := Wrap(stream, withOptions(&s.options))
+		var err error
 
 		defer func() {
 			if err != nil {
 				// log
-				if err := stream.Close(); err != nil {
-					// log
-				}
+			}
+
+			if err := stream.Close(); err != nil {
+				// log
 			}
 		}()
 
 		err = s.Handler.ServeYARPC(rpcStream)
+		if err != nil {
+			err = rpcStream.WriteMsg(&Status{
+				Code:    http.StatusInternalServerError,
+				Message: err.Error(),
+			})
+		}
 	}
 }
 
@@ -112,31 +106,24 @@ func (s *Server) handleSession(session *yamux.Session) func() {
 /* all public functions must start with s.once.Do(s.init) */
 
 func (s *Server) Shutdown() error {
-	s.init()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	if !atomic.CompareAndSwapInt32(&s.state, startedState, stoppedState) {
-		return errors.New("server not started")
+	listener := s.listener
+	s.listener = nil
+
+	if listener != nil {
+		_ = listener.Close()
 	}
 
-	defer func() {
+	if s.pool != nil {
 		s.pool.Release()
-		s.listener = nil
-	}()
-
-	if listener := s.listener; listener != nil {
-		return listener.Close()
 	}
 
 	return nil
 }
 
 func (s *Server) Serve(listener Listener, opts ...Option) error {
-	s.init()
-
-	if !atomic.CompareAndSwapInt32(&s.state, stoppedState, startedState) {
-		return errors.New("server already started")
-	}
-
 	o := options{
 		context:  context.Background(),
 		yamux:    yamux.DefaultConfig(),
@@ -158,20 +145,31 @@ func (s *Server) Serve(listener Listener, opts ...Option) error {
 		}
 	}
 
-	s.options = o
-	s.listener = listener
+	err := func() (err error) {
+		s.mu.Lock()
+		defer s.mu.Unlock()
 
-	if s.pool == nil {
-		pool, err := ants.NewPool(3000, ants.WithOptions(ants.Options{
-			// Logger: zap.NewStdLog(logger),
-		}))
-		if err != nil {
-			return errors.Wrap(err, "failed to construct ant pool")
+		pool := s.pool
+		if pool == nil {
+			pool, err = ants.NewPool(3000, ants.WithOptions(ants.Options{
+				// Logger: zap.NewStdLog(logger),
+			}))
+			if err != nil {
+				return errors.Wrap(err, "failed to construct ant pool")
+			}
+		} else {
+			pool.Reboot()
 		}
 
+		s.options = o
+		s.listener = listener
 		s.pool = pool
-	} else {
-		s.pool.Reboot()
+
+		return nil
+	}()
+
+	if err != nil {
+		return err
 	}
 
 	for {
@@ -179,6 +177,10 @@ func (s *Server) Serve(listener Listener, opts ...Option) error {
 		if err != nil {
 			return errors.Wrap(err, "failed to accept connection")
 		}
+
+		yamuxcfg := *o.yamux
+		yamuxcfg.Logger = zaputil.HashiCorpStdLogger(zaputil.Extract(o.context))
+		yamuxcfg.LogOutput = nil
 
 		session, err := yamux.Server(conn, o.yamux)
 		if err != nil {

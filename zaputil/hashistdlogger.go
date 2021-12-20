@@ -52,7 +52,7 @@ func (w *hashiWriter) Write(p []byte) (n int, err error) {
 		w.logger.Info(msg, fields...)
 	case "WARN", "warn":
 		w.logger.Warn(msg, fields...)
-	case "ERROR", "error":
+	case "ERR", "ERROR", "error":
 		w.logger.Error(msg, fields...)
 	}
 

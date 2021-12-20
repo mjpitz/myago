@@ -23,8 +23,6 @@ import (
 )
 
 func main() {
-	log.SetPrefix("myago-plugin-echo")
-
 	yarpc.HandleFunc("/echo", func(stream yarpc.Stream) (err error) {
 		msg := map[string]interface{}{}
 		err = stream.ReadMsg(&msg)

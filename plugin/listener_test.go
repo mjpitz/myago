@@ -46,29 +46,61 @@ func TestListener(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	stdinReader, stdinWriter := io.Pipe()
-	stdoutReader, stdoutWriter := io.Pipe()
+	stdin := Pipe()
+	stdout := Pipe()
 
 	listener := listen(&serverRWC{
-		stdin: stdinReader,
-		stdout: stdoutWriter,
+		stdin:  stdin,
+		stdout: stdout,
 	})
 
 	dialer := &mockDialer{
 		conn: &clientRWC{
-			stdout: stdoutReader,
-			stdin: stdinWriter,
+			stdin:  stdin,
+			stdout: stdout,
 		},
 	}
 
 	var group errgroup.Group
 
-	defer func() {
-		_ = yarpc.DefaultServer.Shutdown()
-		_ = group.Wait()
-	}()
+	group.Go(func() error {
+		defer func() {
+			t.Log("shutting down")
+			_ = yarpc.DefaultServer.Shutdown()
+		}()
+
+		t.Log("creating client")
+		clientConn := yarpc.NewClientConn(ctx)
+		clientConn.Dialer = dialer
+
+		performCall := func() {
+			stream, err := clientConn.OpenStream(ctx, "/echo")
+			require.NoError(t, err)
+
+			err = stream.WriteMsg(message{
+				Text: "hello world",
+			})
+			require.NoError(t, err)
+
+			msg := &message{}
+
+			err = stream.ReadMsg(msg)
+			require.NoError(t, err)
+
+			require.Equal(t, "hello world", msg.Text)
+		}
+
+		for callID := 1; callID <= 5; callID++ {
+			t.Log("performing call")
+			performCall()
+		}
+
+		return nil
+	})
 
 	group.Go(func() error {
+		t.Log("starting server")
+
 		yarpc.HandleFunc("/echo", func(stream yarpc.Stream) (err error) {
 			msg := message{}
 			err = stream.ReadMsg(&msg)
@@ -87,30 +119,5 @@ func TestListener(t *testing.T) {
 		return yarpc.Serve(listener, yarpc.WithContext(ctx))
 	})
 
-	clientConn := yarpc.NewClientConn(ctx)
-	clientConn.Dialer = dialer
-
-	performCall := func() {
-		stream, err := clientConn.OpenStream(ctx, "/echo")
-		require.NoError(t, err)
-
-		err = stream.WriteMsg(message{
-			Text: "hello world",
-		})
-		require.NoError(t, err)
-
-		msg := &message{}
-
-		err = stream.ReadMsg(msg)
-		require.NoError(t, err)
-
-		require.Equal(t, "hello world", msg.Text)
-	}
-
-	performCall()
-
-	// make 5 successive calls
-	//for callID := 1; callID <= 5; callID++ {
-	//	performCall()
-	//}
+	_ = group.Wait()
 }
