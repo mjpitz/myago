@@ -30,6 +30,13 @@ func Setup(ctx context.Context) context.Context
 ```
 Setup initializes a shutdown hook that cancels the underlying context.
 
+#### func  Shutdown
+
+```go
+func Shutdown(ctx context.Context)
+```
+Shutdown halts the context, stopping any lingering processes.
+
 #### type LifeCycle
 
 ```go

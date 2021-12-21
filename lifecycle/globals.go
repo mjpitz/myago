@@ -35,3 +35,8 @@ func Resolve(ctx context.Context) {
 func Setup(ctx context.Context) context.Context {
 	return systemLifeCycle.Setup(ctx)
 }
+
+// Shutdown halts the context, stopping any lingering processes.
+func Shutdown(ctx context.Context) {
+	systemLifeCycle.Shutdown(ctx)
+}

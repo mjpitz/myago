@@ -28,6 +28,7 @@ type LifeCycle struct {
 	mu       sync.Mutex
 	funcs    []func(ctx context.Context)
 	shutdown context.CancelFunc
+	halt     context.CancelFunc
 }
 
 // Defer will enqueue a function that will be invoked by Resolve.
@@ -61,7 +62,8 @@ func (lc *LifeCycle) Setup(ctx context.Context) context.Context {
 		lc.mu.Lock()
 		defer lc.mu.Unlock()
 
-		ctx, lc.shutdown = signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
+		ctx, lc.shutdown = context.WithCancel(ctx)
+		ctx, lc.halt = signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
 	})
 
 	return ctx
@@ -73,8 +75,10 @@ func (lc *LifeCycle) Shutdown(ctx context.Context) {
 
 	if lc.shutdown != nil {
 		lc.shutdown()
+		lc.halt()
 
 		lc.shutdown = nil
+		lc.halt = nil
 		lc.once = sync.Once{}
 	}
 }
