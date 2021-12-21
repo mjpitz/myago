@@ -26,3 +26,10 @@ func Listen() yarpc.Listener
 ```
 Listen returns a yarpc.Listener that treats a processes stdin and stdout as a
 connection.
+
+#### func  Pipe
+
+```go
+func Pipe() *pipe
+```
+Pipe returns a psuedo-async io.ReadWriteCloser.
