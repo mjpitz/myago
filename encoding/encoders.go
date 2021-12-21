@@ -18,13 +18,10 @@ package encoding
 import (
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"io"
 
 	"github.com/pelletier/go-toml"
 	"github.com/vmihailenco/msgpack/v5"
-	"google.golang.org/protobuf/encoding/prototext"
-	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
 )
 
@@ -46,30 +43,6 @@ var (
 		},
 		Decoder: func(r io.Reader) Decoder {
 			return msgpack.NewDecoder(r)
-		},
-	}
-
-	// ProtoText defines a common structure for handling protobuf text encoding.
-	ProtoText = &Encoding{
-		Encoder: func(w io.Writer) Encoder {
-			return FromMarshaler(w, func(v interface{}) ([]byte, error) {
-				m, ok := v.(proto.Message)
-				if !ok {
-					return nil, fmt.Errorf("value is not a protobuf")
-				}
-
-				return prototext.Marshal(m)
-			})
-		},
-		Decoder: func(r io.Reader) Decoder {
-			return FromUnmarshaler(r, func(data []byte, v interface{}) error {
-				m, ok := v.(proto.Message)
-				if !ok {
-					return fmt.Errorf("value is not a protobuf")
-				}
-
-				return prototext.Unmarshal(data, m)
-			})
 		},
 	}
 

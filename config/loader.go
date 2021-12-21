@@ -29,8 +29,6 @@ import (
 // DefaultLoader provides a default Loader implementation that supports reading a variety of files.
 var DefaultLoader = Loader{
 	".json":     encoding.JSON,
-	".prototxt": encoding.ProtoText,
-	".ptxt":     encoding.ProtoText,
 	".toml":     encoding.TOML,
 	".yaml":     encoding.YAML,
 	".yml":      encoding.YAML,

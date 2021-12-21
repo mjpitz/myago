@@ -26,7 +26,6 @@ import subprocess
 allowed_google_libraries = {
     "": {
         "github.com/google/btree": "",
-        "google.golang.org/protobuf": "",
     },
     "cmd/myago": {},
     "paxos": {

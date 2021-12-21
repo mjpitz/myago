@@ -29,30 +29,6 @@ var (
 		},
 	}
 
-	// ProtoText defines a common structure for handling protobuf text encoding.
-	ProtoText = &Encoding{
-		Encoder: func(w io.Writer) Encoder {
-			return FromMarshaler(w, func(v interface{}) ([]byte, error) {
-				m, ok := v.(proto.Message)
-				if !ok {
-					return nil, fmt.Errorf("value is not a protobuf")
-				}
-
-				return prototext.Marshal(m)
-			})
-		},
-		Decoder: func(r io.Reader) Decoder {
-			return FromUnmarshaler(r, func(data []byte, v interface{}) error {
-				m, ok := v.(proto.Message)
-				if !ok {
-					return fmt.Errorf("value is not a protobuf")
-				}
-
-				return prototext.Unmarshal(data, m)
-			})
-		},
-	}
-
 	// TOML defines a common structure for handling TOML encoding.
 	TOML = &Encoding{
 		Encoder: func(w io.Writer) Encoder {
@@ -95,14 +71,6 @@ type Decoder interface {
 
 Decoder defines how objects are decoded.
 
-#### func  FromUnmarshaler
-
-```go
-func FromUnmarshaler(reader io.Reader, unmarshaler Unmarshaler) Decoder
-```
-FromUnmarshaler returns a Decoder that reads messages from the provided reader
-and decodes them using the provided unmarshaler.
-
 #### type Encoder
 
 ```go
@@ -112,14 +80,6 @@ type Encoder interface {
 ```
 
 Encoder defines how objects are encoded.
-
-#### func  FromMarshaler
-
-```go
-func FromMarshaler(writer io.Writer, marshaler Marshaler) Encoder
-```
-FromMarshaler returns an Encoder that writes messages to the target writer
-encoded with the results of the provided marshaller.
 
 #### type Encoding
 
@@ -133,21 +93,3 @@ type Encoding struct {
 ```
 
 Encoding defines the encoding of a file.
-
-#### type Marshaler
-
-```go
-type Marshaler func(v interface{}) ([]byte, error)
-```
-
-Marshaler defines an interface for marshalling data into its binary/text
-representation.
-
-#### type Unmarshaler
-
-```go
-type Unmarshaler func(data []byte, v interface{}) error
-```
-
-Unmarshaler defines an interface for unmarshalling data for an interface from a
-given byte array.
