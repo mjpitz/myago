@@ -19,8 +19,6 @@ builds:
 archives:
   - id: {{ .Name }}
     name_template: "{{ .Name }}_{{ print "{{ .Os }}_{{ .Arch }}" }}"
-    builds:
-      - {{ .Name }}
 
 checksum:
   name_template: '{{ .Name }}_checksums.txt'

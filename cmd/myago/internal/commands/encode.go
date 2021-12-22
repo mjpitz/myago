@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package internal
+package commands
 
 import (
 	"fmt"
@@ -22,7 +22,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var phoneCodeMap = map[string]string {
+var phoneCodeMap = map[string]string{
 	"a": "2", "b": "2", "c": "2",
 	"d": "3", "e": "3", "f": "3",
 	"g": "4", "h": "4", "i": "4",

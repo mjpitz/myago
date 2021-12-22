@@ -1,19 +1,30 @@
-SKAFFOLD_DEFAULT_REPO ?= ghcr.io/mjpitz
+{{- $dockerEnabled := includes .Features "docker" }}
+{{- $legalEnabled := includes .Features "legal" }}
+{{- $goEnabled := includes .Features "go" }}
+{{- $goreleaserEnabled := includes .Features "goreleaser" }}
+{{- $versionEnabled := includes .Features "version" }}
 CWD = $(shell pwd)
+{{- if $dockerEnabled }}
+SKAFFOLD_DEFAULT_REPO ?= ghcr.io/mjpitz
 VERSION ?= latest
+{{- end }}
 
 define HELP_TEXT
 Welcome to {{ .Name }}!
 
 Targets:
   help             provides help text
-
-  docker           rebuild the {{ .Name }} docker container
-  docker/release   releases {{ .Name }} (will likely move)
-
-  legal            prepends legal header to source code
   test             run tests
+  {{- if $dockerEnabled }}
+  docker           rebuild the {{ .Name }} docker container
+  docker/release   releases {{ .Name }}
+  {{- end}}
+  {{- if $legalEnabled }}
+  legal            prepends legal header to source code
+  {{- end }}
+  {{- if $goreleaserEnabled }}
   dist             recompiles {{ .Name }} binaries
+  {{- end }}
 
 endef
 export HELP_TEXT
@@ -21,6 +32,7 @@ export HELP_TEXT
 help:
 	@echo "$$HELP_TEXT"
 
+{{- if $dockerEnabled }}
 docker: .docker
 .docker:
 	docker build . \
@@ -33,27 +45,35 @@ docker/release:
 		--platform linux/amd64,linux/arm64 \
 		--label "org.opencontainers.image.source=https://github.com/mjpitz/{{ .Name }}" \
 		--label "org.opencontainers.image.version=$(VERSION)" \
-		--label "org.opencontainers.image.licenses={{ .Config.License }}" \
+		--label "org.opencontainers.image.licenses={{ .License }}" \
 		--label "org.opencontainers.image.title={{ .Name }}" \
 		--label "org.opencontainers.image.description=" \
 		--tag $(SKAFFOLD_DEFAULT_REPO)/{{ .Name }}:latest \
 		--tag $(SKAFFOLD_DEFAULT_REPO)/{{ .Name }}:$(VERSION) \
 		--file ./cmd/{{ .Name }}/Dockerfile \
 		--push
+{{- end }}
 
 # actual targets
 
+test:
+	{{- if $goEnabled }}
+	go test -v -race -coverprofile=.coverprofile -covermode=atomic ./...
+	{{- end }}
+
+{{- if $legalEnabled }}
 legal: .legal
 .legal:
 	addlicense -f ./legal/header.txt -skip yaml -skip yml .
+{{- end }}
 
-test:
-	go test -v -race -coverprofile=.coverprofile -covermode=atomic ./...
-
+{{- if $goreleaserEnabled }}
 dist: .dist
 .dist:
 	sh ./scripts/dist-go.sh
+{{- end }}
 
+{{- if $versionEnabled }}
 # useful shortcuts for release
 
 tag/release:
@@ -63,3 +83,4 @@ tag/release:
 tag/patch:
 	npm version patch
 	git push --follow-tags
+{{- end }}

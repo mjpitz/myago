@@ -8,7 +8,7 @@ import (
 
 const versionTemplate = "{{ print "{{ .Name }} {{ .Version }} {{ range $key, $value := .Metadata }}{{ $key }}={{ $value }} {{ end }}" }}\n"
 
-var VersionCommand = &cli.Command{
+var Version = &cli.Command{
 	Name:      "version",
 	Usage:     "Print the binary version information",
 	UsageText: "{{ .Name }} version",

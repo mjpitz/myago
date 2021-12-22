@@ -37,7 +37,7 @@ func main() {
 		Version:   fmt.Sprintf("%s (%s)", version, commit),
 		Flags:     flagset.Extract(cfg),
 		Commands: []*cli.Command{
-			commands.VersionCommand,
+			commands.Version,
 		},
 		Before: func(ctx *cli.Context) error {
 			ctx.Context = zaputil.Setup(ctx.Context, cfg.Log)
@@ -47,6 +47,7 @@ func main() {
 		},
 		After: func(ctx *cli.Context) error {
 			lifecycle.Resolve(ctx.Context)
+			lifecycle.Shutdown(ctx.Context)
 
 			return nil
 		},
