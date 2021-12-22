@@ -2,13 +2,11 @@ module github.com/mjpitz/myago/paxos
 
 go 1.17
 
-replace github.com/mjpitz/myago => ../
-
 require (
 	github.com/cenkalti/backoff/v4 v4.1.2
 	github.com/dgraph-io/badger/v3 v3.2103.2
 	github.com/jonboulle/clockwork v0.2.2
-	github.com/mjpitz/myago v0.0.0-00010101000000-000000000000
+	github.com/mjpitz/myago v0.0.0-20211221010305-eb5ba2633c88
 	github.com/stretchr/testify v1.7.0
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
