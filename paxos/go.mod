@@ -6,7 +6,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.1.2
 	github.com/dgraph-io/badger/v3 v3.2103.2
 	github.com/jonboulle/clockwork v0.2.2
-	github.com/mjpitz/myago v0.0.0-20211221010305-eb5ba2633c88
+	github.com/mjpitz/myago v0.0.0-20211223162157-7e91fadde587
 	github.com/stretchr/testify v1.7.0
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c

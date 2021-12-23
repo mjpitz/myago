@@ -165,7 +165,7 @@ func TestBadger(t *testing.T) {
 
 	opts := badger.DefaultOptions(t.TempDir()).
 		WithSyncWrites(true).
-		WithLogger(zaputil.BadgerLogger(log))
+		WithLogger(zaputil.Badger(log))
 
 	db, err := badger.Open(opts)
 	require.NoError(t, err)
