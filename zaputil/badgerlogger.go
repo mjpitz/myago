@@ -21,17 +21,17 @@ import (
 	"go.uber.org/zap"
 )
 
-// BadgerLog is an interface pulled from the badger library. It defines the functionality needed by the badger system to
-// log messages. It supports a variety of levels and works similar to the fmt.Printf method.
-type BadgerLog interface {
+// BadgerLogger is an interface pulled from the badger library. It defines the functionality needed by the badger system
+// to log messages. It supports a variety of levels and works similar to the fmt.Printf method.
+type BadgerLogger interface {
 	Errorf(string, ...interface{})
 	Warningf(string, ...interface{})
 	Infof(string, ...interface{})
 	Debugf(string, ...interface{})
 }
 
-// BadgerLogger wraps the provided logger so badger can log using zap.
-func BadgerLogger(log *zap.Logger) BadgerLog {
+// Badger wraps the provided logger so badger can log using zap.
+func Badger(log *zap.Logger) BadgerLogger {
 	return &logger{
 		log: log.WithOptions(zap.AddCallerSkip(2)),
 	}
@@ -57,4 +57,4 @@ func (l *logger) Debugf(s string, i ...interface{}) {
 	l.log.Debug(fmt.Sprintf(s, i...))
 }
 
-var _ BadgerLog = &logger{}
+var _ BadgerLogger = &logger{}
