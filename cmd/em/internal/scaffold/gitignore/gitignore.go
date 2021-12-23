@@ -13,24 +13,24 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package commands
+package gitignore
 
 import (
-	"text/template"
-
-	"github.com/urfave/cli/v2"
+	"embed"
+	"fmt"
 )
 
-const versionTemplate = "{{ .Name }} {{ range $key, $value := .Metadata }}{{ $key }}={{ $value }} {{ end }}\n"
+//go:generate sh sync.sh
 
-var VersionCommand = &cli.Command{
-	Name:      "version",
-	Usage:     "Print the binary version information",
-	UsageText: "myago version",
-	Action: func(ctx *cli.Context) error {
-		return template.
-			Must(template.New("version").Parse(versionTemplate)).
-			Execute(ctx.App.Writer, ctx.App)
-	},
-	HideHelpCommand: true,
+//go:embed *.gitignore
+var licenses embed.FS
+
+// Get returns the gitignore associated with the ID.
+func Get(id string) (string, bool) {
+	body, err := licenses.ReadFile(fmt.Sprintf("%s.gitignore", id))
+	if err != nil {
+		return "", false
+	}
+
+	return string(body), true
 }

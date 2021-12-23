@@ -1,3 +1,18 @@
+// Copyright (C) 2021 Mya Pitzeruse
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 package scaffold
 
 import (
@@ -12,8 +27,8 @@ import (
 	"github.com/Masterminds/sprig"
 	"go.uber.org/zap"
 
-	"github.com/mjpitz/myago/cmd/myago/internal/scaffold/gitignore"
-	"github.com/mjpitz/myago/cmd/myago/internal/scaffold/licenses"
+	"github.com/mjpitz/myago/cmd/em/internal/scaffold/gitignore"
+	"github.com/mjpitz/myago/cmd/em/internal/scaffold/licenses"
 	"github.com/mjpitz/myago/zaputil"
 )
 
@@ -23,14 +38,14 @@ var (
 	//go:embed template/.gitignore.tmpl
 	templates embed.FS
 
-	// featureAliases provides common name associates to their appropriate feature name.
-	featureAliases = map[string][]string{
+	// FeatureAliases provides common name associates to their appropriate feature name.
+	FeatureAliases = map[string][]string{
 		"init": {"make", "git", "legal", "authors"},
 		"bin":  {"gobinary", "go", "version"},
 	}
 
-	// filesByFeature contains a map of features to the associated files they render.
-	filesByFeature = map[string][]string{
+	// FilesByFeature contains a map of features to the associated files they render.
+	FilesByFeature = map[string][]string{
 		"Authors": {
 			"AUTHORS.tmpl",
 		},
@@ -48,7 +63,6 @@ var (
 		},
 		"Go": {
 			"go.mod.tmpl",
-			// go mod tidy
 		},
 		"Version": {
 			"package.json.tmpl",
@@ -117,8 +131,8 @@ var gitConfigContents = []byte(strings.TrimSpace(`
 
 func init() {
 	// automatically setup common aliases
-	for featureName := range filesByFeature {
-		featureAliases[strings.ToLower(featureName)] = []string{featureName}
+	for featureName := range FilesByFeature {
+		FeatureAliases[strings.ToLower(featureName)] = []string{featureName}
 	}
 }
 
@@ -138,8 +152,8 @@ func resolveFeatures(features []string) []string {
 		next := make([]string, 0)
 
 		for _, feature := range resolvedFeatures {
-			resolved, aliased := featureAliases[feature]
-			_, validFeature := filesByFeature[feature]
+			resolved, aliased := FeatureAliases[feature]
+			_, validFeature := FilesByFeature[feature]
 
 			switch {
 			case aliased:
@@ -193,7 +207,7 @@ func (s *Renderer) Render(ctx context.Context) []File {
 
 	filesToRender := make([]string, 0)
 	for _, feature := range s.data.Features {
-		filesToRender = append(filesToRender, filesByFeature[feature]...)
+		filesToRender = append(filesToRender, FilesByFeature[feature]...)
 	}
 
 	results := make([]File, 0, len(filesToRender))

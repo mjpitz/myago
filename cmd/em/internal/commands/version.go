@@ -16,42 +16,21 @@
 package commands
 
 import (
-	"fmt"
-	"strings"
+	"text/template"
 
 	"github.com/urfave/cli/v2"
 )
 
-var phoneCodeMap = map[string]string{
-	"a": "2", "b": "2", "c": "2",
-	"d": "3", "e": "3", "f": "3",
-	"g": "4", "h": "4", "i": "4",
-	"j": "5", "k": "5", "l": "5",
-	"m": "6", "n": "6", "o": "6",
-	"p": "7", "q": "7", "r": "7", "s": "7",
-	"t": "8", "u": "8", "v": "8",
-	"w": "9", "x": "9", "y": "9", "z": "9",
-}
+const versionTemplate = "{{ .Name }} {{ range $key, $value := .Metadata }}{{ $key }}={{ $value }} {{ end }}\n"
 
-var EncodeCommand = &cli.Command{
-	Name:      "encode",
-	Usage:     "Encode is a simple utility to encode a provided argument using the specified encoding.",
-	UsageText: "myago encode <plaintext>",
+var Version = &cli.Command{
+	Name:      "version",
+	Usage:     "Print the binary version information.",
+	UsageText: "em version",
 	Action: func(ctx *cli.Context) error {
-		plaintext := ctx.Args().Get(0)
-		cyphertext := ""
-
-		for _, ch := range strings.Split(plaintext, "") {
-			n, ok := phoneCodeMap[ch]
-			if !ok {
-				return fmt.Errorf("unrecognized char: %s", ch)
-			}
-
-			cyphertext += n
-		}
-
-		_, err := ctx.App.Writer.Write([]byte(cyphertext))
-		return err
+		return template.
+			Must(template.New("version").Parse(versionTemplate)).
+			Execute(ctx.App.Writer, ctx.App)
 	},
 	HideHelpCommand: true,
 }

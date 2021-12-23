@@ -23,7 +23,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/mjpitz/myago/cmd/myago/internal/commands"
+	"github.com/mjpitz/myago/cmd/em/internal/commands"
 	"github.com/mjpitz/myago/flagset"
 	"github.com/mjpitz/myago/zaputil"
 )
@@ -38,13 +38,14 @@ func main() {
 	}
 
 	app := &cli.App{
-		Name:      "myago",
-		UsageText: "myago [options] <command>",
+		Name:      "em",
+		Usage:     "mya's general purpose command line utilities",
+		UsageText: "em [options] <command>",
 		Flags:     flagset.Extract(config),
 		Commands: []*cli.Command{
-			commands.EncodeCommand,
-			commands.ScaffoldCommand,
-			commands.VersionCommand,
+			commands.Encode,
+			commands.Scaffold,
+			commands.Version,
 		},
 		Before: func(ctx *cli.Context) error {
 			ctx.Context = zaputil.Setup(ctx.Context, config.Log)

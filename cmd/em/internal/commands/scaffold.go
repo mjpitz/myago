@@ -18,41 +18,76 @@ package commands
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strings"
+	"text/template"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 
-	"github.com/mjpitz/myago/cmd/myago/internal/scaffold"
+	"github.com/mjpitz/myago/cmd/em/internal/scaffold"
 	"github.com/mjpitz/myago/flagset"
 	"github.com/mjpitz/myago/vfs"
 	"github.com/mjpitz/myago/zaputil"
 )
 
+const scaffoldHelpTemplate = `
+  Features:
+    {{- range $feature, $files := .features }}
+    - {{ $feature }}
+    {{- end }}
+
+  Aliases:
+    {{- range $alias, $targets := .aliases }}
+    - {{ $alias }}: {{ join $targets ", " }}
+    {{- end }}
+
+`
+
 type ScaffoldConfig struct {
-	Mkdir    bool             `json:"mkdir" usage:"specify if we should make the target project directory"`
-	License  string           `json:"license" usage:"specify which license should be applied to the project" default:"agpl3"`
+	Mkdir    bool             `json:"mkdir"    usage:"specify if we should make the target project directory"`
+	License  string           `json:"license"  usage:"specify which license should be applied to the project" default:"agpl3"`
 	Features *cli.StringSlice `json:"features" usage:"specify the features to generate"`
 }
 
 var (
-	cfg = &ScaffoldConfig{}
+	scaffoldConfig = &ScaffoldConfig{}
 
-	ScaffoldCommand = &cli.Command{
-		Name:      "scaffold",
-		Usage:     "Build out a default go repository",
-		UsageText: "myago scaffold [options] <name>",
-		Flags:     flagset.ExtractPrefix("myago", cfg),
+	Scaffold = &cli.Command{
+		Name:  "scaffold",
+		Usage: "Scaffold out a new project or add onto an existing one.",
+		UsageText: flagset.ExampleString(
+			"em scaffold [options] <name>",
+			"em scaffold features    # will output a list of features and aliases",
+			"em scaffold --mkdir --license mpl --features init <name>",
+			"em scaffold --mkdir --license mpl --features init --features bin <name>",
+		),
+		Flags: flagset.ExtractPrefix("em", scaffoldConfig),
 		Action: func(ctx *cli.Context) error {
 			if ctx.NArg() == 0 {
 				return fmt.Errorf("name not specified")
 			}
 
 			name := ctx.Args().Get(0)
+			if name == "features" {
+				return template.Must(
+					template.New("scaffold-help").
+						Funcs(map[string]interface{}{
+							"join": func(elems []string, sep string) string {
+								return strings.Join(elems, sep)
+							},
+						}).
+						Parse(scaffoldHelpTemplate),
+				).Execute(ctx.App.Writer, map[string]interface{}{
+					"features": scaffold.FilesByFeature,
+					"aliases":  scaffold.FeatureAliases,
+				})
+			}
 
-			if cfg.Mkdir {
+			if scaffoldConfig.Mkdir {
 				zaputil.Extract(ctx.Context).Info("making directory")
 				if err := os.MkdirAll(name, 0755); err != nil {
 					return errors.Wrap(err, "failed to make project directory")
@@ -67,8 +102,8 @@ var (
 			files := scaffold.Template(
 				scaffold.Data{
 					Name:     name,
-					License:  cfg.License,
-					Features: cfg.Features.Value(),
+					License:  scaffoldConfig.License,
+					Features: scaffoldConfig.Features.Value(),
 				},
 			).Render(ctx.Context)
 
@@ -87,6 +122,15 @@ var (
 				err := afero.WriteFile(afs, file.Name, file.Contents, 0644)
 				if err != nil {
 					return err
+				}
+			}
+
+			if scaffoldConfig.Mkdir {
+				if exists, _ := afero.Exists(afs, "go.mod"); exists {
+					_, err := exec.Command("go", "mod", "tidy").CombinedOutput()
+					if err != nil {
+						return err
+					}
 				}
 			}
 
