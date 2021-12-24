@@ -1,0 +1,140 @@
+# auth
+--
+    import "github.com/mjpitz/myago/auth"
+
+Package auth provides common code for handling user authentication in a rather
+implementation agnostic way. Currently, we only provide basic auth backed by a
+CSV, but most components contain an interface that _should_ make it rather easy
+to swap out implementations.
+
+## Usage
+
+```go
+var (
+	// ErrUnauthorized is returned when no user information is found on a context.
+	ErrUnauthorized = errors.New("unauthorized")
+)
+```
+
+#### func  HTTP
+
+```go
+func HTTP(delegate http.Handler, handlers ...HandlerFunc) http.HandlerFunc
+```
+HTTP returns an http middleware function that invokes the provided auth
+handlers.
+
+#### func  ToContext
+
+```go
+func ToContext(ctx context.Context, userInfo UserInfo) context.Context
+```
+ToContext attaches the provided UserInfo to the context.
+
+#### type Claims
+
+```go
+type Claims struct {
+	Groups []string `json:"groups"`
+}
+```
+
+Claims defines some additional data that can be found on the user object.
+
+#### type HandlerFunc
+
+```go
+type HandlerFunc func(ctx context.Context) (context.Context, error)
+```
+
+HandlerFunc defines a common way to add authentication / authorization to a
+Golang context.
+
+#### func  Basic
+
+```go
+func Basic(store Store) HandlerFunc
+```
+Basic implements a basic access authentication handler function. It parses
+values from the headers to obtain info about the authenticated user.
+
+#### func  Composite
+
+```go
+func Composite(handlers ...HandlerFunc) HandlerFunc
+```
+Composite returns a HandlerFunc that iterates all provided HandlerFunc until the
+end or an error occurs.
+
+#### func  Required
+
+```go
+func Required() HandlerFunc
+```
+Required returns a HandlerFunc that ensures user information is present on the
+context.
+
+#### type Store
+
+```go
+type Store interface {
+	// Lookup retrieves the provided user's password and groups.
+	Lookup(username string) (password string, groups []string, err error)
+}
+```
+
+Store defines an abstraction for loading user credentials.
+
+#### func  OpenCSV
+
+```go
+func OpenCSV(ctx context.Context, fileName string) (Store, error)
+```
+OpenCSV attempts to open the provided csv file and return a parsed index based
+on the contents.
+
+#### type UserInfo
+
+```go
+type UserInfo struct {
+	// Subject is the users ID. CACF1875-7B44-4B77-BF52-51A06E52FFDF
+	Subject string `json:"sub"`
+	// Profile is the users name. "Jane Doe"
+	Profile string `json:"profile"`
+	// Email is the users' email address. jane@example.com
+	Email string `json:"email"`
+	// EmailVerified indicates if the user has verified their email address.
+	EmailVerified bool `json:"email_verified"`
+}
+```
+
+UserInfo represents a minimum set of user information.
+
+#### func  Extract
+
+```go
+func Extract(ctx context.Context) *UserInfo
+```
+Extract attempts to obtain the UserInfo from the provided context.
+
+#### func (*UserInfo) Claims
+
+```go
+func (u *UserInfo) Claims(v interface{}) error
+```
+Claims provides a convenient way to read additional data from the request.
+
+#### func (*UserInfo) UnmarshalJSON
+
+```go
+func (u *UserInfo) UnmarshalJSON(data []byte) error
+```
+UnmarshalJSON transparently unmarshals the user information structure.
+
+#### func (*UserInfo) WithExtra
+
+```go
+func (u *UserInfo) WithExtra(v interface{}) error
+```
+WithExtra adds additional claims to the raw payload. This is a rather expensive
+operation and should really only need to be done once during authentication.
