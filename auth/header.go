@@ -16,29 +16,28 @@
 package auth
 
 import (
-	"context"
+	"strings"
 
-	"github.com/mjpitz/myago"
+	"github.com/mjpitz/myago/headers"
 )
 
-const contextKey = myago.ContextKey("auth")
+const authorization = "authorization"
 
-// ToContext attaches the provided UserInfo to the context.
-func ToContext(ctx context.Context, userInfo UserInfo) context.Context {
-	return context.WithValue(ctx, contextKey, &userInfo)
-}
-
-// Extract attempts to obtain the UserInfo from the provided context.
-func Extract(ctx context.Context) *UserInfo {
-	v := ctx.Value(contextKey)
-	if v == nil {
-		return nil
+// Get retrieves the current authorization value from the header.
+func Get(header headers.Header, expectedScheme string) (string, error) {
+	value := header.Get(authorization)
+	if value == "" {
+		return "", ErrUnauthorized
 	}
 
-	userInfo, ok := v.(*UserInfo)
-	if !ok {
-		return nil
+	parts := strings.SplitN(value, " ", 2)
+	if len(parts) < 2 {
+		return "", ErrUnauthorized
 	}
 
-	return userInfo
+	if !strings.EqualFold(parts[0], expectedScheme) {
+		return "", ErrUnauthorized
+	}
+
+	return parts[1], nil
 }

@@ -1,3 +1,18 @@
+// Copyright (C) 2021 Mya Pitzeruse
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 package auth
 
 import (
@@ -11,17 +26,12 @@ import (
 // Basic implements a basic access authentication handler function. It parses values from the headers to obtain info
 // about the authenticated user.
 func Basic(store Store) HandlerFunc {
-	basicPrefix := "Basic "
-
 	return func(ctx context.Context) (context.Context, error) {
 		header := headers.Extract(ctx)
-
-		authentication := header.Get("Authorization")
-		if !strings.HasPrefix(authentication, basicPrefix) {
+		authentication, err := Get(header, "basic")
+		if err != nil {
 			return ctx, nil
 		}
-
-		authentication = strings.TrimPrefix(authentication, basicPrefix)
 
 		decoded, err := base64.StdEncoding.DecodeString(authentication)
 		if err != nil {
