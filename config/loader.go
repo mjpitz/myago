@@ -28,11 +28,11 @@ import (
 
 // DefaultLoader provides a default Loader implementation that supports reading a variety of files.
 var DefaultLoader = Loader{
-	".json":     encoding.JSON,
-	".toml":     encoding.TOML,
-	".yaml":     encoding.YAML,
-	".yml":      encoding.YAML,
-	".xml":      encoding.XML,
+	".json": encoding.JSON,
+	".toml": encoding.TOML,
+	".yaml": encoding.YAML,
+	".yml":  encoding.YAML,
+	".xml":  encoding.XML,
 }
 
 // Loader provides functionality for reading a variety of file formats into a struct.

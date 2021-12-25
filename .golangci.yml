@@ -18,6 +18,8 @@ linters:
     - exhaustivestruct
     - gci
     - wsl
+    - testpackage
+    - ifshort
     # eventually re-enable
     - staticcheck
     - forcetypeassert

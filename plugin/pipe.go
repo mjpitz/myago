@@ -21,7 +21,8 @@ import (
 	"io"
 )
 
-// Pipe returns a psuedo-async io.ReadWriteCloser.
+// Pipe returns a pseudo-async io.ReadWriteCloser.
+// nolint:revive
 func Pipe() *pipe {
 	done := make(chan bool, 1)
 	done <- false
@@ -73,12 +74,12 @@ func (pip *pipe) Write(p []byte) (n int, err error) {
 		pip.done <- done
 		pip.data <- data
 	}()
-	
+
 	if done {
 		err = io.ErrClosedPipe
 		return
 	}
-	
+
 	return data.Write(p)
 }
 

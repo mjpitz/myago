@@ -35,6 +35,7 @@ type message struct {
 	Text string
 }
 
+// nolint:paralleltest
 func TestEchoClient(t *testing.T) {
 	ctx := lifecycle.Setup(context.Background())
 	defer lifecycle.Resolve(ctx)
@@ -63,6 +64,7 @@ func TestEchoClient(t *testing.T) {
 	require.Equal(t, "hello world", msg.Text)
 }
 
+// nolint:paralleltest
 func TestFailureClient(t *testing.T) {
 	ctx := lifecycle.Setup(context.Background())
 	defer lifecycle.Resolve(ctx)

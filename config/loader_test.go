@@ -52,11 +52,11 @@ func TestLoader(t *testing.T) {
 	ctx := context.Background()
 
 	memFs := afero.NewMemMapFs()
-	_ = afero.WriteFile(memFs, "/test/config.json", []byte(configJSON), 0755)
-	_ = afero.WriteFile(memFs, "/test/config.yaml", []byte(configYAML), 0755)
-	_ = afero.WriteFile(memFs, "/test/config.toml", []byte(configTOML), 0755)
-	_ = afero.WriteFile(memFs, "/test/unrecognized.ext", []byte(""), 0755)
-	_ = afero.WriteFile(memFs, "/test/missing-ext", []byte(""), 0755)
+	_ = afero.WriteFile(memFs, "/test/config.json", []byte(configJSON), 0o755)
+	_ = afero.WriteFile(memFs, "/test/config.yaml", []byte(configYAML), 0o755)
+	_ = afero.WriteFile(memFs, "/test/config.toml", []byte(configTOML), 0o755)
+	_ = afero.WriteFile(memFs, "/test/unrecognized.ext", []byte(""), 0o755)
+	_ = afero.WriteFile(memFs, "/test/missing-ext", []byte(""), 0o755)
 	ctx = vfs.ToContext(ctx, memFs)
 
 	tests := []string{

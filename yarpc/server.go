@@ -109,10 +109,8 @@ func (s *Server) Shutdown() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	listener := s.listener
-	s.listener = nil
-
-	if listener != nil {
+	if listener := s.listener; listener != nil {
+		s.listener = nil
 		_ = listener.Close()
 	}
 
@@ -167,7 +165,6 @@ func (s *Server) Serve(listener Listener, opts ...Option) error {
 
 		return nil
 	}()
-
 	if err != nil {
 		return err
 	}

@@ -19,10 +19,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
 )
 
 func TestLinux(t *testing.T) {
+	t.Parallel()
+
 	directorySet := linux("ExampleApp")
 
 	require.Equal(t, "/var/cache/exampleapp", directorySet.CacheDir)
@@ -33,6 +34,8 @@ func TestLinux(t *testing.T) {
 }
 
 func TestOSX(t *testing.T) {
+	t.Parallel()
+
 	directorySet := osx("/Users/myago", "ExampleApp")
 
 	require.Equal(t, "/Users/myago/Library/Application\\ Support/ExampleApp/Cache", directorySet.CacheDir)
@@ -43,6 +46,8 @@ func TestOSX(t *testing.T) {
 }
 
 func TestWindows(t *testing.T) {
+	t.Parallel()
+
 	directorySet := windows("C:\\Users\\myago", "ExampleApp")
 
 	require.Equal(t, "C:\\Users\\myago\\AppData\\Roaming\\ExampleApp\\Cache", directorySet.CacheDir)

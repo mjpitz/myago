@@ -54,6 +54,7 @@ func (d *dialer) DialContext(ctx context.Context) (io.ReadWriteCloser, error) {
 	stdout := Pipe()
 	stderr := Pipe()
 
+	// nolint:gosec
 	cmd := exec.CommandContext(ctx, d.Binary, d.Args...)
 	cmd.Stdin = stdin
 	cmd.Stdout = stdout
@@ -66,8 +67,7 @@ func (d *dialer) DialContext(ctx context.Context) (io.ReadWriteCloser, error) {
 		err:    make(chan error, 1),
 	}
 
-	err := cmd.Start()
-	if err != nil {
+	if err := cmd.Start(); err != nil {
 		return nil, fmt.Errorf("failed to locate plugin: %s", d.Binary)
 	}
 
@@ -160,6 +160,7 @@ func (c *clientRWC) Close() (err error) {
 	}
 
 	_ = c.stdout.Close()
+
 	return nil
 }
 

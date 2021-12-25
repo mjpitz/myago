@@ -23,9 +23,12 @@ import (
 	"github.com/mjpitz/myago"
 )
 
-var contextKey = myago.ContextKey("ulid.generator")
-var systemGenerator *Generator
+var (
+	contextKey      = myago.ContextKey("ulid.generator")
+	systemGenerator *Generator
+)
 
+// nolint:gochecknoinits
 func init() {
 	skew := byte(1)
 	if skewEnv := os.Getenv("MYAGO_ULID_SKEW"); skewEnv != "" {
