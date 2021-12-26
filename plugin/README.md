@@ -32,4 +32,4 @@ connection.
 ```go
 func Pipe() *pipe
 ```
-Pipe returns a psuedo-async io.ReadWriteCloser.
+Pipe returns a pseudo-async io.ReadWriteCloser. nolint:revive

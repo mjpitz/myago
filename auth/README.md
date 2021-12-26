@@ -10,11 +10,16 @@ to swap out implementations.
 ## Usage
 
 ```go
-var (
-	// ErrUnauthorized is returned when no user information is found on a context.
-	ErrUnauthorized = errors.New("unauthorized")
-)
+var ErrUnauthorized = errors.New("unauthorized")
 ```
+ErrUnauthorized is returned when no user information is found on a context.
+
+#### func  Get
+
+```go
+func Get(header headers.Header, expectedScheme string) (string, error)
+```
+Get retrieves the current authorization value from the header.
 
 #### func  HTTP
 
@@ -31,16 +36,6 @@ func ToContext(ctx context.Context, userInfo UserInfo) context.Context
 ```
 ToContext attaches the provided UserInfo to the context.
 
-#### type Claims
-
-```go
-type Claims struct {
-	Groups []string `json:"groups"`
-}
-```
-
-Claims defines some additional data that can be found on the user object.
-
 #### type HandlerFunc
 
 ```go
@@ -55,8 +50,15 @@ Golang context.
 ```go
 func Basic(store Store) HandlerFunc
 ```
-Basic implements a basic access authentication handler function. It parses
-values from the headers to obtain info about the authenticated user.
+Basic implements a basic access authentication handler function.
+
+#### func  Bearer
+
+```go
+func Bearer(store Store) HandlerFunc
+```
+Bearer returns a handler func that translates bearer tokens into user
+information.
 
 #### func  Composite
 
@@ -74,12 +76,40 @@ func Required() HandlerFunc
 Required returns a HandlerFunc that ensures user information is present on the
 context.
 
+#### type LookupRequest
+
+```go
+type LookupRequest struct {
+	User  string
+	Token string
+}
+```
+
+
+#### type LookupResponse
+
+```go
+type LookupResponse struct {
+	UserID string
+	User   string
+	Groups []string
+
+	Email         string
+	EmailVerified bool
+
+	// one of these will be set based on the LookupRequest
+	Password string
+	Token    string
+}
+```
+
+
 #### type Store
 
 ```go
 type Store interface {
 	// Lookup retrieves the provided user's password and groups.
-	Lookup(username string) (password string, groups []string, err error)
+	Lookup(req LookupRequest) (resp LookupResponse, err error)
 }
 ```
 
@@ -105,6 +135,8 @@ type UserInfo struct {
 	Email string `json:"email"`
 	// EmailVerified indicates if the user has verified their email address.
 	EmailVerified bool `json:"email_verified"`
+	// Groups contains a list of groups that the user belongs to.
+	Groups []string `json:"groups"`
 }
 ```
 
@@ -117,10 +149,10 @@ func Extract(ctx context.Context) *UserInfo
 ```
 Extract attempts to obtain the UserInfo from the provided context.
 
-#### func (*UserInfo) Claims
+#### func (UserInfo) Claims
 
 ```go
-func (u *UserInfo) Claims(v interface{}) error
+func (u UserInfo) Claims(v interface{}) error
 ```
 Claims provides a convenient way to read additional data from the request.
 
@@ -130,11 +162,3 @@ Claims provides a convenient way to read additional data from the request.
 func (u *UserInfo) UnmarshalJSON(data []byte) error
 ```
 UnmarshalJSON transparently unmarshals the user information structure.
-
-#### func (*UserInfo) WithExtra
-
-```go
-func (u *UserInfo) WithExtra(v interface{}) error
-```
-WithExtra adds additional claims to the raw payload. This is a rather expensive
-operation and should really only need to be done once during authentication.
