@@ -24,6 +24,6 @@ package main
 //go:generate openssl req -new -key tls.key -out tls.csr -config tls.conf
 
 // Sign tls.csr using the ca and output to tls.crt
-//go:generate openssl x509 -req -in tls.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 1 -out tls.crt -extfile tls.conf
+//go:generate openssl x509 -req -in tls.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 1 -out tls.crt -extensions req_ext -extfile tls.conf
 
 func main() {}
