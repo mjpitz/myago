@@ -132,6 +132,10 @@ func (f Extractor) FormatStringSliceFlag(common *Common, fieldValue reflect.Valu
 
 	if !fieldValue.IsZero() {
 		flag.Value = fieldValue.Interface().(*cli.StringSlice)
+	} else if common.Default != "" {
+		for _, v := range strings.Split(common.Default, ",") {
+			_ = flag.Value.Set(v)
+		}
 	}
 
 	return flag, nil
