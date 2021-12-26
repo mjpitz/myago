@@ -35,6 +35,7 @@ func Bearer(store Store) auth.HandlerFunc {
 		resp, err := store.Lookup(LookupRequest{
 			Token: token,
 		})
+
 		if err != nil {
 			return ctx, nil
 		}

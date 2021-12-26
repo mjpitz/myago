@@ -62,7 +62,7 @@ func (c ClientConfig) Token() (*oauth2.Token, error) {
 
 		return &oauth2.Token{
 			TokenType:   "basic",
-			AccessToken: c.AccessToken.Token,
+			AccessToken: accessToken,
 		}, nil
 	}
 

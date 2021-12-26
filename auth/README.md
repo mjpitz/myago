@@ -28,6 +28,17 @@ func ToContext(ctx context.Context, userInfo UserInfo) context.Context
 ```
 ToContext attaches the provided UserInfo to the context.
 
+#### type Config
+
+```go
+type Config struct {
+	AuthType string `json:"auth_type" usage:"configure the user authentication type to use"`
+}
+```
+
+Config defines a general configuration structure used configure which
+authentication is enabled.
+
 #### type HandlerFunc
 
 ```go

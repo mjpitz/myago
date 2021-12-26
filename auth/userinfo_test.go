@@ -46,6 +46,8 @@ const expected = `{
 }`
 
 func TestUserInfo(t *testing.T) {
+	t.Parallel()
+
 	customInfo := &CustomUserInfo{
 		UserInfo: auth.UserInfo{
 			Subject:       "0x01234",

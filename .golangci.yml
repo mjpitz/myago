@@ -20,6 +20,7 @@ linters:
     - wsl
     - testpackage
     - ifshort
+    - gofumpt
     # eventually re-enable
     - staticcheck
     - forcetypeassert

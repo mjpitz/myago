@@ -9,7 +9,7 @@
 var ErrBadRequest = errors.New("bad lookup request")
 ```
 ErrBadRequest is returned when a lookup request does not contain a required
-field
+field.
 
 ```go
 var ErrNotFound = errors.New("not found")

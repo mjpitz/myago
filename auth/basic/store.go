@@ -54,7 +54,6 @@ func (s *store) Lookup(req LookupRequest) (resp LookupResponse, err error) {
 		entry := s.idx[req.Token]
 		if entry == nil {
 			err = ErrNotFound
-			return
 		} else {
 			resp = LookupResponse{
 				UserID: entry.userID,
@@ -79,7 +78,7 @@ func (s *store) Lookup(req LookupRequest) (resp LookupResponse, err error) {
 		err = ErrBadRequest
 	}
 
-	return
+	return resp, err
 }
 
 var _ Store = &store{}

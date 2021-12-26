@@ -13,14 +13,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package basicauth
+package auth
 
-import (
-	"errors"
-)
-
-// ErrNotFound is returned when a credential is not found.
-var ErrNotFound = errors.New("not found")
-
-// ErrBadRequest is returned when a lookup request does not contain a required field.
-var ErrBadRequest = errors.New("bad lookup request")
+// Config defines a general configuration structure used configure which authentication is enabled.
+type Config struct {
+	AuthType string `json:"auth_type" usage:"configure the user authentication type to use"`
+}

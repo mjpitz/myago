@@ -23,11 +23,13 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/mjpitz/myago/auth"
-	"github.com/mjpitz/myago/auth/basic"
+	basicauth "github.com/mjpitz/myago/auth/basic"
 	"github.com/mjpitz/myago/headers"
 )
 
 func TestBearer(t *testing.T) {
+	t.Parallel()
+
 	testCases := []struct {
 		Name          string
 		Authorization string

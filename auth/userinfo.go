@@ -55,6 +55,7 @@ func (u *UserInfo) UnmarshalJSON(data []byte) error {
 	u.EmailVerified = bool(raw.EmailVerified)
 	u.Groups = append([]string{}, raw.Groups...)
 	u.claims = append([]byte{}, data...)
+
 	return nil
 }
 
@@ -79,6 +80,7 @@ func (b *boolOrString) UnmarshalJSON(data []byte) error {
 	boolErr := json.Unmarshal(data, &boolValue)
 	if boolErr == nil {
 		*b = boolOrString(boolValue)
+
 		return nil
 	}
 
@@ -95,5 +97,6 @@ func (b *boolOrString) UnmarshalJSON(data []byte) error {
 	}
 
 	*b = boolOrString(boolValue)
+
 	return nil
 }

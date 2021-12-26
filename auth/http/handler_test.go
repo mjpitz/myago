@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/mjpitz/myago/auth"
-	"github.com/mjpitz/myago/auth/basic"
+	basicauth "github.com/mjpitz/myago/auth/basic"
 	httpauth "github.com/mjpitz/myago/auth/http"
 	"github.com/mjpitz/myago/headers"
 )

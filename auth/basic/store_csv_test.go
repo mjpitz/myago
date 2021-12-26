@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/auth/basic"
+	basicauth "github.com/mjpitz/myago/auth/basic"
 )
 
 type testUser struct {
@@ -32,6 +32,8 @@ type testUser struct {
 }
 
 func TestCSVBasicStore(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 
 	store := basicauth.LazyStore{
@@ -72,6 +74,8 @@ func TestCSVBasicStore(t *testing.T) {
 }
 
 func TestCSVTokenStore(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 
 	store, err := basicauth.OpenCSV(ctx, filepath.Join("testdata", "token.csv"))
