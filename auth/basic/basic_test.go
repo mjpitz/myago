@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package auth_test
+package basicauth_test
 
 import (
 	"context"
@@ -23,10 +23,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/mjpitz/myago/auth"
+	"github.com/mjpitz/myago/auth/basic"
 	"github.com/mjpitz/myago/headers"
 )
 
-func TestBearer(t *testing.T) {
+func TestBasic(t *testing.T) {
 	testCases := []struct {
 		Name          string
 		Authorization string
@@ -38,32 +39,42 @@ func TestBearer(t *testing.T) {
 			UserInfo:      nil,
 		},
 		{
-			Name:          "basic",
+			Name:          "bearer",
+			Authorization: "Bearer 52295778-63A0-4809-9B30-F3269D917114",
+			UserInfo:      nil,
+		},
+		{
+			Name:          "basic username",
+			Authorization: "Basic dXNlcm5hbWU=",
+			UserInfo:      nil,
+		},
+		{
+			Name:          "basic admin:",
+			Authorization: "Basic YWRtaW46",
+			UserInfo:      nil,
+		},
+		{
+			Name:          "basic username:",
 			Authorization: "Basic dXNlcm5hbWU6",
 			UserInfo:      nil,
 		},
 		{
-			Name:          "bearer token",
-			Authorization: "Bearer badtoken",
-			UserInfo:      nil,
-		},
-		{
-			Name:          "bearer token",
-			Authorization: "Bearer token",
+			Name:          "basic username:password",
+			Authorization: "Basic dXNlcm5hbWU6cGFzc3dvcmQ=",
 			UserInfo: &auth.UserInfo{
 				Subject:       "userID",
 				Profile:       "username",
 				Email:         "",
 				EmailVerified: false,
-				Groups:        []string{"group1"},
+				Groups:        []string{"group1", "group2"},
 			},
 		},
 	}
 
-	store, err := auth.OpenCSV(context.Background(), filepath.Join("testdata", "token.csv"))
+	store, err := basicauth.OpenCSV(context.Background(), filepath.Join("testdata", "basic.csv"))
 	require.NoError(t, err)
 
-	handler := auth.Bearer(store)
+	handler := basicauth.Basic(store)
 
 	for _, testCase := range testCases {
 		t.Log(testCase.Name)

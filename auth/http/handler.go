@@ -13,22 +13,24 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package auth
+package httpauth
 
 import (
 	"errors"
 	"net/http"
+
+	"github.com/mjpitz/myago/auth"
 )
 
-// HTTP returns an http middleware function that invokes the provided auth handlers.
-func HTTP(delegate http.Handler, handlers ...HandlerFunc) http.HandlerFunc {
-	handler := Composite(handlers...)
+// Handler returns an HTTP middleware function that invokes the provided auth handlers.
+func Handler(delegate http.Handler, handlers ...auth.HandlerFunc) http.HandlerFunc {
+	handler := auth.Composite(handlers...)
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, err := handler(r.Context())
 
 		switch {
-		case errors.Is(err, ErrUnauthorized):
+		case errors.Is(err, auth.ErrUnauthorized):
 			http.Error(w, "", http.StatusUnauthorized)
 		case err != nil:
 			http.Error(w, err.Error(), http.StatusInternalServerError)

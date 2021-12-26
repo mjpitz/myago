@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package auth_test
+package basicauth_test
 
 import (
 	"context"
@@ -22,27 +22,30 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/auth"
+	"github.com/mjpitz/myago/auth/basic"
 )
 
 type testUser struct {
-	Request  auth.LookupRequest
-	Response auth.LookupResponse
+	Request  basicauth.LookupRequest
+	Response basicauth.LookupResponse
 	Error    string
 }
 
 func TestCSVBasicStore(t *testing.T) {
 	ctx := context.Background()
 
-	store, err := auth.OpenCSV(ctx, filepath.Join("testdata", "basic.csv"))
-	require.NoError(t, err)
+	store := basicauth.LazyStore{
+		Provider: func() (basicauth.Store, error) {
+			return basicauth.OpenCSV(ctx, filepath.Join("testdata", "basic.csv"))
+		},
+	}
 
 	testUsers := []testUser{
 		{
-			Request: auth.LookupRequest{
+			Request: basicauth.LookupRequest{
 				User: "username",
 			},
-			Response: auth.LookupResponse{
+			Response: basicauth.LookupResponse{
 				Password: "password",
 				User:     "username",
 				UserID:   "userID",
@@ -50,7 +53,7 @@ func TestCSVBasicStore(t *testing.T) {
 			},
 		},
 		{
-			Request: auth.LookupRequest{
+			Request: basicauth.LookupRequest{
 				Token: "invalid",
 			},
 			Error: "not found",
@@ -71,15 +74,15 @@ func TestCSVBasicStore(t *testing.T) {
 func TestCSVTokenStore(t *testing.T) {
 	ctx := context.Background()
 
-	store, err := auth.OpenCSV(ctx, filepath.Join("testdata", "token.csv"))
+	store, err := basicauth.OpenCSV(ctx, filepath.Join("testdata", "token.csv"))
 	require.NoError(t, err)
 
 	testUsers := []testUser{
 		{
-			Request: auth.LookupRequest{
+			Request: basicauth.LookupRequest{
 				Token: "token",
 			},
-			Response: auth.LookupResponse{
+			Response: basicauth.LookupResponse{
 				User:   "username",
 				Token:  "token",
 				UserID: "userID",
@@ -87,7 +90,7 @@ func TestCSVTokenStore(t *testing.T) {
 			},
 		},
 		{
-			Request: auth.LookupRequest{
+			Request: basicauth.LookupRequest{
 				Token: "invalid",
 			},
 			Error: "not found",

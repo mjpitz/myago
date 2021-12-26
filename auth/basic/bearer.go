@@ -13,57 +13,40 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package auth
+package basicauth
 
 import (
 	"context"
-	"encoding/base64"
-	"strings"
 
+	"github.com/mjpitz/myago/auth"
 	"github.com/mjpitz/myago/headers"
 )
 
-// Basic implements a basic access authentication handler function.
-func Basic(store Store) HandlerFunc {
+// Bearer returns a handler func that translates bearer tokens into user information.
+func Bearer(store Store) auth.HandlerFunc {
 	return func(ctx context.Context) (context.Context, error) {
 		header := headers.Extract(ctx)
-		authentication, err := Get(header, "basic")
+
+		token, err := auth.Get(header, "bearer")
 		if err != nil {
 			return ctx, nil
 		}
-
-		decoded, err := base64.StdEncoding.DecodeString(authentication)
-		if err != nil {
-			return ctx, nil
-		}
-
-		parts := strings.Split(string(decoded), ":")
-		if len(parts) < 2 {
-			return ctx, nil
-		}
-
-		username := parts[0]
-		provided := parts[1]
 
 		resp, err := store.Lookup(LookupRequest{
-			User: username,
+			Token: token,
 		})
 		if err != nil {
 			return ctx, nil
 		}
 
-		if provided != resp.Password {
-			return ctx, nil
-		}
-
-		userInfo := &UserInfo{
+		userInfo := &auth.UserInfo{
 			Subject:       resp.UserID,
-			Profile:       username,
+			Profile:       resp.User,
 			Email:         resp.Email,
 			EmailVerified: resp.EmailVerified,
 			Groups:        resp.Groups,
 		}
 
-		return ToContext(ctx, *userInfo), nil
+		return auth.ToContext(ctx, *userInfo), nil
 	}
 }

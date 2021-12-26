@@ -13,39 +13,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package auth
+package basicauth
 
 import (
-	"context"
-
-	"github.com/mjpitz/myago/headers"
+	"errors"
 )
 
-// Bearer returns a handler func that translates bearer tokens into user information.
-func Bearer(store Store) HandlerFunc {
-	return func(ctx context.Context) (context.Context, error) {
-		header := headers.Extract(ctx)
+// ErrNotFound is returned when a credential is not found.
+var ErrNotFound = errors.New("not found")
 
-		token, err := Get(header, "bearer")
-		if err != nil {
-			return ctx, nil
-		}
-
-		resp, err := store.Lookup(LookupRequest{
-			Token: token,
-		})
-		if err != nil {
-			return ctx, nil
-		}
-
-		userInfo := &UserInfo{
-			Subject:       resp.UserID,
-			Profile:       resp.User,
-			Email:         resp.Email,
-			EmailVerified: resp.EmailVerified,
-			Groups:        resp.Groups,
-		}
-
-		return ToContext(ctx, *userInfo), nil
-	}
-}
+// ErrBadRequest is returned when a lookup request does not contain a required field
+var ErrBadRequest = errors.New("bad lookup request")

@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package auth_test
+package httpauth_test
 
 import (
 	"context"
@@ -24,10 +24,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/mjpitz/myago/auth"
+	"github.com/mjpitz/myago/auth/basic"
+	httpauth "github.com/mjpitz/myago/auth/http"
 	"github.com/mjpitz/myago/headers"
 )
 
-func TestHTTP(t *testing.T) {
+func TestHandler(t *testing.T) {
 	t.Parallel()
 
 	called := false
@@ -44,12 +46,14 @@ func TestHTTP(t *testing.T) {
 		called = true
 	}
 
-	store, err := auth.OpenCSV(context.Background(), filepath.Join("testdata", "basic.csv"))
+	authHandler, err := basicauth.Handler(context.Background(), basicauth.Config{
+		PasswordFile: filepath.Join("..", "basic", "testdata", "basic.csv"),
+	})
 	require.NoError(t, err)
 
-	handler := auth.HTTP(
+	handler := httpauth.Handler(
 		http.HandlerFunc(delegate),
-		auth.Basic(store),
+		authHandler,
 		auth.Required(),
 	)
 

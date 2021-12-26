@@ -13,7 +13,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package auth
+package basicauth
+
+import (
+	"sync"
+)
 
 type LookupRequest struct {
 	User  string
@@ -44,12 +48,12 @@ type store struct {
 	idx map[string]*entry
 }
 
-func (c *store) Lookup(req LookupRequest) (resp LookupResponse, err error) {
+func (s *store) Lookup(req LookupRequest) (resp LookupResponse, err error) {
 	switch {
 	case len(req.Token) > 0:
-		entry := c.idx[req.Token]
+		entry := s.idx[req.Token]
 		if entry == nil {
-			err = errNotFound
+			err = ErrNotFound
 			return
 		} else {
 			resp = LookupResponse{
@@ -60,9 +64,9 @@ func (c *store) Lookup(req LookupRequest) (resp LookupResponse, err error) {
 			}
 		}
 	case len(req.User) > 0:
-		entry := c.idx[req.User]
+		entry := s.idx[req.User]
 		if entry == nil {
-			err = errNotFound
+			err = ErrNotFound
 		} else {
 			resp = LookupResponse{
 				UserID:   entry.userID,
@@ -72,7 +76,7 @@ func (c *store) Lookup(req LookupRequest) (resp LookupResponse, err error) {
 			}
 		}
 	default:
-		err = errBadRequest
+		err = ErrBadRequest
 	}
 
 	return
@@ -85,4 +89,33 @@ type entry struct {
 	f1     string // token for tokens, username for basic auth
 	userID string
 	groups []string
+}
+
+// LazyStore provides a convenient way to lazily load an underlying store.
+type LazyStore struct {
+	mu       sync.Mutex
+	inst     Store
+	Provider func() (Store, error)
+}
+
+func (c *LazyStore) Lookup(req LookupRequest) (resp LookupResponse, err error) {
+	inst, err := func() (Store, error) {
+		c.mu.Lock()
+		defer c.mu.Unlock()
+
+		if c.inst == nil {
+			c.inst, err = c.Provider()
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		return c.inst, nil
+	}()
+
+	if err != nil {
+		return resp, err
+	}
+
+	return inst.Lookup(req)
 }

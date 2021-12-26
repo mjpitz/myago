@@ -21,14 +21,6 @@ func Get(header headers.Header, expectedScheme string) (string, error)
 ```
 Get retrieves the current authorization value from the header.
 
-#### func  HTTP
-
-```go
-func HTTP(delegate http.Handler, handlers ...HandlerFunc) http.HandlerFunc
-```
-HTTP returns an http middleware function that invokes the provided auth
-handlers.
-
 #### func  ToContext
 
 ```go
@@ -45,21 +37,6 @@ type HandlerFunc func(ctx context.Context) (context.Context, error)
 HandlerFunc defines a common way to add authentication / authorization to a
 Golang context.
 
-#### func  Basic
-
-```go
-func Basic(store Store) HandlerFunc
-```
-Basic implements a basic access authentication handler function.
-
-#### func  Bearer
-
-```go
-func Bearer(store Store) HandlerFunc
-```
-Bearer returns a handler func that translates bearer tokens into user
-information.
-
 #### func  Composite
 
 ```go
@@ -75,53 +52,6 @@ func Required() HandlerFunc
 ```
 Required returns a HandlerFunc that ensures user information is present on the
 context.
-
-#### type LookupRequest
-
-```go
-type LookupRequest struct {
-	User  string
-	Token string
-}
-```
-
-
-#### type LookupResponse
-
-```go
-type LookupResponse struct {
-	UserID string
-	User   string
-	Groups []string
-
-	Email         string
-	EmailVerified bool
-
-	// one of these will be set based on the LookupRequest
-	Password string
-	Token    string
-}
-```
-
-
-#### type Store
-
-```go
-type Store interface {
-	// Lookup retrieves the provided user's password and groups.
-	Lookup(req LookupRequest) (resp LookupResponse, err error)
-}
-```
-
-Store defines an abstraction for loading user credentials.
-
-#### func  OpenCSV
-
-```go
-func OpenCSV(ctx context.Context, fileName string) (Store, error)
-```
-OpenCSV attempts to open the provided csv file and return a parsed index based
-on the contents.
 
 #### type UserInfo
 
