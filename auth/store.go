@@ -15,14 +15,28 @@
 
 package auth
 
-import (
-	"fmt"
-)
+type LookupRequest struct {
+	User  string
+	Token string
+}
+
+type LookupResponse struct {
+	UserID string
+	User   string
+	Groups []string
+
+	Email         string
+	EmailVerified bool
+
+	// one of these will be set based on the LookupRequest
+	Password string
+	Token    string
+}
 
 // Store defines an abstraction for loading user credentials.
 type Store interface {
 	// Lookup retrieves the provided user's password and groups.
-	Lookup(username string) (password string, groups []string, err error)
+	Lookup(req LookupRequest) (resp LookupResponse, err error)
 }
 
 // store provides an in-memory index for looking up passwords and groups for a named user.
@@ -30,18 +44,45 @@ type store struct {
 	idx map[string]*entry
 }
 
-func (c *store) Lookup(username string) (password string, groups []string, err error) {
-	entry := c.idx[username]
-	if entry == nil {
-		return "", nil, fmt.Errorf("not found")
+func (c *store) Lookup(req LookupRequest) (resp LookupResponse, err error) {
+	switch {
+	case len(req.Token) > 0:
+		entry := c.idx[req.Token]
+		if entry == nil {
+			err = errNotFound
+			return
+		} else {
+			resp = LookupResponse{
+				UserID: entry.userID,
+				User:   entry.f0,
+				Groups: entry.groups,
+				Token:  req.Token,
+			}
+		}
+	case len(req.User) > 0:
+		entry := c.idx[req.User]
+		if entry == nil {
+			err = errNotFound
+		} else {
+			resp = LookupResponse{
+				UserID:   entry.userID,
+				Password: entry.f0,
+				Groups:   entry.groups,
+				User:     req.User,
+			}
+		}
+	default:
+		err = errBadRequest
 	}
 
-	return entry.password, entry.groups, nil
+	return
 }
 
 var _ Store = &store{}
 
 type entry struct {
-	password string
-	groups   []string
+	f0     string // username for tokens, password for basic auth
+	f1     string // token for tokens, username for basic auth
+	userID string
+	groups []string
 }

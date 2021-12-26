@@ -17,8 +17,8 @@ package auth_test
 
 import (
 	"context"
-	"encoding/base64"
 	"net/http"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -26,18 +26,6 @@ import (
 	"github.com/mjpitz/myago/auth"
 	"github.com/mjpitz/myago/headers"
 )
-
-type mockStore struct{}
-
-func (m *mockStore) Lookup(username string) (password string, groups []string, err error) {
-	if username != "admin" {
-		return "", nil, auth.ErrUnauthorized
-	}
-
-	return "badadmin", []string{"admin"}, nil
-}
-
-var _ auth.Store = &mockStore{}
 
 func TestHTTP(t *testing.T) {
 	t.Parallel()
@@ -48,14 +36,20 @@ func TestHTTP(t *testing.T) {
 		user := auth.Extract(r.Context())
 		require.NotNil(t, user)
 
-		require.Equal(t, "admin", user.Subject)
-		require.Equal(t, "admin", user.Profile)
+		require.Equal(t, "userID", user.Subject)
+		require.Equal(t, "username", user.Profile)
+		require.Equal(t, "", user.Email)
+		require.Equal(t, false, user.EmailVerified)
+		require.Equal(t, []string{"group1", "group2"}, user.Groups)
 		called = true
 	}
 
+	store, err := auth.OpenCSV(context.Background(), filepath.Join("testdata", "basic.csv"))
+	require.NoError(t, err)
+
 	handler := auth.HTTP(
 		http.HandlerFunc(delegate),
-		auth.Basic(&mockStore{}),
+		auth.Basic(store),
 		auth.Required(),
 	)
 
@@ -64,8 +58,7 @@ func TestHTTP(t *testing.T) {
 	r, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	require.NoError(t, err)
 
-	authentication := base64.StdEncoding.EncodeToString([]byte("admin:badadmin"))
-	r.Header.Set("Authorization", "Basic "+authentication)
+	r.Header.Set("Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=")
 
 	handler(nil, r)
 	require.True(t, called)

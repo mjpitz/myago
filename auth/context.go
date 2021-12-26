@@ -35,10 +35,5 @@ func Extract(ctx context.Context) *UserInfo {
 		return nil
 	}
 
-	userInfo, ok := v.(*UserInfo)
-	if !ok {
-		return nil
-	}
-
-	return userInfo
+	return v.(*UserInfo)
 }

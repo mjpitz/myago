@@ -23,8 +23,7 @@ import (
 	"github.com/mjpitz/myago/headers"
 )
 
-// Basic implements a basic access authentication handler function. It parses values from the headers to obtain info
-// about the authenticated user.
+// Basic implements a basic access authentication handler function.
 func Basic(store Store) HandlerFunc {
 	return func(ctx context.Context) (context.Context, error) {
 		header := headers.Extract(ctx)
@@ -46,32 +45,25 @@ func Basic(store Store) HandlerFunc {
 		username := parts[0]
 		provided := parts[1]
 
-		password, groups, err := store.Lookup(username)
-		if err != nil {
-			return ctx, nil
-		}
-
-		if provided != password {
-			return ctx, nil
-		}
-
-		userInfo := &UserInfo{
-			Subject: username,
-			Profile: username,
-		}
-
-		err = userInfo.WithExtra(&Claims{
-			Groups: groups,
+		resp, err := store.Lookup(LookupRequest{
+			User: username,
 		})
 		if err != nil {
 			return ctx, nil
 		}
 
+		if provided != resp.Password {
+			return ctx, nil
+		}
+
+		userInfo := &UserInfo{
+			Subject:       resp.UserID,
+			Profile:       username,
+			Email:         resp.Email,
+			EmailVerified: resp.EmailVerified,
+			Groups:        resp.Groups,
+		}
+
 		return ToContext(ctx, *userInfo), nil
 	}
-}
-
-// Claims defines some additional data that can be found on the user object.
-type Claims struct {
-	Groups []string `json:"groups"`
 }

@@ -30,47 +30,15 @@ type UserInfo struct {
 	Email string `json:"email"`
 	// EmailVerified indicates if the user has verified their email address.
 	EmailVerified bool `json:"email_verified"`
+	// Groups contains a list of groups that the user belongs to.
+	Groups []string `json:"groups"`
 
 	claims []byte
 }
 
 // Claims provides a convenient way to read additional data from the request.
-func (u *UserInfo) Claims(v interface{}) error {
+func (u UserInfo) Claims(v interface{}) error {
 	return json.Unmarshal(u.claims, v)
-}
-
-// WithExtra adds additional claims to the raw payload. This is a rather expensive operation and should really
-// only need to be done once during authentication.
-func (u *UserInfo) WithExtra(v interface{}) error {
-	idx := make(map[string]interface{})
-
-	providedData, providedErr := json.Marshal(v)
-	if providedErr != nil {
-		return providedErr
-	}
-
-	userData, userErr := json.Marshal(u)
-	if userErr != nil {
-		return userErr
-	}
-
-	providedErr = json.Unmarshal(providedData, &idx)
-	if providedErr != nil {
-		return providedErr
-	}
-
-	userErr = json.Unmarshal(userData, &idx)
-	if userErr != nil {
-		return userErr
-	}
-
-	data, err := json.Marshal(idx)
-	if err != nil {
-		return err
-	}
-
-	u.claims = data
-	return nil
 }
 
 // UnmarshalJSON transparently unmarshals the user information structure.
@@ -85,6 +53,7 @@ func (u *UserInfo) UnmarshalJSON(data []byte) error {
 	u.Profile = raw.Profile
 	u.Email = raw.Email
 	u.EmailVerified = bool(raw.EmailVerified)
+	u.Groups = append([]string{}, raw.Groups...)
 	u.claims = append([]byte{}, data...)
 	return nil
 }
@@ -95,6 +64,7 @@ type userInfoWire struct {
 	Profile       string       `json:"profile"`
 	Email         string       `json:"email"`
 	EmailVerified boolOrString `json:"email_verified"`
+	Groups        []string     `json:"groups"`
 }
 
 // boolOrString is used to deserialize a boolean value that may also be represented as a string. Some identity providers

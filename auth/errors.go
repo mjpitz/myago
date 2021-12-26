@@ -21,3 +21,6 @@ import (
 
 // ErrUnauthorized is returned when no user information is found on a context.
 var ErrUnauthorized = errors.New("unauthorized")
+
+var errNotFound = errors.New("not found")
+var errBadRequest = errors.New("bad lookup request")

@@ -17,41 +17,35 @@ package auth
 
 import (
 	"context"
-	"encoding/csv"
-	"errors"
-	"io"
-	"strings"
 
-	"github.com/mjpitz/myago/vfs"
+	"github.com/mjpitz/myago/headers"
 )
 
-// OpenCSV attempts to open the provided csv file and return a parsed index based on the contents.
-func OpenCSV(ctx context.Context, fileName string) (Store, error) {
-	fs := vfs.Extract(ctx)
-	f, err := fs.Open(fileName)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
+// Bearer returns a handler func that translates bearer tokens into user information.
+func Bearer(store Store) HandlerFunc {
+	return func(ctx context.Context) (context.Context, error) {
+		header := headers.Extract(ctx)
 
-	c := &store{
-		idx: make(map[string]*entry),
-	}
-
-	reader := csv.NewReader(f)
-	for {
-		record, err := reader.Read()
-		if errors.Is(err, io.EOF) {
-			break
-		} else if err != nil {
-			return nil, err
+		token, err := Get(header, "bearer")
+		if err != nil {
+			return ctx, nil
 		}
 
-		c.idx[record[1]] = &entry{
-			password: record[0],
-			groups:   strings.Split(record[3], ","),
+		resp, err := store.Lookup(LookupRequest{
+			Token: token,
+		})
+		if err != nil {
+			return ctx, nil
 		}
-	}
 
-	return c, nil
+		userInfo := &UserInfo{
+			Subject:       resp.UserID,
+			Profile:       resp.User,
+			Email:         resp.Email,
+			EmailVerified: resp.EmailVerified,
+			Groups:        resp.Groups,
+		}
+
+		return ToContext(ctx, *userInfo), nil
+	}
 }
