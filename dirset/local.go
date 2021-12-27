@@ -21,17 +21,31 @@ import (
 	"strings"
 )
 
+// Must panics if Local fails to obtain the directory set.
+func Must(appName string) DirectorySet {
+	dirs, err := Local(appName)
+	if err != nil {
+		panic(err)
+	}
+	return dirs
+}
+
 // Local uses information about the local system to determine a common set of paths for use by the application.
 func Local(appName string) (DirectorySet, error) {
-	info, err := user.Current()
-	if err != nil {
-		return DirectorySet{}, err
-	}
-
 	switch runtime.GOOS {
 	case "windows":
+		info, err := user.Current()
+		if err != nil {
+			return DirectorySet{}, err
+		}
+
 		return windows(info.HomeDir, appName), nil
 	case "darwin":
+		info, err := user.Current()
+		if err != nil {
+			return DirectorySet{}, err
+		}
+
 		return osx(info.HomeDir, appName), nil
 	default:
 		return linux(appName), nil
@@ -58,7 +72,7 @@ func linux(appName string) DirectorySet {
 func osx(home, appName string) DirectorySet {
 	sep := "/"
 	join := func(parts ...string) string {
-		parts = append([]string{home, "Library", "Application\\ Support", appName}, parts...)
+		parts = append([]string{home, "Library", "Application Support", appName}, parts...)
 
 		return strings.Join(parts, sep)
 	}

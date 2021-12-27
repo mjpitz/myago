@@ -96,7 +96,15 @@ func ServeMux(cfg Config, callback TokenCallback) *http.ServeMux {
 			return
 		}
 
-		oauth2Token, err := config.(*oauth2.Config).Exchange(ctx, r.URL.Query().Get("code"))
+		query := r.URL.Query()
+		errKind := query.Get("error")
+		errDescription := query.Get("error_description")
+		if errKind != "" {
+			http.Error(w, errKind+": "+errDescription, http.StatusBadRequest)
+			return
+		}
+
+		oauth2Token, err := config.(*oauth2.Config).Exchange(ctx, query.Get("code"))
 		if err != nil {
 			logger.Error("failed to exchange code for auth info", zap.Error(err))
 			http.Error(w, "", http.StatusInternalServerError)
