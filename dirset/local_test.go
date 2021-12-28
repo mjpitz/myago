@@ -38,11 +38,11 @@ func TestOSX(t *testing.T) {
 
 	directorySet := osx("/Users/myago", "ExampleApp")
 
-	require.Equal(t, "/Users/myago/Library/Application\\ Support/ExampleApp/Cache", directorySet.CacheDir)
-	require.Equal(t, "/Users/myago/Library/Application\\ Support/ExampleApp/State", directorySet.StateDir)
-	require.Equal(t, "/Users/myago/Library/Application\\ Support/ExampleApp/Local", directorySet.LocalStateDir)
-	require.Equal(t, "/Users/myago/Library/Application\\ Support/ExampleApp/Locks", directorySet.LockDir)
-	require.Equal(t, "/Users/myago/Library/Application\\ Support/ExampleApp/Logs", directorySet.LogDir)
+	require.Equal(t, "/Users/myago/Library/Application Support/ExampleApp/Cache", directorySet.CacheDir)
+	require.Equal(t, "/Users/myago/Library/Application Support/ExampleApp/State", directorySet.StateDir)
+	require.Equal(t, "/Users/myago/Library/Application Support/ExampleApp/Local", directorySet.LocalStateDir)
+	require.Equal(t, "/Users/myago/Library/Application Support/ExampleApp/Locks", directorySet.LockDir)
+	require.Equal(t, "/Users/myago/Library/Application Support/ExampleApp/Logs", directorySet.LogDir)
 }
 
 func TestWindows(t *testing.T) {

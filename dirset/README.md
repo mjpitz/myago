@@ -29,3 +29,10 @@ func Local(appName string) (DirectorySet, error)
 ```
 Local uses information about the local system to determine a common set of paths
 for use by the application.
+
+#### func  Must
+
+```go
+func Must(appName string) DirectorySet
+```
+Must panics if Local fails to obtain the directory set.
