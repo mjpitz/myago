@@ -1,7 +1,11 @@
 # httpauth
---
-    import "github.com/mjpitz/myago/auth/http"
 
+
+
+
+```go
+import github.com/mjpitz/myago/auth/http
+```
 
 ## Usage
 

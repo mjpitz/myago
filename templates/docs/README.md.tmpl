@@ -1,0 +1,15 @@
+# {{ .Name }}
+
+{{ .EmitSynopsis }}
+
+{{ if .IsCommand }}
+```
+go install {{ .ImportPath }}@latest
+```
+{{- else }}
+```go
+import {{ .ImportPath }}
+```
+{{- end }}
+
+{{ .EmitUsage }}

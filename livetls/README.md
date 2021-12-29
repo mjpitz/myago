@@ -1,29 +1,33 @@
 # livetls
---
-    import "github.com/mjpitz/myago/livetls"
 
+```go
+import github.com/mjpitz/myago/livetls
+```
 
 ## Usage
 
-#### func  LoadCertPool
+#### func LoadCertPool
 
 ```go
 func LoadCertPool(ctx context.Context, cfg *Config) (*x509.CertPool, error)
 ```
+
 LoadCertPool loads the x509 certificate authority pool.
 
-#### func  LoadCertificate
+#### func LoadCertificate
 
 ```go
 func LoadCertificate(ctx context.Context, cfg *Config) (*tls.Certificate, error)
 ```
+
 LoadCertificate loads the certificate from the configured public/private key.
 
-#### func  New
+#### func New
 
 ```go
 func New(ctx context.Context, config Config) (*tls.Config, error)
 ```
+
 New construct a tls.Config that will periodically reload the configured
 certificate. nolint:cyclop
 

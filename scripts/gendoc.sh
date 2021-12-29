@@ -18,5 +18,7 @@
 for pkg in $(go list ./... | egrep -v '^github.com/mjpitz/myago$'); do
   output="${pkg#"github.com/mjpitz/myago/"}/README.md"
 
-  godocdown "$pkg" > "$output"
+  godocdown -template ./templates/docs/README.md.tmpl "$pkg" > "$output"
 done
+
+prettier --write --parser markdown **/README.md

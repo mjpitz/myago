@@ -1,6 +1,4 @@
 # yarpc
---
-    import "github.com/mjpitz/myago/yarpc"
 
 Package yarpc implements "yet another RPC framework" on top of HashiCorp's yamux
 library. I wanted something with the simplicity of Go's HTTP library and the
@@ -48,6 +46,10 @@ Example ClientConn:
     	stat.Name // "uptime"
     }
 
+```go
+import github.com/mjpitz/myago/yarpc
+```
+
 ## Usage
 
 ```go
@@ -62,32 +64,36 @@ var (
 )
 ```
 
-#### func  Handle
+#### func Handle
 
 ```go
 func Handle(pattern string, handler Handler)
 ```
+
 Handle adds the provided handler to the default server.
 
-#### func  HandleFunc
+#### func HandleFunc
 
 ```go
 func HandleFunc(pattern string, handler func(Stream) error)
 ```
+
 HandleFunc adds the provided handler function to the default server.
 
-#### func  ListenAndServe
+#### func ListenAndServe
 
 ```go
 func ListenAndServe(network, address string, opts ...Option) error
 ```
+
 ListenAndServe starts the default server on the provided network and address.
 
-#### func  Serve
+#### func Serve
 
 ```go
 func Serve(listener Listener, opts ...Option) error
 ```
+
 Serve starts the default server using the provided listener.
 
 #### type ClientConn
@@ -100,34 +106,38 @@ type ClientConn struct {
 
 ClientConn defines an abstract connection yarpc clients to use.
 
-#### func  DialContext
+#### func DialContext
 
 ```go
 func DialContext(ctx context.Context, network, target string, opts ...Option) *ClientConn
 ```
+
 DialContext initializes a new client connection to the target server.
 
-#### func  NewClientConn
+#### func NewClientConn
 
 ```go
 func NewClientConn(ctx context.Context) *ClientConn
 ```
+
 NewClientConn creates a default ClientConn with an empty dialer implementation.
 The Dialer must be configured before use. This function is intended to be used
 in initializer functions such as DialContext.
 
-#### func (*ClientConn) OpenStream
+#### func (\*ClientConn) OpenStream
 
 ```go
 func (c *ClientConn) OpenStream(ctx context.Context, method string) (Stream, error)
 ```
+
 OpenStream starts a stream for the named RPC.
 
-#### func (*ClientConn) WithOptions
+#### func (\*ClientConn) WithOptions
 
 ```go
 func (c *ClientConn) WithOptions(opts ...Option) *ClientConn
 ```
+
 WithOptions configures the options for the underlying client connection.
 
 #### type Dialer
@@ -184,7 +194,6 @@ type Invoke struct {
 }
 ```
 
-
 #### type Listener
 
 ```go
@@ -193,7 +202,6 @@ type Listener interface {
 	Close() error
 }
 ```
-
 
 #### type NetDialer
 
@@ -218,11 +226,12 @@ type NetDialerAdapter struct {
 
 NetDialerAdapter adapts the provided NetDialer to support io.ReadWriteCloser.
 
-#### func (*NetDialerAdapter) DialContext
+#### func (\*NetDialerAdapter) DialContext
 
 ```go
 func (a *NetDialerAdapter) DialContext(ctx context.Context) (io.ReadWriteCloser, error)
 ```
+
 DialContext returns a creates a new network connection.
 
 #### type NetListenerAdapter
@@ -236,13 +245,13 @@ type NetListenerAdapter struct {
 NetListenerAdapter adapts the provided net.Listener to support
 io.ReadWriteCloser.
 
-#### func (*NetListenerAdapter) Accept
+#### func (\*NetListenerAdapter) Accept
 
 ```go
 func (n *NetListenerAdapter) Accept() (io.ReadWriteCloser, error)
 ```
 
-#### func (*NetListenerAdapter) Close
+#### func (\*NetListenerAdapter) Close
 
 ```go
 func (n *NetListenerAdapter) Close() error
@@ -256,33 +265,37 @@ type Option func(opt *options)
 
 Option defines an generic way to configure clients and servers.
 
-#### func  WithContext
+#### func WithContext
 
 ```go
 func WithContext(ctx context.Context) Option
 ```
+
 WithContext provides a custom context to the underlying system. Mostly used on
 servers.
 
-#### func  WithEncoding
+#### func WithEncoding
 
 ```go
 func WithEncoding(encoding *encoding.Encoding) Option
 ```
+
 WithEncoding configures how messages are serialized.
 
-#### func  WithTLS
+#### func WithTLS
 
 ```go
 func WithTLS(config *tls.Config) Option
 ```
+
 WithTLS enables TLS.
 
-#### func  WithYamux
+#### func WithYamux
 
 ```go
 func WithYamux(config *yamux.Config) Option
 ```
+
 WithYamux configures yamux using the provided configuration.
 
 #### type ServeMux
@@ -294,13 +307,13 @@ type ServeMux struct {
 
 ServeMux provides a router implementation for yarpc calls.
 
-#### func (*ServeMux) Handle
+#### func (\*ServeMux) Handle
 
 ```go
 func (s *ServeMux) Handle(pattern string, handler Handler)
 ```
 
-#### func (*ServeMux) ServeYARPC
+#### func (\*ServeMux) ServeYARPC
 
 ```go
 func (s *ServeMux) ServeYARPC(stream Stream) (err error)
@@ -314,20 +327,19 @@ type Server struct {
 }
 ```
 
-
-#### func (*Server) ListenAndServe
+#### func (\*Server) ListenAndServe
 
 ```go
 func (s *Server) ListenAndServe(network, address string, opts ...Option) error
 ```
 
-#### func (*Server) Serve
+#### func (\*Server) Serve
 
 ```go
 func (s *Server) Serve(listener Listener, opts ...Option) error
 ```
 
-#### func (*Server) Shutdown
+#### func (\*Server) Shutdown
 
 ```go
 func (s *Server) Shutdown() error
@@ -360,9 +372,10 @@ type Stream interface {
 Stream provides an interface for reading and writing message structures from a
 stream.
 
-#### func  Wrap
+#### func Wrap
 
 ```go
 func Wrap(ys *yamux.Stream, opts ...Option) Stream
 ```
+
 Wrap converts the provided yamux stream into a yarpc Stream.

@@ -1,6 +1,4 @@
 # ulid
---
-    import "github.com/mjpitz/myago/ulid"
 
 Package ulid provides code for generating variable length unique, lexigraphic
 identifiers (ULID) with programmable fills. Currently, there is a
@@ -16,6 +14,10 @@ systems. The wire format is as follows: `[ skew ][ millis ][ payload ]`
     - `skew` - 1 byte used to handle major clock skews (reserved, unused)
     - `millis` - 6 bytes of a unix timestamp (should give us until the year 10k or so)
     - `payload` - N bytes for the payload
+
+```go
+import github.com/mjpitz/myago/ulid
+```
 
 ## Usage
 
@@ -49,18 +51,20 @@ var (
 )
 ```
 
-#### func  RandomFill
+#### func RandomFill
 
 ```go
 func RandomFill(_ ULID, data []byte) (int, error)
 ```
+
 RandomFill is a fill that populates the data payload with random data.
 
-#### func  ToContext
+#### func ToContext
 
 ```go
 func ToContext(ctx context.Context, generator *Generator) context.Context
 ```
+
 ToContext appends the provided generator to the provided context.
 
 #### type Fill
@@ -80,26 +84,29 @@ type Generator struct {
 
 Generator is the base interface defines how to generate ULIDs of varying length.
 
-#### func  Extract
+#### func Extract
 
 ```go
 func Extract(ctx context.Context) *Generator
 ```
+
 Extract is used to obtain the generator from a context. If none is present, the
 system generator is used.
 
-#### func  NewGenerator
+#### func NewGenerator
 
 ```go
 func NewGenerator(skew byte, fill Fill) *Generator
 ```
+
 NewGenerator constructs a generator using the provided skew and fill.
 
-#### func (*Generator) Generate
+#### func (\*Generator) Generate
 
 ```go
 func (g *Generator) Generate(ctx context.Context, bits int) (ULID, error)
 ```
+
 Generate produces a new ULID unless an error occurs. A clock can be provided on
 the context to override how the Generator obtains a timestamp.
 
@@ -111,11 +118,12 @@ type ULID []byte
 
 ULID is a variable-length, generalized, unique lexographical identifier.
 
-#### func  Parse
+#### func Parse
 
 ```go
 func Parse(ulid string) (ULID, error)
 ```
+
 Parse accepts a ULID string and attempts to extract a ULID from the provided
 string.
 
@@ -124,6 +132,7 @@ string.
 ```go
 func (ulid ULID) Bytes() []byte
 ```
+
 Bytes returns a copy of the underlying byte array backing the ulid.
 
 #### func (ULID) Payload
@@ -131,6 +140,7 @@ Bytes returns a copy of the underlying byte array backing the ulid.
 ```go
 func (ulid ULID) Payload() []byte
 ```
+
 Payload returns a copy of the payload bytes.
 
 #### func (ULID) Skew
@@ -138,6 +148,7 @@ Payload returns a copy of the payload bytes.
 ```go
 func (ulid ULID) Skew() byte
 ```
+
 Skew returns the current skew used to correct massive time skews.
 
 #### func (ULID) String
@@ -145,6 +156,7 @@ Skew returns the current skew used to correct massive time skews.
 ```go
 func (ulid ULID) String() string
 ```
+
 String returns a string representation of the payload. It's encoded using a
 crockford base32 encoding.
 
@@ -153,4 +165,5 @@ crockford base32 encoding.
 ```go
 func (ulid ULID) Timestamp() time.Time
 ```
+
 Timestamp returns the timestamp portion of the identifier.

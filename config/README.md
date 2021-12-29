@@ -1,7 +1,8 @@
 # config
---
-    import "github.com/mjpitz/myago/config"
 
+```go
+import github.com/mjpitz/myago/config
+```
 
 ## Usage
 
@@ -27,14 +28,16 @@ var DefaultLoader = Loader{
 	".xml":  encoding.XML,
 }
 ```
+
 DefaultLoader provides a default Loader implementation that supports reading a
 variety of files.
 
-#### func  Load
+#### func Load
 
 ```go
 func Load(ctx context.Context, v interface{}, filePaths ...string) error
 ```
+
 Load provides a convenience function for being able to load configuration using
 the DefaultLoader.
 
@@ -52,5 +55,6 @@ struct.
 ```go
 func (l Loader) Load(ctx context.Context, v interface{}, filePaths ...string) error
 ```
+
 Load reads the provided files (if they exist) and unmarshals the data into the
 provided interface.

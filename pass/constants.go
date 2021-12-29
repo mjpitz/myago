@@ -1,3 +1,18 @@
+// Copyright (C) 2021 Mya Pitzeruse
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 package pass
 
 import (
@@ -38,11 +53,11 @@ const (
 	PIN TemplateClass = "pin"
 )
 
-// CharacterClasses defines a mapping of a character code to it's associated character set.
-type CharacterClasses map[byte]string
+// characterClasses defines a mapping of a character code to it's associated character set.
+type characterClasses map[byte]string
 
-// TemplateClasses defines a mapping of templates that yield different strengths.
-type TemplateClasses map[TemplateClass][][]byte
+// templateClasses defines a mapping of templates that yield different strengths.
+type templateClasses map[TemplateClass][][]byte
 
 var (
 	vowels          = "aeiou"
@@ -57,7 +72,7 @@ var (
 
 	// defaultCharacterClasses defines a default set of characters to pick from when a template class sees a specific
 	// byte. This is used to ensure the password is a good mix of values.
-	defaultCharacterClasses = CharacterClasses{
+	defaultCharacterClasses = characterClasses{
 		'v': vowels,
 		'V': vowelsUpper,
 		'c': consonants,
@@ -71,7 +86,7 @@ var (
 
 	// defaultTemplateClasses defines a common set of templates for passwords to use. They're keyed by the class of
 	// password formats.
-	defaultTemplateClasses = TemplateClasses{
+	defaultTemplateClasses = templateClasses{
 		MaximumSecurity: {
 			[]byte("anoxxxxxxxxxxxxxxxxx"), []byte("axxxxxxxxxxxxxxxxxno"),
 		},

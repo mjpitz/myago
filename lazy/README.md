@@ -1,7 +1,8 @@
 # lazy
---
-    import "github.com/mjpitz/myago/lazy"
 
+```go
+import github.com/mjpitz/myago/lazy
+```
 
 ## Usage
 
@@ -16,9 +17,10 @@ type Once struct {
 
 Once will attempt to load a value until one is loaded.
 
-#### func (*Once) Get
+#### func (\*Once) Get
 
 ```go
 func (o *Once) Get(ctx context.Context) (interface{}, error)
 ```
+
 Get returns the loaded value if set or an error should one occur.

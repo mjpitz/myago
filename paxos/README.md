@@ -1,6 +1,7 @@
 # paxos
+
 --
-    import "github.com/mjpitz/myago/paxos"
+import "github.com/mjpitz/myago/paxos"
 
 Package paxos implements the paxos algorithm. The logic is mostly ported from
 mjpitz/paxos, but with a few modifications. First, I didn't continue using gRPC
@@ -13,29 +14,32 @@ stands, it _should_ support simple paxos.
 
 ## Usage
 
-#### func  RegisterYarpcAcceptorServer
+#### func RegisterYarpcAcceptorServer
 
 ```go
 func RegisterYarpcAcceptorServer(svr *yarpc.Server, impl AcceptorServer)
 ```
+
 RegisterYarpcAcceptorServer registers the provided AcceptorServer implementation
 with the yarpc.Server to handle requests.
 
-#### func  RegisterYarpcObserverServer
+#### func RegisterYarpcObserverServer
 
 ```go
 func RegisterYarpcObserverServer(svr *yarpc.Server, impl ObserverServer)
 ```
+
 RegisterYarpcObserverServer registers the provided ObserverServer implementation
 with the yarpc.Server to handle requests. Acceptors should implement the
 observer server, otherwise other members of the cluster cannot determine what
 records have been accepted.
 
-#### func  RegisterYarpcProposerServer
+#### func RegisterYarpcProposerServer
 
 ```go
 func RegisterYarpcProposerServer(svr *yarpc.Server, impl ProposerServer)
 ```
+
 RegisterYarpcProposerServer registers the provided ProposerServer implementation
 with the yarpc.Server to handle requests. Typically, proposers aren't embedded
 as a server and are instead run as client side code.
@@ -49,8 +53,7 @@ type Acceptor interface {
 }
 ```
 
-
-#### func  NewAcceptor
+#### func NewAcceptor
 
 ```go
 func NewAcceptor(promiseLog, acceptedLog Log) (Acceptor, error)
@@ -65,12 +68,12 @@ type AcceptorClient interface {
 }
 ```
 
-
-#### func  NewYarpcAcceptorClient
+#### func NewYarpcAcceptorClient
 
 ```go
 func NewYarpcAcceptorClient(cc *yarpc.ClientConn) AcceptorClient
 ```
+
 NewYarpcAcceptorClient wraps the provided yarpc.ClientConn with an
 AcceptorClient implementation.
 
@@ -83,7 +86,6 @@ type AcceptorServer interface {
 }
 ```
 
-
 #### type Badger
 
 ```go
@@ -94,25 +96,25 @@ type Badger struct {
 
 Badger implements a Log that wraps an underlying badgerdb instance.
 
-#### func (*Badger) Last
+#### func (\*Badger) Last
 
 ```go
 func (l *Badger) Last(msg interface{}) error
 ```
 
-#### func (*Badger) Range
+#### func (\*Badger) Range
 
 ```go
 func (l *Badger) Range(start, stop uint64, proto interface{}, fn func(msg interface{}) error) error
 ```
 
-#### func (*Badger) Record
+#### func (\*Badger) Record
 
 ```go
 func (l *Badger) Record(id uint64, msg interface{}) error
 ```
 
-#### func (*Badger) WithPrefix
+#### func (\*Badger) WithPrefix
 
 ```go
 func (l *Badger) WithPrefix(prefix string) Log
@@ -144,11 +146,12 @@ type Config struct {
 
 Config contains configurable elements of Paxos.
 
-#### func (*Config) Validate
+#### func (\*Config) Validate
 
 ```go
 func (c *Config) Validate() error
 ```
+
 Validate ensures the configuration is valid.
 
 #### type IDGenerator
@@ -161,11 +164,12 @@ type IDGenerator interface {
 
 IDGenerator defines an interface for generating IDs used internally by paxos.
 
-#### func  ServerIDGenerator
+#### func ServerIDGenerator
 
 ```go
 func ServerIDGenerator(serverID uint8, clock clockwork.Clock) IDGenerator
 ```
+
 ServerIDGenerator returns an IDGenerator that creates an ID using a provided
 serverID and clock. It works by by taking a millisecond level timestamp,
 shifting it's value left 8 bits, and or'ing it with the server ID. The leading
@@ -199,7 +203,6 @@ type Log interface {
 }
 ```
 
-
 #### type Memory
 
 ```go
@@ -207,26 +210,25 @@ type Memory struct {
 }
 ```
 
-
-#### func (*Memory) Last
+#### func (\*Memory) Last
 
 ```go
 func (m *Memory) Last(msg interface{}) error
 ```
 
-#### func (*Memory) Range
+#### func (\*Memory) Range
 
 ```go
 func (m *Memory) Range(start, end uint64, proto interface{}, fn func(msg interface{}) error) error
 ```
 
-#### func (*Memory) Record
+#### func (\*Memory) Record
 
 ```go
 func (m *Memory) Record(id uint64, msg interface{}) error
 ```
 
-#### func (*Memory) WithPrefix
+#### func (\*Memory) WithPrefix
 
 ```go
 func (m *Memory) WithPrefix(prefix string) Log
@@ -242,46 +244,46 @@ type MockStream struct {
 }
 ```
 
-
-#### func  NewMockStream
+#### func NewMockStream
 
 ```go
 func NewMockStream(size int) *MockStream
 ```
+
 NewMockStream provides a mock Stream implementation useful for testing. This
 could be yarpc or paxos related.
 
-#### func (*MockStream) Close
+#### func (\*MockStream) Close
 
 ```go
 func (m *MockStream) Close() error
 ```
 
-#### func (*MockStream) Context
+#### func (\*MockStream) Context
 
 ```go
 func (m *MockStream) Context() context.Context
 ```
 
-#### func (*MockStream) ReadMsg
+#### func (\*MockStream) ReadMsg
 
 ```go
 func (m *MockStream) ReadMsg(i interface{}) error
 ```
 
-#### func (*MockStream) SetReadDeadline
+#### func (\*MockStream) SetReadDeadline
 
 ```go
 func (m *MockStream) SetReadDeadline(deadline time.Time) error
 ```
 
-#### func (*MockStream) SetWriteDeadline
+#### func (\*MockStream) SetWriteDeadline
 
 ```go
 func (m *MockStream) SetWriteDeadline(deadline time.Time) error
 ```
 
-#### func (*MockStream) WriteMsg
+#### func (\*MockStream) WriteMsg
 
 ```go
 func (m *MockStream) WriteMsg(i interface{}) error
@@ -295,21 +297,21 @@ type MultiAcceptorClient struct {
 }
 ```
 
-
-#### func (*MultiAcceptorClient) Accept
+#### func (\*MultiAcceptorClient) Accept
 
 ```go
 func (m *MultiAcceptorClient) Accept(ctx context.Context, in *Proposal) (*Proposal, error)
 ```
 
-#### func (*MultiAcceptorClient) Prepare
+#### func (\*MultiAcceptorClient) Prepare
 
 ```go
 func (m *MultiAcceptorClient) Prepare(ctx context.Context, request *Request) (*Promise, error)
 ```
+
 nolint:cyclop
 
-#### func (*MultiAcceptorClient) Start
+#### func (\*MultiAcceptorClient) Start
 
 ```go
 func (m *MultiAcceptorClient) Start(ctx context.Context, membership *cluster.Membership) error
@@ -323,8 +325,7 @@ type ObserveClientStream struct {
 }
 ```
 
-
-#### func (*ObserveClientStream) Recv
+#### func (\*ObserveClientStream) Recv
 
 ```go
 func (s *ObserveClientStream) Recv() (*Proposal, error)
@@ -338,14 +339,13 @@ type ObserveServerStream struct {
 }
 ```
 
-
-#### func (*ObserveServerStream) Recv
+#### func (\*ObserveServerStream) Recv
 
 ```go
 func (s *ObserveServerStream) Recv() (*Request, error)
 ```
 
-#### func (*ObserveServerStream) Send
+#### func (\*ObserveServerStream) Send
 
 ```go
 func (s *ObserveServerStream) Send(msg *Proposal) error
@@ -362,11 +362,12 @@ type Observer struct {
 
 Observer watches the Acceptors to learn about what values have been accepted.
 
-#### func (*Observer) Start
+#### func (\*Observer) Start
 
 ```go
 func (o *Observer) Start(ctx context.Context, membership *cluster.Membership) error
 ```
+
 nolint:gocognit,cyclop
 
 #### type ObserverClient
@@ -377,12 +378,12 @@ type ObserverClient interface {
 }
 ```
 
-
-#### func  NewYarpcObserverClient
+#### func NewYarpcObserverClient
 
 ```go
 func NewYarpcObserverClient(cc *yarpc.ClientConn) ObserverClient
 ```
+
 NewYarpcObserverClient wraps the provided yarpc.ClientConn with an
 ObserverClient implementation.
 
@@ -393,7 +394,6 @@ type ObserverServer interface {
 	Observe(call *ObserveServerStream) error
 }
 ```
-
 
 #### type Paxos
 
@@ -415,15 +415,16 @@ type Paxos struct {
 
 Paxos defines the core elements of a paxos participant.
 
-#### func  New
+#### func New
 
 ```go
 func New(cfg *Config) (*Paxos, error)
 ```
+
 New constructs a new instance of paxos given the provided configuration. It
 returns an error should the provided configuration be invalid.
 
-#### func (*Paxos) Start
+#### func (\*Paxos) Start
 
 ```go
 func (p *Paxos) Start(ctx context.Context, membership *cluster.Membership) error
@@ -466,7 +467,7 @@ Proposer can be run either as an embedded client, or as part of a standalone
 server. Proposers Propose additions to the paxos log and uses the acceptors to
 get consensus on if the proposed value was accepted.
 
-#### func (*Proposer) Propose
+#### func (\*Proposer) Propose
 
 ```go
 func (p *Proposer) Propose(ctx context.Context, value []byte) (accepted []byte, err error)
@@ -480,12 +481,12 @@ type ProposerClient interface {
 }
 ```
 
-
-#### func  NewYarpcProposerClient
+#### func NewYarpcProposerClient
 
 ```go
 func NewYarpcProposerClient(cc *yarpc.ClientConn) ProposerClient
 ```
+
 NewYarpcProposerClient wraps the provided yarpc.ClientConn with an
 ProposerClient implementation.
 
@@ -496,7 +497,6 @@ type ProposerServer interface {
 	Propose(ctx context.Context, value []byte) ([]byte, error)
 }
 ```
-
 
 #### type Request
 

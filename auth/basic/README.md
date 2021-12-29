@@ -1,7 +1,11 @@
 # basicauth
---
-    import "github.com/mjpitz/myago/auth/basic"
 
+
+
+
+```go
+import github.com/mjpitz/myago/auth/basic
+```
 
 ## Usage
 

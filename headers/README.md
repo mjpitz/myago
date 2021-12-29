@@ -1,26 +1,30 @@
 # headers
---
-    import "github.com/mjpitz/myago/headers"
 
 Package headers provides utility code for operating on header values that come
 from different sources. A default HTTP middleware handler is provided and will
 ensure that the headers are appropriately translated and passed along.
 
+```go
+import github.com/mjpitz/myago/headers
+```
+
 ## Usage
 
-#### func  HTTP
+#### func HTTP
 
 ```go
 func HTTP(delegate http.Handler) http.HandlerFunc
 ```
+
 HTTP returns an http middleware function that translates HTTP headers into a
 context Header.
 
-#### func  ToContext
+#### func ToContext
 
 ```go
 func ToContext(ctx context.Context, header Header) context.Context
 ```
+
 ToContext attaches the provided headers to the context.
 
 #### type Header
@@ -31,18 +35,20 @@ type Header map[string][]string
 
 Header defines an abstract definition of a header.
 
-#### func  Extract
+#### func Extract
 
 ```go
 func Extract(ctx context.Context) Header
 ```
+
 Extract attempts to obtain the headers from the provided context.
 
-#### func  New
+#### func New
 
 ```go
 func New() Header
 ```
+
 New constructs a Header for use.
 
 #### func (Header) Get
@@ -50,6 +56,7 @@ New constructs a Header for use.
 ```go
 func (h Header) Get(key string) string
 ```
+
 Get returns the first possible header value for a key (if present).
 
 #### func (Header) GetAll
@@ -57,6 +64,7 @@ Get returns the first possible header value for a key (if present).
 ```go
 func (h Header) GetAll(key string) []string
 ```
+
 GetAll returns all possible values for a key.
 
 #### func (Header) Set
@@ -64,6 +72,7 @@ GetAll returns all possible values for a key.
 ```go
 func (h Header) Set(key, value string)
 ```
+
 Set sets a single value for the provided key.
 
 #### func (Header) SetAll
@@ -71,4 +80,5 @@ Set sets a single value for the provided key.
 ```go
 func (h Header) SetAll(key string, values []string)
 ```
+
 SetAll sets the values for the provides key.

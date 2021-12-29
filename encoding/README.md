@@ -1,9 +1,11 @@
 # encoding
---
-    import "github.com/mjpitz/myago/encoding"
 
 Package encoding provides common Encoding and associated interfaces for Encoder
 and Decoder logic.
+
+```go
+import github.com/mjpitz/myago/encoding
+```
 
 ## Usage
 

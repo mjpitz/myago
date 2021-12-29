@@ -1,10 +1,12 @@
 # cluster
---
-    import "github.com/mjpitz/myago/cluster"
 
 Package cluster provides code to manage cluster Membership. Membership can
 currently be managed statically (via explicit configuration of active) or
 dynamically (using HashiCorp's Serf project).
+
+```go
+import github.com/mjpitz/myago/cluster
+```
 
 ## Usage
 
@@ -27,27 +29,30 @@ Cluster handles the discovery and management of cluster members. It uses
 HashiCorp's Serf and MemberList projects to discover and track active given a
 join address.
 
-#### func  New
+#### func New
 
 ```go
 func New(opts ...Option) *Cluster
 ```
+
 New constructs a cluster given the provided options.
 
-#### func (*Cluster) Membership
+#### func (\*Cluster) Membership
 
 ```go
 func (c *Cluster) Membership() *Membership
 ```
+
 Membership returns the underlying membership of the cluster. Useful for
 obtaining a snapshot or for manipulating the entries used by the cluster during
 testing.
 
-#### func (*Cluster) Start
+#### func (\*Cluster) Start
 
 ```go
 func (c *Cluster) Start(ctx context.Context) error
 ```
+
 Start initializes and starts up the cluster.
 
 #### type Config
@@ -63,11 +68,12 @@ Config provides a common configuration structure for forming clusters. Either
 through a list of known addresses (peers) or using gossip to form pool
 dynamically.
 
-#### func (*Config) Start
+#### func (\*Config) Start
 
 ```go
 func (c *Config) Start(ctx context.Context, membership *Membership) error
 ```
+
 Start controls which discovery mechanism is invoked based on the provided
 configuration.
 
@@ -99,7 +105,7 @@ type GossipDiscovery struct {
 GossipDiscovery uses HashiCorp's Serf library to discover nodes within the
 cluster. It requires both TCP and UDP communication to be available.
 
-#### func (*GossipDiscovery) Start
+#### func (\*GossipDiscovery) Start
 
 ```go
 func (g *GossipDiscovery) Start(ctx context.Context, membership *Membership) error
@@ -115,52 +121,57 @@ type Membership struct {
 Membership tacks a current list of active within the cluster. It can be
 populated manually (useful for testing) or using common discovery mechanisms.
 
-#### func (*Membership) Add
+#### func (\*Membership) Add
 
 ```go
 func (m *Membership) Add(peers []string)
 ```
+
 Add inserts the provided active into the cluster's active list. Operation should
 be `O( m log(n) )` where `m = len(peers)` and `n = len(m.active) + len(m.left)`.
 
-#### func (*Membership) Left
+#### func (\*Membership) Left
 
 ```go
 func (m *Membership) Left(peers []string)
 ```
+
 Left allows peers to temporarily leave the cluster, but still be considered part
 of active membership. Operation should be `O( m log(n) )` where `m = len(peers)`
 and `n = len(m.active) + len(m.left)`.
 
-#### func (*Membership) Majority
+#### func (\*Membership) Majority
 
 ```go
 func (m *Membership) Majority() int
 ```
+
 Majority computes a cluster majority. This returns a simple majority for the
 cluster.
 
-#### func (*Membership) Remove
+#### func (\*Membership) Remove
 
 ```go
 func (m *Membership) Remove(peers []string)
 ```
-Remove deletes the provided active from the cluster's peer list. Operation
-should be `O( m log(n) )` where `m = len(peers)` and `n = len(m.active) +
-len(m.left)`.
 
-#### func (*Membership) Snapshot
+Remove deletes the provided active from the cluster's peer list. Operation
+should be `O( m log(n) )` where `m = len(peers)` and `n = len(m.active) + len(m.left)`.
+
+#### func (\*Membership) Snapshot
 
 ```go
 func (m *Membership) Snapshot() ([]string, int)
 ```
+
 Snapshot returns a copy of the current peer list.
 
-#### func (*Membership) Watch
+#### func (\*Membership) Watch
 
 ```go
 func (m *Membership) Watch() (<-chan MembershipChange, CancelWatch)
 ```
+
 Watch allows others to observe changes in the cluster membership.
 
 #### type MembershipChange
@@ -186,7 +197,7 @@ type NoDiscovery struct {
 
 NoDiscovery uses a statically provided list of peers to fill Membership.
 
-#### func (*NoDiscovery) Start
+#### func (\*NoDiscovery) Start
 
 ```go
 func (n *NoDiscovery) Start(ctx context.Context, membership *Membership) error
@@ -200,9 +211,10 @@ type Option func(cluster *Cluster)
 
 Option defines how callers can customize aspects of the cluster.
 
-#### func  WithDiscovery
+#### func WithDiscovery
 
 ```go
 func WithDiscovery(discovery Discovery) Option
 ```
+
 WithDiscovery allows alternative peer discovery mechanisms to be plugged in.

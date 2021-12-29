@@ -1,15 +1,17 @@
 # authors
---
-    import "github.com/mjpitz/myago/authors"
 
+```go
+import github.com/mjpitz/myago/authors
+```
 
 ## Usage
 
-#### func  Parse
+#### func Parse
 
 ```go
 func Parse(contents string) []*cli.Author
 ```
+
 Parse parses the contents of an AUTHORS file. An AUTHORS file is a plaintext
 file whose contents details the primary contributors to the project. Each line
 in the file contains either a comment (denoted by the pound symbol, "#") or an

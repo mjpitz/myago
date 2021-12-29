@@ -15,4 +15,4 @@ test: gen
 
 legal: .legal
 .legal:
-	addlicense -f ./legal/header.txt -skip yaml -skip yml .
+	addlicense -f ./templates/legal/header.txt -skip yaml -skip yml .

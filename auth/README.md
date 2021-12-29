@@ -1,31 +1,36 @@
 # auth
---
-    import "github.com/mjpitz/myago/auth"
 
 Package auth provides common code for handling user authentication in a rather
 implementation agnostic way. Currently, we only provide basic auth backed by a
 CSV, but most components contain an interface that _should_ make it rather easy
 to swap out implementations.
 
+```go
+import github.com/mjpitz/myago/auth
+```
+
 ## Usage
 
 ```go
 var ErrUnauthorized = errors.New("unauthorized")
 ```
+
 ErrUnauthorized is returned when no user information is found on a context.
 
-#### func  Get
+#### func Get
 
 ```go
 func Get(header headers.Header, expectedScheme string) (string, error)
 ```
+
 Get retrieves the current authorization value from the header.
 
-#### func  ToContext
+#### func ToContext
 
 ```go
 func ToContext(ctx context.Context, userInfo UserInfo) context.Context
 ```
+
 ToContext attaches the provided UserInfo to the context.
 
 #### type Config
@@ -48,19 +53,21 @@ type HandlerFunc func(ctx context.Context) (context.Context, error)
 HandlerFunc defines a common way to add authentication / authorization to a
 Golang context.
 
-#### func  Composite
+#### func Composite
 
 ```go
 func Composite(handlers ...HandlerFunc) HandlerFunc
 ```
+
 Composite returns a HandlerFunc that iterates all provided HandlerFunc until the
 end or an error occurs.
 
-#### func  Required
+#### func Required
 
 ```go
 func Required() HandlerFunc
 ```
+
 Required returns a HandlerFunc that ensures user information is present on the
 context.
 
@@ -83,11 +90,12 @@ type UserInfo struct {
 
 UserInfo represents a minimum set of user information.
 
-#### func  Extract
+#### func Extract
 
 ```go
 func Extract(ctx context.Context) *UserInfo
 ```
+
 Extract attempts to obtain the UserInfo from the provided context.
 
 #### func (UserInfo) Claims
@@ -95,11 +103,13 @@ Extract attempts to obtain the UserInfo from the provided context.
 ```go
 func (u UserInfo) Claims(v interface{}) error
 ```
+
 Claims provides a convenient way to read additional data from the request.
 
-#### func (*UserInfo) UnmarshalJSON
+#### func (\*UserInfo) UnmarshalJSON
 
 ```go
 func (u *UserInfo) UnmarshalJSON(data []byte) error
 ```
+
 UnmarshalJSON transparently unmarshals the user information structure.

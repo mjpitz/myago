@@ -1,7 +1,11 @@
 # oidcauth
---
-    import "github.com/mjpitz/myago/auth/oidc"
 
+
+
+
+```go
+import github.com/mjpitz/myago/auth/oidc
+```
 
 ## Usage
 
