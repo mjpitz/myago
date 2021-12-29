@@ -23,9 +23,7 @@ func Identity(scope Scope, password []byte, name string) ([]byte, error) {
 	seed := bytes.NewBuffer(nil)
 
 	seed.WriteString(string(scope))
-	seed.WriteByte('.')
 	_ = binary.Write(seed, binary.BigEndian, uint32(len(name)))
-	seed.WriteByte('.')
 	seed.WriteString(name)
 
 	return scrypt.Key(password, seed.Bytes(), n, r, p, keyLen)
@@ -38,10 +36,8 @@ func SiteKey(scope Scope, identity []byte, site string, counter uint32) []byte {
 	seed := bytes.NewBuffer(nil)
 
 	seed.WriteString(string(scope))
-	seed.WriteByte('.')
 	_ = binary.Write(seed, binary.BigEndian, uint32(len(site)))
 	seed.WriteString(site)
-	seed.WriteByte('.')
 	_ = binary.Write(seed, binary.BigEndian, counter)
 
 	sig := hmac.New(sha256.New, identity)

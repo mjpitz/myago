@@ -21,8 +21,8 @@ func TestDerivation(t *testing.T) {
 	require.NotEqual(t, keyB0, keyA1)
 
 	passA0 := pass.SitePassword(keyA0, pass.MaximumSecurity)
-	require.Equal(t, "V8-^r&YEi2kq4w6nfDa7", string(passA0))
+	require.Equal(t, "yNAKh*3ehO^y1H&R3g7.", string(passA0))
 
 	passA1 := pass.SitePassword(keyA1, pass.MaximumSecurity)
-	require.Equal(t, "aG84VX0l6%UqL5pD^o7+", string(passA1))
+	require.Equal(t, "nlNnov@)qjciN51wOA7[", string(passA1))
 }
