@@ -1,6 +1,7 @@
 package pass_test
 
 import (
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -9,20 +10,37 @@ import (
 )
 
 func TestDerivation(t *testing.T) {
-	root, err := pass.Identity(pass.Authentication, []byte("badadmin"), "admin")
-	require.NoError(t, err)
+	password := []byte("badadmin")
+	user := "admin"
 
-	keyA0 := pass.SiteKey(pass.Authentication, root, "a.com", 0)
-	keyB0 := pass.SiteKey(pass.Authentication, root, "b.com", 0)
-	require.NotEqual(t, keyA0, keyB0)
+	testCases := []struct {
+		site     string
+		scope    pass.Scope
+		counter  uint32
+		template pass.TemplateClass
+		password string
+	}{
+		{"scope.varies", pass.Authentication, 0, pass.MaximumSecurity, "Yc(BMzvIdhLt*JQhPZ3~"},
+		{"scope.varies", pass.Identification, 0, pass.MaximumSecurity, "B2%%OeMJuiruYZ$un34s"},
+		{"scope.varies", pass.Recovery, 0, pass.MaximumSecurity, "jf3WgS2PMu$35fbNbG1^"},
+		{"counter.varies", pass.Authentication, 3, pass.MaximumSecurity, "a(I3rJe&qDBVS^uFF@3!"},
+		{"counter.varies", pass.Authentication, 5, pass.MaximumSecurity, "Rm4HJRqHMA$fxUNnoK8#"},
+		{"counter.varies", pass.Authentication, math.MaxInt32, pass.MaximumSecurity, "S1&Pcjik6*bGTk!U$#*V"},
+		{"template.varies", pass.Authentication, 0, pass.MaximumSecurity, "edqYl3g7pDuj3lf9t08="},
+		{"template.varies", pass.Authentication, 0, pass.Long, "HansJaduXutc2!"},
+		{"template.varies", pass.Authentication, 0, pass.Medium, "HanSer9+"},
+		{"template.varies", pass.Authentication, 0, pass.Short, "Han3"},
+		{"template.varies", pass.Authentication, 0, pass.Basic, "eE83iOO6"},
+		{"template.varies", pass.Authentication, 0, pass.PIN, "3783"},
+	}
 
-	keyA1 := pass.SiteKey(pass.Authentication, root, "a.com", 1)
-	require.NotEqual(t, keyA0, keyA1)
-	require.NotEqual(t, keyB0, keyA1)
+	for _, testCase := range testCases {
+		identity, err := pass.Identity(testCase.scope, password, user)
+		require.NoError(t, err)
 
-	passA0 := pass.SitePassword(keyA0, pass.MaximumSecurity)
-	require.Equal(t, "yNAKh*3ehO^y1H&R3g7.", string(passA0))
+		siteKey := pass.SiteKey(testCase.scope, identity, testCase.site, testCase.counter)
+		password := pass.SitePassword(siteKey, testCase.template)
 
-	passA1 := pass.SitePassword(keyA1, pass.MaximumSecurity)
-	require.Equal(t, "nlNnov@)qjciN51wOA7[", string(passA1))
+		require.Equal(t, testCase.password, string(password))
+	}
 }
