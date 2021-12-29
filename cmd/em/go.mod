@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
-	github.com/mjpitz/myago v0.0.0-20211221010305-eb5ba2633c88
+	github.com/mjpitz/myago v0.0.0-20211229025657-71e8b0e2e3f9
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/afero v1.6.0
 	github.com/urfave/cli/v2 v2.3.0

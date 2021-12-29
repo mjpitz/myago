@@ -108,6 +108,8 @@ github.com/mitchellh/reflectwalk v1.0.2 h1:G2LzWKi524PWgd3mLHV8Y5k7s6XUvT0Gef6zx
 github.com/mitchellh/reflectwalk v1.0.2/go.mod h1:mSTlrgnPZtwu0c4WaC2kGObEpuNDbx0jmZXqmk4esnw=
 github.com/mjpitz/myago v0.0.0-20211221010305-eb5ba2633c88 h1:ZWWj7hVi/Wk4EK6FpWH6av5qz9I9e7uaEHJbsQJATDw=
 github.com/mjpitz/myago v0.0.0-20211221010305-eb5ba2633c88/go.mod h1:Rinwo/BBhwGpupKnLV8pOHfU0vLS2B7LEokJ6j+Ap3Y=
+github.com/mjpitz/myago v0.0.0-20211229025657-71e8b0e2e3f9 h1:/6rXSTA/myJjzd5SqDAkE5RmwRljikomiXz4gJOQAYc=
+github.com/mjpitz/myago v0.0.0-20211229025657-71e8b0e2e3f9/go.mod h1:mn74CuqypahqrdL0I/+uJkvpjhsHJqoiU29aWTpGN30=
 github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=

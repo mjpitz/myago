@@ -19,26 +19,26 @@ import (
 	"io"
 )
 
-var encoding = map[byte]byte{
-	// upper
-	65: 50, 66: 50, 67: 50,
-	68: 51, 69: 51, 70: 51,
-	71: 52, 72: 52, 73: 52,
-	74: 53, 75: 53, 76: 53,
-	77: 54, 78: 54, 79: 54,
-	80: 55, 81: 55, 82: 55, 83: 55,
-	84: 56, 85: 56, 86: 56,
-	87: 57, 88: 57, 89: 57, 90: 57,
+var encoding = map[byte]byte{}
 
-	// lower
-	97: 50, 98: 50, 99: 50,
-	100: 51, 101: 51, 102: 51,
-	103: 52, 104: 52, 105: 52,
-	106: 53, 107: 53, 108: 53,
-	109: 54, 110: 54, 111: 54,
-	112: 55, 113: 55, 114: 55, 115: 55,
-	116: 56, 117: 56, 118: 56,
-	119: 57, 120: 57, 121: 57, 122: 57,
+var keyPad = map[byte][]byte{
+	'2': []byte("abcABC"),
+	'3': []byte("defDEF"),
+	'4': []byte("ghiGHI"),
+	'5': []byte("jklJKL"),
+	'6': []byte("mnoMNO"),
+	'7': []byte("pqrsPQRS"),
+	'8': []byte("tuvTUV"),
+	'9': []byte("wxyzWXYZ"),
+	'0': []byte("@&%?,=[]_:-+*$#!'^~;()/."),
+}
+
+func init() {
+	for num, values := range keyPad {
+		for _, value := range values {
+			encoding[value] = num
+		}
+	}
 }
 
 // NewEncoder returns an encoder that translates data into a phone code.
