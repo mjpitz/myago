@@ -16,6 +16,14 @@ import github.com/mjpitz/myago/wal
 
 ## Usage
 
+#### func RecordLength
+
+```go
+func RecordLength(data []byte) int
+```
+
+RecordLength returns the computed length for the underlying record.
+
 #### type Reader
 
 ```go
