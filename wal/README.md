@@ -16,14 +16,6 @@ import github.com/mjpitz/myago/wal
 
 ## Usage
 
-#### func RecordLength
-
-```go
-func RecordLength(data []byte) int
-```
-
-RecordLength returns the computed length for the underlying record.
-
 #### type Reader
 
 ```go
@@ -48,6 +40,14 @@ OpenReader opens a new read-only handle to the target file.
 ```go
 func (r *Reader) Close() error
 ```
+
+#### func (\*Reader) Position
+
+```go
+func (r *Reader) Position() uint64
+```
+
+Position returns the current position of the reader.
 
 #### func (\*Reader) Read
 

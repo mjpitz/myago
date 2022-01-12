@@ -17,6 +17,7 @@ package wal_test
 
 import (
 	"context"
+	"io"
 	"path/filepath"
 	"testing"
 
@@ -37,6 +38,8 @@ func TestWAL(t *testing.T) {
 	require.NoError(t, err)
 	defer reader.Close()
 
+	require.Equal(t, uint64(0), reader.Position())
+
 	_, err = writer.Write([]byte("hello world"))
 	require.NoError(t, err)
 
@@ -44,8 +47,16 @@ func TestWAL(t *testing.T) {
 	require.NoError(t, err)
 
 	read := make([]byte, 100)
-	n, err := reader.Read(read)
-	require.NoError(t, err)
+	for i := 0; i < 2; i++ {
+		n, err := reader.Read(read)
+		require.NoError(t, err)
 
-	require.Equal(t, "hello world", string(read[:n]))
+		require.Equal(t, "hello world", string(read[:n]))
+
+		require.Equal(t, uint64(0x10), reader.Position())
+
+		pos, err := reader.Seek(0, io.SeekStart)
+		require.NoError(t, err)
+		require.Equal(t, int64(0), pos)
+	}
 }

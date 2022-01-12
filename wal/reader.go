@@ -17,6 +17,7 @@ package wal
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"encoding/binary"
 	"fmt"
@@ -37,41 +38,51 @@ func OpenReader(ctx context.Context, filepath string) (*Reader, error) {
 		return nil, err
 	}
 
-	return &Reader{handle, bufio.NewReader(handle)}, nil
+	return &Reader{handle, bufio.NewReader(handle), 0}, nil
 }
 
 // Reader implements the logic for reading information from the write-ahead log. The underlying file is wrapped with a
 // buffered reader to help improve performance.
 type Reader struct {
-	handle afero.File
-	buffer *bufio.Reader
+	handle   afero.File
+	buffer   *bufio.Reader
+	position uint64
+}
+
+// Position returns the current position of the reader.
+func (r *Reader) Position() uint64 {
+	return r.position
 }
 
 func (r *Reader) Read(p []byte) (n int, err error) {
-	length, err := binary.ReadUvarint(r.buffer)
-	if err != nil {
-		return 0, fmt.Errorf("bad record value")
-	}
-
-	buf := make([]byte, length)
-	n, err = r.buffer.Read(buf)
+	data, err := r.buffer.Peek(10)
 	if err != nil {
 		return 0, err
 	}
 
-	buf = buf[:n]
-
-	var checksum uint32
-	err = binary.Read(r.buffer, binary.BigEndian, &checksum)
+	buffer := bytes.NewReader(data)
+	length, err := binary.ReadUvarint(buffer)
 	if err != nil {
 		return 0, err
 	}
 
-	if crc32.ChecksumIEEE(buf) != checksum {
+	n = len(data) - buffer.Len()
+	data = make([]byte, uint64(n)+length+4)
+
+	_, err = r.buffer.Read(data)
+	if err != nil {
+		return 0, err
+	}
+	r.position += uint64(n) + length + 4
+
+	record := data[n : uint64(n)+length]
+	checksum := binary.BigEndian.Uint32(data[uint64(n)+length:])
+
+	if crc32.ChecksumIEEE(record) != checksum {
 		return 0, fmt.Errorf("corrupted block")
 	}
 
-	return copy(p, buf), nil
+	return copy(p, record), nil
 }
 
 func (r *Reader) Seek(offset int64, whence int) (int64, error) {
@@ -81,6 +92,7 @@ func (r *Reader) Seek(offset int64, whence int) (int64, error) {
 	}
 
 	r.buffer.Reset(r.handle)
+	r.position = uint64(pos)
 	return pos, nil
 }
 
