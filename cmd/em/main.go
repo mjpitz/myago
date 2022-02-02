@@ -43,6 +43,7 @@ func main() {
 		UsageText: "em [options] <command>",
 		Flags:     flagset.Extract(config),
 		Commands: []*cli.Command{
+			commands.Analyze,
 			commands.Encode,
 			commands.Scaffold,
 			commands.Version,

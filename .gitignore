@@ -15,3 +15,6 @@
 # vendor/
 
 .coverprofile
+
+# no sqlite dbs plz
+*.sqlite
