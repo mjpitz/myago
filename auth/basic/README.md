@@ -81,8 +81,11 @@ func (c ClientConfig) Token() (*oauth2.Token, error)
 
 ```go
 type Config struct {
-	PasswordFile string `json:"password_file" usage:"path to the csv file containing usernames and passwords"`
-	TokenFile    string `json:"token_file" usage:"path to the csv file containing tokens"`
+	PasswordFile   string           `json:"password_file" usage:"path to the csv file containing usernames and passwords"`
+	TokenFile      string           `json:"token_file" usage:"path to the csv file containing tokens"`
+	StaticUsername string           `json:"static_username" usage:"provide a static username to authenticate the user" hidden:"true"`
+	StaticPassword string           `json:"static_password" usage:"provide a static password to authenticate the user" hidden:"true"`
+	StaticGroups   *cli.StringSlice `json:"static_groups" usage:"provide a static set of groups to assign to the user" hidden:"true"`
 }
 ```
 
