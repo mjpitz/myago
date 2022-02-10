@@ -1,8 +1,8 @@
-{{- $dockerEnabled := includes .Features "docker" }}
-{{- $legalEnabled := includes .Features "legal" }}
-{{- $goEnabled := includes .Features "go" }}
-{{- $goreleaserEnabled := includes .Features "goreleaser" }}
-{{- $versionEnabled := includes .Features "version" }}
+{{- $dockerEnabled := includes .Features "docker" -}}
+{{- $legalEnabled := includes .Features "legal" -}}
+{{- $goEnabled := includes .Features "go" -}}
+{{- $goreleaserEnabled := includes .Features "goreleaser" -}}
+{{- $versionEnabled := includes .Features "version" -}}
 CWD = $(shell pwd)
 {{- if $dockerEnabled }}
 SKAFFOLD_DEFAULT_REPO ?= ghcr.io/mjpitz
