@@ -34,8 +34,7 @@ func format(prefix []string, name string) string {
 	return val
 }
 
-// Common encapsulates common elements across all flag types.
-type Common struct {
+type common struct {
 	Name     string
 	FlagName string
 	Aliases  []string
@@ -70,8 +69,8 @@ func (f Extractor) Child(name string) Extractor {
 	return nf
 }
 
-// Common returns the common metadata between all fields.
-func (f Extractor) Common(field reflect.StructField) *Common {
+// common returns the common metadata between all fields.
+func (f Extractor) common(field reflect.StructField) *common {
 	name := strings.Split(field.Tag.Get("json"), ",")[0]
 	if name == "-" {
 		return nil
@@ -80,7 +79,7 @@ func (f Extractor) Common(field reflect.StructField) *Common {
 	hidden, _ := strconv.ParseBool(field.Tag.Get("hidden"))
 	required, _ := strconv.ParseBool(field.Tag.Get("required"))
 
-	common := &Common{
+	common := &common{
 		Name:     name,
 		FlagName: format(f.Prefix, name),
 		Usage:    field.Tag.Get("usage"),
@@ -105,8 +104,8 @@ func (f Extractor) Common(field reflect.StructField) *Common {
 	return common
 }
 
-// FormatDurationFlag creates a cli.DurationFlag for the given common configuration and value.
-func (f Extractor) FormatDurationFlag(common *Common, fieldValue reflect.Value) (flag *cli.DurationFlag, err error) {
+// formatDurationFlag creates a cli.DurationFlag for the given common configuration and value.
+func (f Extractor) formatDurationFlag(common *common, fieldValue reflect.Value) (flag *cli.DurationFlag, err error) {
 	flag = &cli.DurationFlag{
 		Name:        common.FlagName,
 		Aliases:     common.Aliases,
@@ -129,8 +128,8 @@ func (f Extractor) FormatDurationFlag(common *Common, fieldValue reflect.Value) 
 	return flag, nil
 }
 
-// FormatStringSliceFlag creates a cli.StringSliceFlag for the given common configuration and value.
-func (f Extractor) FormatStringSliceFlag(common *Common, fieldValue reflect.Value) (flag *cli.StringSliceFlag, err error) {
+// formatStringSliceFlag creates a cli.StringSliceFlag for the given common configuration and value.
+func (f Extractor) formatStringSliceFlag(common *common, fieldValue reflect.Value) (flag *cli.StringSliceFlag, err error) {
 	flag = &cli.StringSliceFlag{
 		Name:        common.FlagName,
 		Aliases:     common.Aliases,
@@ -152,8 +151,8 @@ func (f Extractor) FormatStringSliceFlag(common *Common, fieldValue reflect.Valu
 	return flag, nil
 }
 
-// FormatGenericFlag creates a cli.StringSliceFlag for the given common configuration and value.
-func (f Extractor) FormatGenericFlag(common *Common, fieldValue reflect.Value) (flag *cli.GenericFlag, err error) {
+// formatGenericFlag creates a cli.StringSliceFlag for the given common configuration and value.
+func (f Extractor) formatGenericFlag(common *common, fieldValue reflect.Value) (flag *cli.GenericFlag, err error) {
 	flag = &cli.GenericFlag{
 		Name:     common.FlagName,
 		Aliases:  common.Aliases,
@@ -167,8 +166,8 @@ func (f Extractor) FormatGenericFlag(common *Common, fieldValue reflect.Value) (
 	return flag, nil
 }
 
-// FormatStringFlag creates a cli.StringFlag for the given common configuration and value.
-func (f Extractor) FormatStringFlag(common *Common, fieldValue reflect.Value) (flag *cli.StringFlag, err error) {
+// formatStringFlag creates a cli.StringFlag for the given common configuration and value.
+func (f Extractor) formatStringFlag(common *common, fieldValue reflect.Value) (flag *cli.StringFlag, err error) {
 	flag = &cli.StringFlag{
 		Name:        common.FlagName,
 		Aliases:     common.Aliases,
@@ -187,8 +186,8 @@ func (f Extractor) FormatStringFlag(common *Common, fieldValue reflect.Value) (f
 	return flag, nil
 }
 
-// FormatIntFlag creates a cli.IntFlag for the given common configuration and value.
-func (f Extractor) FormatIntFlag(common *Common, fieldValue reflect.Value) (flag *cli.IntFlag, err error) {
+// formatIntFlag creates a cli.IntFlag for the given common configuration and value.
+func (f Extractor) formatIntFlag(common *common, fieldValue reflect.Value) (flag *cli.IntFlag, err error) {
 	flag = &cli.IntFlag{
 		Name:        common.FlagName,
 		Aliases:     common.Aliases,
@@ -211,8 +210,8 @@ func (f Extractor) FormatIntFlag(common *Common, fieldValue reflect.Value) (flag
 	return flag, nil
 }
 
-// FormatBoolFlag creates a cli.BoolFlag for the given common configuration and value.
-func (f Extractor) FormatBoolFlag(common *Common, fieldValue reflect.Value) (flag *cli.BoolFlag, err error) {
+// formatBoolFlag creates a cli.BoolFlag for the given common configuration and value.
+func (f Extractor) formatBoolFlag(common *common, fieldValue reflect.Value) (flag *cli.BoolFlag, err error) {
 	flag = &cli.BoolFlag{
 		Name:        common.FlagName,
 		Aliases:     common.Aliases,
@@ -235,31 +234,31 @@ func (f Extractor) FormatBoolFlag(common *Common, fieldValue reflect.Value) (fla
 	return flag, nil
 }
 
-// FormatFlag attempts to create a cli.Flag based on the type of the value.
-func (f Extractor) FormatFlag(common *Common, value reflect.Value) (flag cli.Flag, err error) {
+// formatFlag attempts to create a cli.Flag based on the type of the value.
+func (f Extractor) formatFlag(common *common, value reflect.Value) (flag cli.Flag, err error) {
 	switch value.Interface().(type) {
 	case time.Duration:
-		return f.FormatDurationFlag(common, value)
+		return f.formatDurationFlag(common, value)
 	case *cli.StringSlice:
-		return f.FormatStringSliceFlag(common, value)
+		return f.formatStringSliceFlag(common, value)
 	case cli.Generic:
-		return f.FormatGenericFlag(common, value)
+		return f.formatGenericFlag(common, value)
 	default:
 		switch value.Type().Kind() {
 		case reflect.String:
-			return f.FormatStringFlag(common, value)
+			return f.formatStringFlag(common, value)
 		case reflect.Int:
-			return f.FormatIntFlag(common, value)
+			return f.formatIntFlag(common, value)
 		case reflect.Bool:
-			return f.FormatBoolFlag(common, value)
+			return f.formatBoolFlag(common, value)
 		}
 	}
 
 	return nil, nil
 }
 
-func (f Extractor) extractField(value reflect.Value, field reflect.StructField) (flags []cli.Flag) {
-	common := f.Common(field)
+func (f Extractor) extractField(value reflect.Value, field reflect.StructField) (flags FlagSet) {
+	common := f.common(field)
 	if common == nil {
 		return
 	}
@@ -278,18 +277,18 @@ func (f Extractor) extractField(value reflect.Value, field reflect.StructField) 
 		}
 	}
 
-	flag, err := f.FormatFlag(common, value)
+	flag, err := f.formatFlag(common, value)
 	switch {
 	case err != nil:
 		panic(fmt.Sprintf("failed to format flag: %v", err))
-	case flag != nil:
+	case flag != nil && common.Name != "":
 		flags = append(flags, flag)
 	}
 
 	return flags
 }
 
-func (f Extractor) extract(value reflect.Value) (flags []cli.Flag) {
+func (f Extractor) extract(value reflect.Value) (flags FlagSet) {
 	for i := 0; i < value.NumField(); i++ {
 		fieldValue := value.Field(i)
 		field := value.Type().Field(i)
@@ -301,17 +300,17 @@ func (f Extractor) extract(value reflect.Value) (flags []cli.Flag) {
 }
 
 // Extract returns the set of flags associated with the provided structure.
-func (f Extractor) Extract(v interface{}) []cli.Flag {
+func (f Extractor) Extract(v interface{}) FlagSet {
 	return f.extract(reflect.Indirect(reflect.ValueOf(v)))
 }
 
 // Extract parses the provided object to create a flagset.
-func Extract(v interface{}) []cli.Flag {
+func Extract(v interface{}) FlagSet {
 	return Extractor{}.Extract(v)
 }
 
-// ExtractPrefix parses the provided to create a flagset with the provided Prefix.
-func ExtractPrefix(prefix string, v interface{}) []cli.Flag {
+// ExtractPrefix parses the provided to create a flagset with the provided environment variable prefix.
+func ExtractPrefix(prefix string, v interface{}) FlagSet {
 	return Extractor{
 		EnvPrefix: []string{prefix},
 	}.Extract(v)

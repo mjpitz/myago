@@ -25,6 +25,11 @@ import (
 	"github.com/mjpitz/myago/flagset"
 )
 
+type Nested struct {
+	Tagged   string `json:"tagged" hidden:"true" required:"true"`
+	Untagged string
+}
+
 type Options struct {
 	Endpoint    string        `json:"endpoint"    alias:"e" usage:"the endpoint of the server we're speaking to" default:"default-endpoint"`
 	EnableSSL   bool          `json:"enable_ssl"  alias:"s" usage:"enable encryption between processes" default:"false"`
@@ -36,14 +41,17 @@ type Full struct {
 	Options     Options          `json:"options"`
 	Features    *cli.StringSlice `json:"features" alias:"f"`
 	Percentiles *cli.IntSlice    `json:"percentiles"`
+	Nested
 }
 
 type Expectation struct {
-	name  string
-	alias string
-	env   string
-	usage string
-	value interface{}
+	name     string
+	alias    string
+	env      string
+	usage    string
+	value    interface{}
+	hidden   bool
+	required bool
 }
 
 func verifyExpectations(t *testing.T, flags []cli.Flag, expectations []Expectation) {
@@ -57,28 +65,48 @@ func verifyExpectations(t *testing.T, flags []cli.Flag, expectations []Expectati
 		switch f := flag.(type) {
 		case *cli.StringFlag:
 			require.Equal(t, e.name, f.Name)
-			require.Equal(t, e.alias, f.Aliases[0])
 			require.Equal(t, e.env, f.EnvVars[0])
 			require.Equal(t, e.usage, f.Usage)
 			require.Equal(t, e.value, f.Value)
+			require.Equal(t, e.hidden, f.Hidden)
+			require.Equal(t, e.required, f.Required)
+
+			if e.alias != "" {
+				require.Equal(t, e.alias, f.Aliases[0])
+			}
 		case *cli.BoolFlag:
 			require.Equal(t, e.name, f.Name)
-			require.Equal(t, e.alias, f.Aliases[0])
 			require.Equal(t, e.env, f.EnvVars[0])
 			require.Equal(t, e.usage, f.Usage)
 			require.Equal(t, e.value, f.Value)
+			require.Equal(t, e.hidden, f.Hidden)
+			require.Equal(t, e.required, f.Required)
+
+			if e.alias != "" {
+				require.Equal(t, e.alias, f.Aliases[0])
+			}
 		case *cli.IntFlag:
 			require.Equal(t, e.name, f.Name)
-			require.Equal(t, e.alias, f.Aliases[0])
 			require.Equal(t, e.env, f.EnvVars[0])
 			require.Equal(t, e.usage, f.Usage)
 			require.Equal(t, e.value, f.Value)
+			require.Equal(t, e.hidden, f.Hidden)
+			require.Equal(t, e.required, f.Required)
+
+			if e.alias != "" {
+				require.Equal(t, e.alias, f.Aliases[0])
+			}
 		case *cli.DurationFlag:
 			require.Equal(t, e.name, f.Name)
-			require.Equal(t, e.alias, f.Aliases[0])
 			require.Equal(t, e.env, f.EnvVars[0])
 			require.Equal(t, e.usage, f.Usage)
 			require.Equal(t, e.value, f.Value)
+			require.Equal(t, e.hidden, f.Hidden)
+			require.Equal(t, e.required, f.Required)
+
+			if e.alias != "" {
+				require.Equal(t, e.alias, f.Aliases[0])
+			}
 		}
 	}
 }
@@ -104,20 +132,22 @@ func TestExtract(t *testing.T) {
 		expectations []Expectation
 	}{
 		{"tag", fromTag, []Expectation{
-			{"options_endpoint", "e", "OPTIONS_ENDPOINT", "the endpoint of the server we're speaking to", "default-endpoint"},
-			{"options_enable_ssl", "s", "OPTIONS_ENABLE_SSL", "enable encryption between processes", false},
-			{"options_temperature", "t", "OPTIONS_TEMPERATURE", "", 50},
-			{"options_interval", "i", "OPTIONS_INTERVAL", "", 5 * time.Minute},
-			{"features", "f", "FEATURES", "", cli.NewStringSlice()},
-			{"percentiles", "", "PERCENTILES", "", cli.NewIntSlice()},
+			{"options_endpoint", "e", "OPTIONS_ENDPOINT", "the endpoint of the server we're speaking to", "default-endpoint", false, false},
+			{"options_enable_ssl", "s", "OPTIONS_ENABLE_SSL", "enable encryption between processes", false, false, false},
+			{"options_temperature", "t", "OPTIONS_TEMPERATURE", "", 50, false, false},
+			{"options_interval", "i", "OPTIONS_INTERVAL", "", 5 * time.Minute, false, false},
+			{"features", "f", "FEATURES", "", cli.NewStringSlice(), false, false},
+			{"percentiles", "", "PERCENTILES", "", cli.NewIntSlice(), false, false},
+			{"tagged", "", "TAGGED", "", "", true, true},
 		}},
 		{"struct", fromStruct, []Expectation{
-			{"options_endpoint", "e", "OPTIONS_ENDPOINT", "the endpoint of the server we're speaking to", "override"},
-			{"options_enable_ssl", "s", "OPTIONS_ENABLE_SSL", "enable encryption between processes", true},
-			{"options_temperature", "t", "OPTIONS_TEMPERATURE", "", 100},
-			{"options_interval", "i", "OPTIONS_INTERVAL", "", 10 * time.Minute},
-			{"features", "f", "FEATURES", "", fromStruct.Features},
-			{"percentiles", "", "PERCENTILES", "", fromStruct.Percentiles},
+			{"options_endpoint", "e", "OPTIONS_ENDPOINT", "the endpoint of the server we're speaking to", "override", false, false},
+			{"options_enable_ssl", "s", "OPTIONS_ENABLE_SSL", "enable encryption between processes", true, false, false},
+			{"options_temperature", "t", "OPTIONS_TEMPERATURE", "", 100, false, false},
+			{"options_interval", "i", "OPTIONS_INTERVAL", "", 10 * time.Minute, false, false},
+			{"features", "f", "FEATURES", "", fromStruct.Features, false, false},
+			{"percentiles", "", "PERCENTILES", "", fromStruct.Percentiles, false, false},
+			{"tagged", "", "TAGGED", "", "", true, true},
 		}},
 	}
 

@@ -1,6 +1,26 @@
 # flagset
 
-Package flagset provides logic for creating a flagset from a struct.
+Package flagset provides an opinionated approach to constructing an
+applications' configuration using Golang structs and tags. It's designed in a
+way that allows configuration to be loaded from files, environment variables,
+and/or command line flags. The following details the various tags that can be
+specified on a primitive field.
+
+- `json` - `string` - Configure the name of the flag. Convention is to use snake
+  case.
+
+- `usage` - `string` - Configure the description string of the flag.
+
+- `default` - `any` - Configure the default value for the flag. Can be
+  overridden by setting the value on the struct.
+
+- `hidden` - `bool` - Hides the flag from output. The value can still be
+  configured.
+
+- `required` - `bool` - Specifies that the flag must be specified.
+
+Nested structures are supported, making application configuration composable and
+portable between systems.
 
 ```go
 import github.com/mjpitz/myago/flagset
@@ -16,37 +36,6 @@ func ExampleString(examples ...string) string
 
 ExampleString formats a list of examples so that they display properly in the
 terminal. This function just pulls things out into a simple helper.
-
-#### func Extract
-
-```go
-func Extract(v interface{}) []cli.Flag
-```
-
-Extract parses the provided object to create a flagset.
-
-#### func ExtractPrefix
-
-```go
-func ExtractPrefix(prefix string, v interface{}) []cli.Flag
-```
-
-ExtractPrefix parses the provided to create a flagset with the provided Prefix.
-
-#### type Common
-
-```go
-type Common struct {
-	Name     string
-	FlagName string
-	Aliases  []string
-	Usage    string
-	EnvVars  []string
-	Default  string
-}
-```
-
-Common encapsulates common elements across all flag types.
 
 #### type Extractor
 
@@ -75,80 +64,52 @@ func (f Extractor) Clone() Extractor
 
 Clone creates a copy of the current Extractor.
 
-#### func (Extractor) Common
-
-```go
-func (f Extractor) Common(field reflect.StructField) *Common
-```
-
-Common returns the common metadata between all fields.
-
 #### func (Extractor) Extract
 
 ```go
-func (f Extractor) Extract(v interface{}) []cli.Flag
+func (f Extractor) Extract(v interface{}) FlagSet
 ```
 
 Extract returns the set of flags associated with the provided structure.
 
-#### func (Extractor) FormatBoolFlag
+#### type Filter
 
 ```go
-func (f Extractor) FormatBoolFlag(common *Common, fieldValue reflect.Value) (flag *cli.BoolFlag, err error)
+type Filter func(flag cli.Flag) bool
 ```
 
-FormatBoolFlag creates a cli.BoolFlag for the given common configuration and
-value.
+Filter allows the user to inspect the flag to determine if it should be in the
+resulting FlagSet.
 
-#### func (Extractor) FormatDurationFlag
+#### type FlagSet
 
 ```go
-func (f Extractor) FormatDurationFlag(common *Common, fieldValue reflect.Value) (flag *cli.DurationFlag, err error)
+type FlagSet []cli.Flag
 ```
 
-FormatDurationFlag creates a cli.DurationFlag for the given common configuration
-and value.
+FlagSet provides additional functionality on top of a collection of flags.
 
-#### func (Extractor) FormatFlag
+#### func Extract
 
 ```go
-func (f Extractor) FormatFlag(common *Common, value reflect.Value) (flag cli.Flag, err error)
+func Extract(v interface{}) FlagSet
 ```
 
-FormatFlag attempts to create a cli.Flag based on the type of the value.
+Extract parses the provided object to create a flagset.
 
-#### func (Extractor) FormatGenericFlag
+#### func ExtractPrefix
 
 ```go
-func (f Extractor) FormatGenericFlag(common *Common, fieldValue reflect.Value) (flag *cli.GenericFlag, err error)
+func ExtractPrefix(prefix string, v interface{}) FlagSet
 ```
 
-FormatGenericFlag creates a cli.StringSliceFlag for the given common
-configuration and value.
+ExtractPrefix parses the provided to create a flagset with the provided
+environment variable prefix.
 
-#### func (Extractor) FormatIntFlag
+#### func (FlagSet) Filter
 
 ```go
-func (f Extractor) FormatIntFlag(common *Common, fieldValue reflect.Value) (flag *cli.IntFlag, err error)
+func (flags FlagSet) Filter(allow Filter) FlagSet
 ```
 
-FormatIntFlag creates a cli.IntFlag for the given common configuration and
-value.
-
-#### func (Extractor) FormatStringFlag
-
-```go
-func (f Extractor) FormatStringFlag(common *Common, fieldValue reflect.Value) (flag *cli.StringFlag, err error)
-```
-
-FormatStringFlag creates a cli.StringFlag for the given common configuration and
-value.
-
-#### func (Extractor) FormatStringSliceFlag
-
-```go
-func (f Extractor) FormatStringSliceFlag(common *Common, fieldValue reflect.Value) (flag *cli.StringSliceFlag, err error)
-```
-
-FormatStringSliceFlag creates a cli.StringSliceFlag for the given common
-configuration and value.
+Filter returns a new FlagSet that contains flags allowed by the provided Filter.
