@@ -42,6 +42,8 @@ type Common struct {
 	Usage    string
 	EnvVars  []string
 	Default  string
+	Hidden   bool
+	Required bool
 }
 
 // Extractor extracts flags from provided interfaces.
@@ -75,6 +77,9 @@ func (f Extractor) Common(field reflect.StructField) *Common {
 		return nil
 	}
 
+	hidden, _ := strconv.ParseBool(field.Tag.Get("hidden"))
+	required, _ := strconv.ParseBool(field.Tag.Get("required"))
+
 	common := &Common{
 		Name:     name,
 		FlagName: format(f.Prefix, name),
@@ -82,7 +87,9 @@ func (f Extractor) Common(field reflect.StructField) *Common {
 		EnvVars: []string{
 			strings.ToUpper(format(f.EnvPrefix, name)),
 		},
-		Default: field.Tag.Get("default"),
+		Default:  field.Tag.Get("default"),
+		Hidden:   hidden,
+		Required: required,
 	}
 
 	if alias := field.Tag.Get("aliases"); alias != "" {
@@ -105,6 +112,8 @@ func (f Extractor) FormatDurationFlag(common *Common, fieldValue reflect.Value) 
 		Aliases:     common.Aliases,
 		Usage:       common.Usage,
 		EnvVars:     common.EnvVars,
+		Required:    common.Required,
+		Hidden:      common.Hidden,
 		Destination: fieldValue.Addr().Interface().(*time.Duration),
 	}
 
@@ -127,6 +136,8 @@ func (f Extractor) FormatStringSliceFlag(common *Common, fieldValue reflect.Valu
 		Aliases:     common.Aliases,
 		Usage:       common.Usage,
 		EnvVars:     common.EnvVars,
+		Required:    common.Required,
+		Hidden:      common.Hidden,
 		Destination: fieldValue.Interface().(*cli.StringSlice),
 	}
 
@@ -144,11 +155,13 @@ func (f Extractor) FormatStringSliceFlag(common *Common, fieldValue reflect.Valu
 // FormatGenericFlag creates a cli.StringSliceFlag for the given common configuration and value.
 func (f Extractor) FormatGenericFlag(common *Common, fieldValue reflect.Value) (flag *cli.GenericFlag, err error) {
 	flag = &cli.GenericFlag{
-		Name:    common.FlagName,
-		Aliases: common.Aliases,
-		Usage:   common.Usage,
-		EnvVars: common.EnvVars,
-		Value:   fieldValue.Interface().(cli.Generic),
+		Name:     common.FlagName,
+		Aliases:  common.Aliases,
+		Usage:    common.Usage,
+		EnvVars:  common.EnvVars,
+		Required: common.Required,
+		Hidden:   common.Hidden,
+		Value:    fieldValue.Interface().(cli.Generic),
 	}
 
 	return flag, nil
@@ -161,6 +174,8 @@ func (f Extractor) FormatStringFlag(common *Common, fieldValue reflect.Value) (f
 		Aliases:     common.Aliases,
 		Usage:       common.Usage,
 		EnvVars:     common.EnvVars,
+		Required:    common.Required,
+		Hidden:      common.Hidden,
 		Destination: fieldValue.Addr().Interface().(*string),
 		Value:       common.Default,
 	}
@@ -179,6 +194,8 @@ func (f Extractor) FormatIntFlag(common *Common, fieldValue reflect.Value) (flag
 		Aliases:     common.Aliases,
 		Usage:       common.Usage,
 		EnvVars:     common.EnvVars,
+		Required:    common.Required,
+		Hidden:      common.Hidden,
 		Destination: fieldValue.Addr().Interface().(*int),
 	}
 
@@ -201,6 +218,8 @@ func (f Extractor) FormatBoolFlag(common *Common, fieldValue reflect.Value) (fla
 		Aliases:     common.Aliases,
 		Usage:       common.Usage,
 		EnvVars:     common.EnvVars,
+		Required:    common.Required,
+		Hidden:      common.Hidden,
 		Destination: fieldValue.Addr().Interface().(*bool),
 	}
 
