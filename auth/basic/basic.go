@@ -57,7 +57,7 @@ func Basic(store Store) auth.HandlerFunc {
 			return ctx, nil
 		}
 
-		userInfo := &auth.UserInfo{
+		userInfo := auth.UserInfo{
 			Subject:       resp.UserID,
 			Profile:       username,
 			Email:         resp.Email,
@@ -65,6 +65,6 @@ func Basic(store Store) auth.HandlerFunc {
 			Groups:        resp.Groups,
 		}
 
-		return auth.ToContext(ctx, *userInfo), nil
+		return auth.ToContext(ctx, userInfo), nil
 	}
 }

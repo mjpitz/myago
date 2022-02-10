@@ -42,6 +42,14 @@ func Handler(ctx context.Context, cfg Config) (auth.HandlerFunc, error)
 ```
 Handler returns the appropriate handler based on the provided configuration.
 
+#### func  Static
+
+```go
+func Static(username, password string, groups ...string) auth.HandlerFunc
+```
+Static returns an auth.HandlerFunc that uses a static username/password for the
+system.
+
 #### type AccessToken
 
 ```go

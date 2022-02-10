@@ -40,7 +40,7 @@ func Bearer(store Store) auth.HandlerFunc {
 			return ctx, nil
 		}
 
-		userInfo := &auth.UserInfo{
+		userInfo := auth.UserInfo{
 			Subject:       resp.UserID,
 			Profile:       resp.User,
 			Email:         resp.Email,
@@ -48,6 +48,6 @@ func Bearer(store Store) auth.HandlerFunc {
 			Groups:        resp.Groups,
 		}
 
-		return auth.ToContext(ctx, *userInfo), nil
+		return auth.ToContext(ctx, userInfo), nil
 	}
 }
