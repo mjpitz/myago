@@ -21,6 +21,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/mjpitz/myago/lifecycle"
 	"github.com/urfave/cli/v2"
 
 	"github.com/mjpitz/myago/cmd/em/internal/commands"
@@ -44,12 +45,16 @@ func main() {
 		Flags:     flagset.Extract(config),
 		Commands: []*cli.Command{
 			commands.Analyze,
+			commands.Auth,
 			commands.Encode,
 			commands.Scaffold,
+			commands.Storj,
 			commands.Version,
 		},
 		Before: func(ctx *cli.Context) error {
 			ctx.Context = zaputil.Setup(ctx.Context, config.Log)
+			ctx.Context = lifecycle.Setup(ctx.Context)
+
 			return nil
 		},
 		HideVersion:          true,
