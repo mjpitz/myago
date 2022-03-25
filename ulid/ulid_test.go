@@ -73,5 +73,16 @@ func TestParse(t *testing.T) {
 		require.Equal(t, testCase.skew, u.Skew())
 		require.Equal(t, testCase.millis, u.Timestamp().UnixMilli())
 		require.Len(t, u.Payload(), testCase.payloadLen)
+
+		v, err := u.Value()
+		require.NoError(t, err)
+
+		w := &ulid.ULID{}
+		err = w.Scan(v)
+		require.NoError(t, err)
+
+		require.Equal(t, testCase.skew, w.Skew())
+		require.Equal(t, testCase.millis, w.Timestamp().UnixMilli())
+		require.Len(t, w.Payload(), testCase.payloadLen)
 	}
 }

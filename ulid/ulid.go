@@ -16,8 +16,10 @@
 package ulid
 
 import (
+	"database/sql/driver"
 	"encoding/base32"
 	"encoding/binary"
+	"fmt"
 	"strings"
 	"time"
 )
@@ -88,4 +90,39 @@ func (ulid ULID) Bytes() []byte {
 // String returns a string representation of the payload. It's encoded using a crockford base32 encoding.
 func (ulid ULID) String() string {
 	return crockfordBase32.EncodeToString(ulid)
+}
+
+// Value serializes the ULID so that it can be stored in SQL databases.
+func (ulid ULID) Value() (driver.Value, error) {
+	return ulid.String(), nil
+}
+
+// Scan attempts to parse the provided src value into the ULID.
+func (ulid *ULID) Scan(src interface{}) (err error) {
+	if src == nil {
+		*ulid = ULID{}
+		return nil
+	}
+
+	if ulid == nil {
+		return fmt.Errorf("destination pointer is nil")
+	}
+
+	var val ULID
+	switch v := src.(type) {
+	case *string:
+		val, err = Parse(*v)
+	case string:
+		val, err = Parse(v)
+	default:
+		err = fmt.Errorf("unsupport source type: %s", v)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	*ulid = val
+
+	return nil
 }
