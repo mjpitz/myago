@@ -86,6 +86,7 @@ func (s *ServeMux) ServeYARPC(stream Stream) (err error) {
 	handler := s.handlers[invoke.Method]
 	if handler == nil {
 		err = fmt.Errorf("handler not found")
+
 		return
 	}
 

@@ -4,6 +4,7 @@ doc:
 	./scripts/gendoc.sh
 
 lint:
+	./scripts/nogoogle.py
 	golangci-lint run --max-issues-per-linter 0 --max-same-issues 0
 
 gen:

@@ -51,6 +51,8 @@ const (
 	Basic TemplateClass = "basic"
 	// PIN generates a pin.
 	PIN TemplateClass = "pin"
+	// VerificationCode provides a template for generating a 6-digit verification code.
+	VerificationCode TemplateClass = "code"
 )
 
 // characterClasses defines a mapping of a character code to it's associated character set.
@@ -87,6 +89,8 @@ var (
 	// defaultTemplateClasses defines a common set of templates for passwords to use. They're keyed by the class of
 	// password formats.
 	defaultTemplateClasses = templateClasses{
+		// according to specification
+
 		MaximumSecurity: {
 			[]byte("anoxxxxxxxxxxxxxxxxx"), []byte("axxxxxxxxxxxxxxxxxno"),
 		},
@@ -107,5 +111,9 @@ var (
 		Short:  {[]byte("Cvcn")},
 		Basic:  {[]byte("aaanaaan"), []byte("aannaaan"), []byte("aaannaaa")},
 		PIN:    {[]byte("nnnn")},
+
+		// custom formats
+
+		VerificationCode: {[]byte("nnnnnn")},
 	}
 )

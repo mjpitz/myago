@@ -27,6 +27,8 @@ import (
 )
 
 func TestWAL(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	vlogPath := filepath.Join(t.TempDir(), "test.vlog")
 

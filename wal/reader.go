@@ -93,6 +93,7 @@ func (r *Reader) Seek(offset int64, whence int) (int64, error) {
 
 	r.buffer.Reset(r.handle)
 	r.position = uint64(pos)
+
 	return pos, nil
 }
 

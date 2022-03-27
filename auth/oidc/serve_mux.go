@@ -101,6 +101,7 @@ func ServeMux(cfg Config, callback TokenCallback) *http.ServeMux {
 		errDescription := query.Get("error_description")
 		if errKind != "" {
 			http.Error(w, errKind+": "+errDescription, http.StatusBadRequest)
+
 			return
 		}
 

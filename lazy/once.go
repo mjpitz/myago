@@ -70,5 +70,6 @@ func (o *Once) Get(ctx context.Context) (interface{}, error) {
 	}
 
 	o.value = resp[0].Interface()
+
 	return o.value, nil
 }

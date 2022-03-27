@@ -101,6 +101,7 @@ func (ulid ULID) Value() (driver.Value, error) {
 func (ulid *ULID) Scan(src interface{}) (err error) {
 	if src == nil {
 		*ulid = ULID{}
+
 		return nil
 	}
 

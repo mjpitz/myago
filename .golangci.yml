@@ -26,8 +26,18 @@ linters:
     - forcetypeassert
     - wrapcheck
     - goerr113
+    - nilnil
+    - unparam
+    - ireturn
+    - funlen
+    - cyclop
+    - contextcheck
+    - containedctx
+    - nilerr
     # deprecated
     - scopelint
     - interfacer
     - maligned
     - golint
+    - varnamelen
+

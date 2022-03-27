@@ -25,6 +25,8 @@ import (
 )
 
 func TestDerivation(t *testing.T) {
+	t.Parallel()
+
 	password := []byte("badadmin")
 	user := "admin"
 

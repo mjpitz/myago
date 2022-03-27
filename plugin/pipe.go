@@ -77,6 +77,7 @@ func (pip *pipe) Write(p []byte) (n int, err error) {
 
 	if done {
 		err = io.ErrClosedPipe
+
 		return
 	}
 
@@ -97,6 +98,7 @@ func (pip *pipe) Close() error {
 	}
 
 	done = true
+
 	return nil
 }
 

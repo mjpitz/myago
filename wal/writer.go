@@ -74,6 +74,7 @@ func (w *Writer) Sync() error {
 
 func (w *Writer) Close() error {
 	w.Flush()
+
 	return w.handle.Close()
 }
 

@@ -47,6 +47,7 @@ func DialContext(ctx context.Context, network, target string, opts ...Option) *C
 	}
 
 	c.Dialer = dialer
+
 	return c
 }
 

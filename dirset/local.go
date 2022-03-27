@@ -27,6 +27,7 @@ func Must(appName string) DirectorySet {
 	if err != nil {
 		panic(err)
 	}
+
 	return dirs
 }
 

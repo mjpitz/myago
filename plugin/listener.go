@@ -62,6 +62,7 @@ func (l *listener) Accept() (io.ReadWriteCloser, error) {
 
 func (l *listener) Close() error {
 	l.cancel()
+
 	return nil
 }
 
@@ -90,6 +91,7 @@ func (s *serverRWC) Close() error {
 
 	_ = s.stdin.Close()
 	_ = s.stdout.Close()
+
 	return nil
 }
 

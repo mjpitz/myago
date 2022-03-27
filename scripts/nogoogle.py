@@ -27,7 +27,9 @@ allowed_google_libraries = {
     "": {
         "github.com/google/btree": "",
     },
-    "cmd/myago": {},
+    "cmd/em": {
+        "github.com/google/uuid": "",
+    },
     "paxos": {
         "github.com/google/flatbuffers": "",
         "github.com/google/btree": "",
