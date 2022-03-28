@@ -60,6 +60,7 @@ Start initializes and starts up the cluster.
 ```go
 type Config struct {
 	NoDiscovery
+	DNSDiscovery
 	GossipDiscovery
 }
 ```
@@ -76,6 +77,26 @@ func (c *Config) Start(ctx context.Context, membership *Membership) error
 
 Start controls which discovery mechanism is invoked based on the provided
 configuration.
+
+#### type DNSDiscovery
+
+```go
+type DNSDiscovery struct {
+	Name            string        `json:"dns_name" usage:"specify the dns name to resolve"`
+	ResolveInterval time.Duration `json:"dns_resolve_interval" usage:"how frequently the dns name should be resolved" default:"30s"`
+}
+```
+
+DNSDiscovery uses DNS to resolve cluster membership. Currently, this
+implementation uses the default DNS resolver that comes with Go. I know that the
+serf library uses something beyond the default implementation, so it might be
+worth exploring this later on.
+
+#### func (\*DNSDiscovery) Start
+
+```go
+func (dns *DNSDiscovery) Start(ctx context.Context, membership *Membership) error
+```
 
 #### type Discovery
 

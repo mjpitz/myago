@@ -18,6 +18,7 @@ package cluster_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/serf/serf"
 	"github.com/pkg/errors"
@@ -102,4 +103,15 @@ func TestConfigNoDiscovery(t *testing.T) {
 			},
 		},
 	}, 3)
+}
+
+func TestConfigDNSDiscovery(t *testing.T) {
+	t.Parallel()
+
+	testHarness(t, &cluster.Config{
+		DNSDiscovery: cluster.DNSDiscovery{
+			Name:            "google.com",
+			ResolveInterval: 30 * time.Second,
+		},
+	}, 6)
 }

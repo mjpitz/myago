@@ -19,10 +19,11 @@ import (
 	"context"
 )
 
-// Config provides a common configuration structure for forming clusters. Either through a list of known addresses
-// (peers) or using gossip to form pool dynamically.
+// Config provides a common configuration structure for forming clusters. This can be done by specifying a concrete list
+// of peers, a DNS name that's periodically resolved, or using a gossip protocol.
 type Config struct {
 	NoDiscovery
+	DNSDiscovery
 	GossipDiscovery
 }
 
@@ -31,6 +32,8 @@ func (c *Config) Start(ctx context.Context, membership *Membership) error {
 	switch {
 	case len(c.NoDiscovery.Peers) > 0:
 		return c.NoDiscovery.Start(ctx, membership)
+	case len(c.DNSDiscovery.Name) > 0:
+		return c.DNSDiscovery.Start(ctx, membership)
 	case len(c.GossipDiscovery.JoinAddress) > 0:
 		return c.GossipDiscovery.Start(ctx, membership)
 	}
