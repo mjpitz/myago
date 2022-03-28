@@ -135,6 +135,12 @@ func (ulid ULID) Bytes() []byte
 
 Bytes returns a copy of the underlying byte array backing the ulid.
 
+#### func (ULID) MarshalJSON
+
+```go
+func (ulid ULID) MarshalJSON() ([]byte, error)
+```
+
 #### func (ULID) Payload
 
 ```go
@@ -142,6 +148,14 @@ func (ulid ULID) Payload() []byte
 ```
 
 Payload returns a copy of the payload bytes.
+
+#### func (\*ULID) Scan
+
+```go
+func (ulid *ULID) Scan(src interface{}) (err error)
+```
+
+Scan attempts to parse the provided src value into the ULID.
 
 #### func (ULID) Skew
 
@@ -167,3 +181,17 @@ func (ulid ULID) Timestamp() time.Time
 ```
 
 Timestamp returns the timestamp portion of the identifier.
+
+#### func (\*ULID) UnmarshalJSON
+
+```go
+func (ulid *ULID) UnmarshalJSON(bytes []byte) error
+```
+
+#### func (ULID) Value
+
+```go
+func (ulid ULID) Value() (driver.Value, error)
+```
+
+Value serializes the ULID so that it can be stored in SQL databases.

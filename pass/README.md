@@ -91,5 +91,7 @@ const (
 	Basic TemplateClass = "basic"
 	// PIN generates a pin.
 	PIN TemplateClass = "pin"
+	// VerificationCode provides a template for generating a 6-digit verification code.
+	VerificationCode TemplateClass = "code"
 )
 ```
