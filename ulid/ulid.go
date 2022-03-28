@@ -127,3 +127,17 @@ func (ulid *ULID) Scan(src interface{}) (err error) {
 
 	return nil
 }
+
+func (ulid ULID) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + ulid.String() + `"`), nil
+}
+
+func (ulid *ULID) UnmarshalJSON(bytes []byte) error {
+	val, err := Parse(strings.Trim(string(bytes), "\""))
+	if err != nil {
+		return err
+	}
+
+	*ulid = val
+	return nil
+}

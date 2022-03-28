@@ -16,10 +16,12 @@
 package ulid_test
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/mjpitz/myago/encoding"
 	"github.com/mjpitz/myago/ulid"
 )
 
@@ -77,12 +79,26 @@ func TestParse(t *testing.T) {
 		v, err := u.Value()
 		require.NoError(t, err)
 
-		w := &ulid.ULID{}
-		err = w.Scan(v)
+		w := ulid.ULID{}
+		err = (&w).Scan(v)
 		require.NoError(t, err)
 
 		require.Equal(t, testCase.skew, w.Skew())
 		require.Equal(t, testCase.millis, w.Timestamp().UnixMilli())
 		require.Len(t, w.Payload(), testCase.payloadLen)
+
+		buf := bytes.NewBuffer(nil)
+		err = encoding.JSON.Encoder(buf).Encode(u)
+		require.NoError(t, err)
+
+		require.Equal(t, "\""+testCase.ulid+"\"\n", buf.String())
+
+		x := ulid.ULID{}
+		err = encoding.JSON.Decoder(bytes.NewBuffer(buf.Bytes())).Decode(&x)
+		require.NoError(t, err)
+
+		require.Equal(t, testCase.skew, x.Skew())
+		require.Equal(t, testCase.millis, x.Timestamp().UnixMilli())
+		require.Len(t, x.Payload(), testCase.payloadLen)
 	}
 }
