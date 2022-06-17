@@ -19,8 +19,9 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/mjpitz/myago/flagset"
 	"github.com/urfave/cli/v2"
+
+	"github.com/mjpitz/myago/flagset"
 
 	"storj.io/common/uuid"
 )
@@ -36,11 +37,11 @@ type uuidFormatConfig struct {
 }
 
 var (
-	genConfig = &uuidGenConfig{
+	uuidGen = &uuidGenConfig{
 		Out: "string",
 	}
 
-	formatConfig = &uuidFormatConfig{
+	uuidFormat = &uuidFormatConfig{
 		In: "string",
 		uuidGenConfig: uuidGenConfig{
 			Out: "bytes",
@@ -54,12 +55,12 @@ var (
 			{
 				Name:  "uuid",
 				Usage: "Format storj-specific UUID.",
-				Flags: flagset.ExtractPrefix("em", genConfig),
+				Flags: flagset.ExtractPrefix("em", uuidGen),
 				Subcommands: []*cli.Command{
 					{
 						Name:  "format",
 						Usage: "Swap between different formats of the UUID (string and bytes)",
-						Flags: flagset.ExtractPrefix("em", formatConfig),
+						Flags: flagset.ExtractPrefix("em", uuidFormat),
 						Action: func(ctx *cli.Context) error {
 							in, err := ioutil.ReadAll(ctx.App.Reader)
 							if err != nil {
@@ -68,26 +69,26 @@ var (
 
 							var parsed uuid.UUID
 
-							switch formatConfig.In {
+							switch uuidFormat.In {
 							case "string":
 								parsed, err = uuid.FromString(string(in))
 							case "bytes":
 								parsed, err = uuid.FromBytes(in)
 							default:
-								err = fmt.Errorf("unrecognized input type: %s (available: string, bytes)", formatConfig.In)
+								err = fmt.Errorf("unrecognized input type: %s (available: string, bytes)", uuidFormat.In)
 							}
 
 							if err != nil {
 								return err
 							}
 
-							switch formatConfig.Out {
+							switch uuidFormat.Out {
 							case "string":
 								_, err = ctx.App.Writer.Write([]byte(parsed.String()))
 							case "bytes":
 								_, err = ctx.App.Writer.Write(parsed.Bytes())
 							default:
-								err = fmt.Errorf("unrecognized output type: %s (available: string, bytes)", formatConfig.Out)
+								err = fmt.Errorf("unrecognized output type: %s (available: string, bytes)", uuidFormat.Out)
 							}
 
 							return err
@@ -101,13 +102,13 @@ var (
 						return err
 					}
 
-					switch genConfig.Out {
+					switch uuidGen.Out {
 					case "string":
 						_, err = ctx.App.Writer.Write([]byte(uuid.String()))
 					case "bytes":
 						_, err = ctx.App.Writer.Write(uuid.Bytes())
 					default:
-						err = fmt.Errorf("unrecognized output type: %s (available: string, bytes)", formatConfig.Out)
+						err = fmt.Errorf("unrecognized output type: %s (available: string, bytes)", uuidFormat.Out)
 					}
 
 					return err

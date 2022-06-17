@@ -21,8 +21,9 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/mjpitz/myago/lifecycle"
 	"github.com/urfave/cli/v2"
+
+	"github.com/mjpitz/myago/lifecycle"
 
 	"github.com/mjpitz/myago/cmd/em/internal/commands"
 	"github.com/mjpitz/myago/flagset"
@@ -49,6 +50,7 @@ func main() {
 			commands.Encode,
 			commands.Scaffold,
 			commands.Storj,
+			commands.ULID,
 			commands.Version,
 		},
 		Before: func(ctx *cli.Context) error {
