@@ -28,10 +28,10 @@ import (
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 
-	"github.com/mjpitz/myago/cmd/em/internal/scaffold"
-	"github.com/mjpitz/myago/flagset"
-	"github.com/mjpitz/myago/vfs"
-	"github.com/mjpitz/myago/zaputil"
+	"go.pitz.tech/lib/cmd/em/internal/scaffold"
+	"go.pitz.tech/lib/flagset"
+	"go.pitz.tech/lib/vfs"
+	"go.pitz.tech/lib/zaputil"
 )
 
 const scaffoldHelpTemplate = `

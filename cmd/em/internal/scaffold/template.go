@@ -27,9 +27,9 @@ import (
 	"github.com/Masterminds/sprig"
 	"go.uber.org/zap"
 
-	"github.com/mjpitz/myago/cmd/em/internal/scaffold/gitignore"
-	"github.com/mjpitz/myago/cmd/em/internal/scaffold/licenses"
-	"github.com/mjpitz/myago/zaputil"
+	"go.pitz.tech/lib/cmd/em/internal/scaffold/gitignore"
+	"go.pitz.tech/lib/cmd/em/internal/scaffold/licenses"
+	"go.pitz.tech/lib/zaputil"
 )
 
 var (

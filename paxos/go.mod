@@ -1,15 +1,15 @@
 module go.pitz.tech/lib/paxos
 
-go 1.17
+go 1.19
 
 require (
 	github.com/cenkalti/backoff/v4 v4.1.2
 	github.com/dgraph-io/badger/v3 v3.2103.2
-	github.com/jonboulle/clockwork v0.2.2
-	go.pitz.tech/lib v0.0.0-20211223162157-7e91fadde587
-	github.com/stretchr/testify v1.7.0
+	github.com/jonboulle/clockwork v0.3.0
+	github.com/stretchr/testify v1.8.0
 	github.com/vmihailenco/msgpack/v5 v5.3.5
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+	go.pitz.tech/lib v0.0.0-20221020005345-8cee279ff8a2
+	golang.org/x/sync v0.1.0
 )
 
 require (
@@ -26,6 +26,7 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/btree v1.0.1 // indirect
 	github.com/google/flatbuffers v2.0.0+incompatible // indirect
+	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-msgpack v1.1.5 // indirect
@@ -44,11 +45,11 @@ require (
 	github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	go.uber.org/atomic v1.9.0 // indirect
-	go.uber.org/multierr v1.7.0 // indirect
-	go.uber.org/zap v1.19.1 // indirect
-	golang.org/x/net v0.0.0-20211116231205-47ca1ff31462 // indirect
-	golang.org/x/sys v0.0.0-20211117180635-dee7805ff2e1 // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	go.uber.org/atomic v1.10.0 // indirect
+	go.uber.org/multierr v1.8.0 // indirect
+	go.uber.org/zap v1.23.0 // indirect
+	golang.org/x/net v0.1.0 // indirect
+	golang.org/x/sys v0.1.0 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
