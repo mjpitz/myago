@@ -110,8 +110,8 @@ func TestConfigDNSDiscovery(t *testing.T) {
 
 	testHarness(t, &cluster.Config{
 		DNSDiscovery: cluster.DNSDiscovery{
-			Name:            "google.com",
+			Name:            "go.pitz.tech",
 			ResolveInterval: 30 * time.Second,
 		},
-	}, 6)
+	}, 2)
 }
