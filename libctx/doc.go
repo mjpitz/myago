@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Mya Pitzeruse
+// Copyright (C) 2022 Mya Pitzeruse
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published
@@ -13,29 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package zaputil
-
-import (
-	"context"
-
-	"go.uber.org/zap"
-)
-
-var contextKey = libctx.Key("zap")
-
-var defaultLogger = zap.NewNop()
-
-// Extract pulls the logger from the provided context. If no logger is found, then the defaultLogger is returned.
-func Extract(ctx context.Context) *zap.Logger {
-	log := ctx.Value(contextKey)
-	if log == nil {
-		return defaultLogger
-	}
-
-	return log.(*zap.Logger)
-}
-
-// ToContext sets the logger on the provided context.
-func ToContext(ctx context.Context, logger *zap.Logger) context.Context {
-	return context.WithValue(ctx, contextKey, logger)
-}
+/*
+Package libctx provides common code for working with contexts and may eventually write its own.
+*/
+package libctx

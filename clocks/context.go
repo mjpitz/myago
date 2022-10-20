@@ -19,11 +19,10 @@ import (
 	"context"
 
 	"github.com/jonboulle/clockwork"
-
-	"go.pitz.tech/lib"
+	"go.pitz.tech/lib/libctx"
 )
 
-var contextKey = myago.ContextKey("clocks")
+var contextKey = libctx.Key("clocks")
 
 var defaultClock = clockwork.NewRealClock()
 

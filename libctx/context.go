@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package myago
+package libctx
 
-// ContextKey provides a scoped key used to persist data on contexts.
-type ContextKey string
+// Key provides a scoped key used to persist data on contexts.
+type Key string
 
-func (c ContextKey) String() string {
+func (c Key) String() string {
 	return "myago:" + string(c)
 }

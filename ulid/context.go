@@ -20,11 +20,11 @@ import (
 	"os"
 	"strconv"
 
-	"go.pitz.tech/lib"
+	"go.pitz.tech/lib/libctx"
 )
 
 var (
-	contextKey      = myago.ContextKey("ulid.generator")
+	contextKey      = libctx.Key("ulid.generator")
 	systemGenerator *Generator
 )
 

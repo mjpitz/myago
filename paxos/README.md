@@ -1,8 +1,5 @@
 # paxos
 
---
-import "go.pitz.tech/lib/paxos"
-
 Package paxos implements the paxos algorithm. The logic is mostly ported from
 mjpitz/paxos, but with a few modifications. First, I didn't continue using gRPC
 as the transport as I wanted something a bit less cumbersome. I've tried to
@@ -12,12 +9,16 @@ plugged in. More on that later.
 This package is (and likely will be for a while) a work in progress. As it
 stands, it _should_ support simple paxos.
 
+```go
+import go.pitz.tech/lib/paxos
+```
+
 ## Usage
 
 #### func RegisterYarpcAcceptorServer
 
 ```go
-func RegisterYarpcAcceptorServer(svr *yarpc.Server, impl AcceptorServer)
+func RegisterYarpcAcceptorServer(svr *yarpc.ServeMux, impl AcceptorServer)
 ```
 
 RegisterYarpcAcceptorServer registers the provided AcceptorServer implementation
@@ -26,7 +27,7 @@ with the yarpc.Server to handle requests.
 #### func RegisterYarpcObserverServer
 
 ```go
-func RegisterYarpcObserverServer(svr *yarpc.Server, impl ObserverServer)
+func RegisterYarpcObserverServer(svr *yarpc.ServeMux, impl ObserverServer)
 ```
 
 RegisterYarpcObserverServer registers the provided ObserverServer implementation
@@ -37,7 +38,7 @@ records have been accepted.
 #### func RegisterYarpcProposerServer
 
 ```go
-func RegisterYarpcProposerServer(svr *yarpc.Server, impl ProposerServer)
+func RegisterYarpcProposerServer(svr *yarpc.ServeMux, impl ProposerServer)
 ```
 
 RegisterYarpcProposerServer registers the provided ProposerServer implementation

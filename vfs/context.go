@@ -19,14 +19,13 @@ import (
 	"context"
 
 	"github.com/spf13/afero"
-
-	"go.pitz.tech/lib"
+	"go.pitz.tech/lib/libctx"
 )
 
 // FS provides a file system abstraction.
 type FS = afero.Fs
 
-var contextKey = myago.ContextKey("vfs")
+var contextKey = libctx.Key("vfs")
 
 var defaultFS = afero.NewOsFs()
 

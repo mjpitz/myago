@@ -18,10 +18,10 @@ package auth
 import (
 	"context"
 
-	"go.pitz.tech/lib"
+	"go.pitz.tech/lib/libctx"
 )
 
-const contextKey = myago.ContextKey("auth")
+const contextKey = libctx.Key("auth")
 
 // ToContext attaches the provided UserInfo to the context.
 func ToContext(ctx context.Context, userInfo UserInfo) context.Context {

@@ -18,10 +18,10 @@ package headers
 import (
 	"context"
 
-	"go.pitz.tech/lib"
+	"go.pitz.tech/lib/libctx"
 )
 
-const contextKey = myago.ContextKey("headers")
+const contextKey = libctx.Key("headers")
 
 // ToContext attaches the provided headers to the context.
 func ToContext(ctx context.Context, header Header) context.Context {
