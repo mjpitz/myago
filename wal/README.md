@@ -11,7 +11,7 @@ help conserve space. The checksum is a simple CRC32 checksum. Reference:
 https://github.com/indeedeng/lsmtree/blob/master/recordlog/src/main/java/com/indeed/lsmtree/recordlog/BasicRecordFile.java
 
 ```go
-import github.com/mjpitz/myago/wal
+import go.pitz.tech/lib/wal
 ```
 
 ## Usage

@@ -19,7 +19,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/mjpitz/myago/auth"
+	"go.pitz.tech/lib/auth"
 )
 
 // Handler returns an HTTP middleware function that invokes the provided auth handlers.

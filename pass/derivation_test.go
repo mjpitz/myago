@@ -21,7 +21,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/pass"
+	"go.pitz.tech/lib/pass"
 )
 
 func TestDerivation(t *testing.T) {

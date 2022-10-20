@@ -23,10 +23,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/auth"
-	basicauth "github.com/mjpitz/myago/auth/basic"
-	httpauth "github.com/mjpitz/myago/auth/http"
-	"github.com/mjpitz/myago/headers"
+	"go.pitz.tech/lib/auth"
+	basicauth "go.pitz.tech/lib/auth/basic"
+	httpauth "go.pitz.tech/lib/auth/http"
+	"go.pitz.tech/lib/headers"
 )
 
 func TestHandler(t *testing.T) {

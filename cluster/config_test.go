@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/mjpitz/myago/cluster"
+	"go.pitz.tech/lib/cluster"
 )
 
 func testHarness(t *testing.T, discovery cluster.Discovery, length int) {

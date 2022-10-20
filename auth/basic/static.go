@@ -20,7 +20,7 @@ import (
 	"encoding/base32"
 	"strings"
 
-	"github.com/mjpitz/myago/auth"
+	"go.pitz.tech/lib/auth"
 )
 
 // Static returns an auth.HandlerFunc that uses a static username/password for the system.

@@ -5,7 +5,7 @@ currently be managed statically (via explicit configuration of active) or
 dynamically (using HashiCorp's Serf project).
 
 ```go
-import github.com/mjpitz/myago/cluster
+import go.pitz.tech/lib/cluster
 ```
 
 ## Usage
@@ -65,9 +65,9 @@ type Config struct {
 }
 ```
 
-Config provides a common configuration structure for forming clusters. Either
-through a list of known addresses (peers) or using gossip to form pool
-dynamically.
+Config provides a common configuration structure for forming clusters. This can
+be done by specifying a concrete list of peers, a DNS name that's periodically
+resolved, or using a gossip protocol.
 
 #### func (\*Config) Start
 

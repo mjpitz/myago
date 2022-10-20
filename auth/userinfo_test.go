@@ -21,7 +21,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/auth"
+	"go.pitz.tech/lib/auth"
 )
 
 type Extensions struct {

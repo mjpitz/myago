@@ -4,7 +4,7 @@
 
 
 ```go
-import github.com/mjpitz/myago/auth/oidc
+import go.pitz.tech/lib/auth/oidc
 ```
 
 ## Usage

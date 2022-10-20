@@ -24,7 +24,7 @@ import (
 	"github.com/urfave/cli/v2"
 	"golang.org/x/oauth2"
 
-	"github.com/mjpitz/myago/auth"
+	"go.pitz.tech/lib/auth"
 )
 
 // UsernamePassword is used to authenticate a user using a username and password.

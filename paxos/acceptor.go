@@ -19,7 +19,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/mjpitz/myago/yarpc"
+	"go.pitz.tech/lib/yarpc"
 )
 
 type Acceptor interface {

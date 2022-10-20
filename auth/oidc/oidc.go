@@ -10,10 +10,10 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
 
-	"github.com/mjpitz/myago/auth"
-	"github.com/mjpitz/myago/headers"
-	"github.com/mjpitz/myago/lazy"
-	"github.com/mjpitz/myago/zaputil"
+	"go.pitz.tech/lib/auth"
+	"go.pitz.tech/lib/headers"
+	"go.pitz.tech/lib/lazy"
+	"go.pitz.tech/lib/zaputil"
 )
 
 // OIDC returns a HandlerFunc who authenticates a user with the provided issuer using an access_token attached to the

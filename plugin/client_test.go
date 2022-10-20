@@ -23,9 +23,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
-	"github.com/mjpitz/myago/lifecycle"
-	"github.com/mjpitz/myago/plugin"
-	"github.com/mjpitz/myago/zaputil"
+	"go.pitz.tech/lib/lifecycle"
+	"go.pitz.tech/lib/plugin"
+	"go.pitz.tech/lib/zaputil"
 )
 
 //go:generate go install ./examples/myago-plugin-echo
@@ -35,7 +35,7 @@ type message struct {
 	Text string
 }
 
-// nolint:paralleltest
+//nolint:paralleltest
 func TestEchoClient(t *testing.T) {
 	ctx := lifecycle.Setup(context.Background())
 	defer lifecycle.Resolve(ctx)
@@ -64,7 +64,7 @@ func TestEchoClient(t *testing.T) {
 	require.Equal(t, "hello world", msg.Text)
 }
 
-// nolint:paralleltest
+//nolint:paralleltest
 func TestFailureClient(t *testing.T) {
 	ctx := lifecycle.Setup(context.Background())
 	defer lifecycle.Resolve(ctx)

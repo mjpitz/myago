@@ -28,8 +28,8 @@ import (
 	"github.com/panjf2000/ants/v2"
 	"github.com/pkg/errors"
 
-	"github.com/mjpitz/myago/encoding"
-	"github.com/mjpitz/myago/zaputil"
+	"go.pitz.tech/lib/encoding"
+	"go.pitz.tech/lib/zaputil"
 )
 
 type Listener interface {

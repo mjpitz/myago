@@ -23,7 +23,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/wal"
+	"go.pitz.tech/lib/wal"
 )
 
 func TestWAL(t *testing.T) {

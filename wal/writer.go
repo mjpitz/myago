@@ -25,13 +25,14 @@ import (
 
 	"github.com/spf13/afero"
 
-	"github.com/mjpitz/myago/vfs"
+	"go.pitz.tech/lib/vfs"
 )
 
 // OpenWriter opens a new append-only handle that writes data to the target file.
 func OpenWriter(ctx context.Context, filepath string) (*Writer, error) {
 	afs := vfs.Extract(ctx)
 
+	//nolint:nosnakecase
 	handle, err := afs.OpenFile(filepath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		return nil, err

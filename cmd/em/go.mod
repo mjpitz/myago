@@ -1,11 +1,11 @@
-module github.com/mjpitz/myago/cmd/em
+module go.pitz.tech/lib/cmd/em
 
 go 1.18
 
 require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/coreos/go-oidc/v3 v3.1.0
-	github.com/mjpitz/myago v0.0.0-20211229025657-71e8b0e2e3f9
+	go.pitz.tech/lib v0.0.0-20211229025657-71e8b0e2e3f9
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/afero v1.6.0
 	github.com/urfave/cli/v2 v2.3.0

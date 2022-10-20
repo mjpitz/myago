@@ -20,7 +20,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/mjpitz/myago/yarpc"
+	"go.pitz.tech/lib/yarpc"
 )
 
 // Stream provides an abstract definition of the functionality the underlying stream needs to provide.

@@ -20,7 +20,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/cluster"
+	"go.pitz.tech/lib/cluster"
 )
 
 func TestMembership(t *testing.T) {

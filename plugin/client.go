@@ -27,8 +27,8 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/mjpitz/myago/yarpc"
-	"github.com/mjpitz/myago/zaputil"
+	"go.pitz.tech/lib/yarpc"
+	"go.pitz.tech/lib/zaputil"
 )
 
 // DialContext returns a ClientConn whose dialer forks a process for the specified binary.
@@ -54,7 +54,7 @@ func (d *dialer) DialContext(ctx context.Context) (io.ReadWriteCloser, error) {
 	stdout := Pipe()
 	stderr := Pipe()
 
-	// nolint:gosec
+	//nolint:gosec
 	cmd := exec.CommandContext(ctx, d.Binary, d.Args...)
 	cmd.Stdin = stdin
 	cmd.Stdout = stdout

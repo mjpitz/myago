@@ -21,8 +21,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/encoding"
-	"github.com/mjpitz/myago/ulid"
+	"go.pitz.tech/lib/encoding"
+	"go.pitz.tech/lib/ulid"
 )
 
 func TestParse(t *testing.T) {

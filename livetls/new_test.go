@@ -24,8 +24,8 @@ import (
 	"github.com/jonboulle/clockwork"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/clocks"
-	"github.com/mjpitz/myago/livetls"
+	"go.pitz.tech/lib/clocks"
+	"go.pitz.tech/lib/livetls"
 )
 
 func TestNew(t *testing.T) {

@@ -47,7 +47,7 @@ Example ClientConn:
     }
 
 ```go
-import github.com/mjpitz/myago/yarpc
+import go.pitz.tech/lib/yarpc
 ```
 
 ## Usage

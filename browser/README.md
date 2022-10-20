@@ -1,7 +1,7 @@
 # browser
 
 ```go
-import github.com/mjpitz/myago/browser
+import go.pitz.tech/lib/browser
 ```
 
 ## Usage

@@ -13,9 +13,9 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
 
-	"github.com/mjpitz/myago/lazy"
-	"github.com/mjpitz/myago/ulid"
-	"github.com/mjpitz/myago/zaputil"
+	"go.pitz.tech/lib/lazy"
+	"go.pitz.tech/lib/ulid"
+	"go.pitz.tech/lib/zaputil"
 )
 
 // TokenCallback is invoked by the OIDCServeMux endpoint when we've successfully received and validated the

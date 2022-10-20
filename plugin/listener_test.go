@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/mjpitz/myago/yarpc"
+	"go.pitz.tech/lib/yarpc"
 )
 
 type message struct {
@@ -101,16 +101,16 @@ func TestListener(t *testing.T) {
 	group.Go(func() error {
 		t.Log("starting server")
 
-		yarpc.HandleFunc("/echo", func(stream yarpc.Stream) (err error) {
+		yarpc.HandleFunc("/echo", func(stream yarpc.Stream) error {
 			msg := message{}
-			err = stream.ReadMsg(&msg)
+			err := stream.ReadMsg(&msg)
 			if err != nil {
-				return
+				return err
 			}
 
 			err = stream.WriteMsg(msg)
 			if err != nil {
-				return
+				return err
 			}
 
 			return nil

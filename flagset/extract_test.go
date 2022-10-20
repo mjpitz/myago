@@ -22,7 +22,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/urfave/cli/v2"
 
-	"github.com/mjpitz/myago/flagset"
+	"go.pitz.tech/lib/flagset"
 )
 
 type Nested struct {

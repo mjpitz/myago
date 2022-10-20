@@ -22,8 +22,8 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/mjpitz/myago/flagset"
-	"github.com/mjpitz/myago/ulid"
+	"go.pitz.tech/lib/flagset"
+	"go.pitz.tech/lib/ulid"
 )
 
 type ulidGenConfig struct {

@@ -22,7 +22,7 @@ import (
 	"github.com/dgryski/go-farm"
 	"github.com/serialx/hashring"
 
-	"github.com/mjpitz/myago/cluster"
+	"go.pitz.tech/lib/cluster"
 )
 
 // New returns a Director that can aid in the coordination of work within a cluster.

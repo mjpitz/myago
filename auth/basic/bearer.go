@@ -18,8 +18,8 @@ package basicauth
 import (
 	"context"
 
-	"github.com/mjpitz/myago/auth"
-	"github.com/mjpitz/myago/headers"
+	"go.pitz.tech/lib/auth"
+	"go.pitz.tech/lib/headers"
 )
 
 // Bearer returns a handler func that translates bearer tokens into user information.

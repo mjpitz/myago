@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/headers"
+	"go.pitz.tech/lib/headers"
 )
 
 func TestHTTP(t *testing.T) {

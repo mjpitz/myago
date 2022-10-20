@@ -20,7 +20,7 @@ import (
 
 	"github.com/spf13/afero"
 
-	"github.com/mjpitz/myago"
+	"go.pitz.tech/lib"
 )
 
 // FS provides a file system abstraction.

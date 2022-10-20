@@ -5,7 +5,7 @@ lifecycle such as setting up a shutdown hook and deferring functions until
 application shutdown.
 
 ```go
-import github.com/mjpitz/myago/lifecycle
+import go.pitz.tech/lib/lifecycle
 ```
 
 ## Usage

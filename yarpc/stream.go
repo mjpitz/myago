@@ -24,7 +24,7 @@ import (
 
 	"github.com/hashicorp/yamux"
 
-	"github.com/mjpitz/myago/encoding"
+	"go.pitz.tech/lib/encoding"
 )
 
 func nonce() string {

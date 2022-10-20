@@ -23,7 +23,7 @@ Nested structures are supported, making application configuration composable and
 portable between systems.
 
 ```go
-import github.com/mjpitz/myago/flagset
+import go.pitz.tech/lib/flagset
 ```
 
 ## Usage

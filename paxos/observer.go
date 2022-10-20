@@ -21,7 +21,7 @@ import (
 
 	"github.com/cenkalti/backoff/v4"
 
-	"github.com/mjpitz/myago/cluster"
+	"go.pitz.tech/lib/cluster"
 )
 
 // Observer watches the Acceptors to learn about what values have been accepted.

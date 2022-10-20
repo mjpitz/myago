@@ -21,7 +21,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/paxos"
+	"go.pitz.tech/lib/paxos"
 )
 
 // nolint:funlen // idc about length for tests

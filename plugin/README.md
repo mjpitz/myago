@@ -8,7 +8,7 @@ variables provided to the program to configure its behaviour, but then stream
 data from stdin to issue RPCs and write their responses to stdout.
 
 ```go
-import github.com/mjpitz/myago/plugin
+import go.pitz.tech/lib/plugin
 ```
 
 ## Usage
@@ -37,4 +37,4 @@ connection.
 func Pipe() *pipe
 ```
 
-Pipe returns a pseudo-async io.ReadWriteCloser. nolint:revive
+Pipe returns a pseudo-async io.ReadWriteCloser.

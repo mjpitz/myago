@@ -5,7 +5,7 @@ constructed by Wrap enables use of the web router, eliminating the need for
 fragments in the application layer.
 
 ```go
-import github.com/mjpitz/myago/vue
+import go.pitz.tech/lib/vue
 ```
 
 ## Usage

@@ -22,8 +22,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 
-	"github.com/mjpitz/myago/encoding"
-	"github.com/mjpitz/myago/vfs"
+	"go.pitz.tech/lib/encoding"
+	"go.pitz.tech/lib/vfs"
 )
 
 // DefaultLoader provides a default Loader implementation that supports reading a variety of files.

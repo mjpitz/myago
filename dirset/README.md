@@ -4,7 +4,7 @@ Package dirset provides discovery of common application directories for things
 like caching, locks, and logs.
 
 ```go
-import github.com/mjpitz/myago/dirset
+import go.pitz.tech/lib/dirset
 ```
 
 ## Usage

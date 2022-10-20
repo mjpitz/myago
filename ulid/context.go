@@ -20,7 +20,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/mjpitz/myago"
+	"go.pitz.tech/lib"
 )
 
 var (
@@ -28,7 +28,7 @@ var (
 	systemGenerator *Generator
 )
 
-// nolint:gochecknoinits
+//nolint:gochecknoinits
 func init() {
 	skew := byte(1)
 	if skewEnv := os.Getenv("MYAGO_ULID_SKEW"); skewEnv != "" {

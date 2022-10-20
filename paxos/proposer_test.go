@@ -23,7 +23,7 @@ import (
 	"github.com/jonboulle/clockwork"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/paxos"
+	"go.pitz.tech/lib/paxos"
 )
 
 // this is quite similar to the yarpc client. would be good to generalize the yarpc.ClientConn definition too...

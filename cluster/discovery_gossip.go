@@ -20,7 +20,7 @@ import (
 
 	"github.com/hashicorp/serf/serf"
 
-	"github.com/mjpitz/myago/zaputil"
+	"go.pitz.tech/lib/zaputil"
 )
 
 // GossipDiscovery uses HashiCorp's Serf library to discover nodes within the cluster. It requires both TCP and UDP

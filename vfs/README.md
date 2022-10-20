@@ -6,7 +6,7 @@ for testing. Currently, this wraps the afero virtual file system which provides
 OS and in memory implementations.
 
 ```go
-import github.com/mjpitz/myago/vfs
+import go.pitz.tech/lib/vfs
 ```
 
 ## Usage

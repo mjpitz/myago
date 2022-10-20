@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/mjpitz/myago/yarpc"
+	"go.pitz.tech/lib/yarpc"
 )
 
 const method = "example"

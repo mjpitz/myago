@@ -9,7 +9,7 @@ generating the key for. Finally, the last step is to generate a SitePassword
 using the derived SiteKey and associated password format.
 
 ```go
-import github.com/mjpitz/myago/pass
+import go.pitz.tech/lib/pass
 ```
 
 ## Usage

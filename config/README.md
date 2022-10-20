@@ -1,7 +1,7 @@
 # config
 
 ```go
-import github.com/mjpitz/myago/config
+import go.pitz.tech/lib/config
 ```
 
 ## Usage

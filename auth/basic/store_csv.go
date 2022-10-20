@@ -22,7 +22,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/mjpitz/myago/vfs"
+	"go.pitz.tech/lib/vfs"
 )
 
 // OpenCSV attempts to open the provided csv file and return a parsed index based on the contents.

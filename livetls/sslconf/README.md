@@ -4,7 +4,7 @@
 
 
 ```
-go install github.com/mjpitz/myago/livetls/sslconf@latest
+go install go.pitz.tech/lib/livetls/sslconf@latest
 ```
 
 ## Usage

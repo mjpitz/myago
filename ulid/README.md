@@ -16,7 +16,7 @@ systems. The wire format is as follows: `[ skew ][ millis ][ payload ]`
     - `payload` - N bytes for the payload
 
 ```go
-import github.com/mjpitz/myago/ulid
+import go.pitz.tech/lib/ulid
 ```
 
 ## Usage

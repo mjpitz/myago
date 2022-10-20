@@ -23,7 +23,7 @@ import (
 
 	"github.com/spf13/afero"
 
-	"github.com/mjpitz/myago/vfs"
+	"go.pitz.tech/lib/vfs"
 )
 
 // LoadCertPool loads the x509 certificate authority pool.

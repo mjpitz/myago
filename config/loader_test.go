@@ -22,8 +22,8 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/config"
-	"github.com/mjpitz/myago/vfs"
+	"go.pitz.tech/lib/config"
+	"go.pitz.tech/lib/vfs"
 )
 
 const configJSON = `{

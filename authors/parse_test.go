@@ -20,7 +20,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/authors"
+	"go.pitz.tech/lib/authors"
 )
 
 const exampleAuthorsFile = `

@@ -1,7 +1,7 @@
 # livetls
 
 ```go
-import github.com/mjpitz/myago/livetls
+import go.pitz.tech/lib/livetls
 ```
 
 ## Usage
@@ -29,7 +29,7 @@ func New(ctx context.Context, config Config) (*tls.Config, error)
 ```
 
 New construct a tls.Config that will periodically reload the configured
-certificate. nolint:cyclop
+certificate.
 
 #### type Config
 

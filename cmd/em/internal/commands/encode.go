@@ -26,8 +26,8 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/mjpitz/myago/cmd/em/internal/phone"
-	"github.com/mjpitz/myago/flagset"
+	"go.pitz.tech/lib/cmd/em/internal/phone"
+	"go.pitz.tech/lib/flagset"
 )
 
 type EncodeConfig struct {

@@ -20,7 +20,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/mjpitz/myago"
+	"go.pitz.tech/lib"
 )
 
 var contextKey = myago.ContextKey("zap")

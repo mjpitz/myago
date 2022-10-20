@@ -18,7 +18,7 @@ package paxos
 import (
 	"context"
 
-	"github.com/mjpitz/myago/yarpc"
+	"go.pitz.tech/lib/yarpc"
 )
 
 // RegisterYarpcAcceptorServer registers the provided AcceptorServer implementation with the yarpc.Server to handle

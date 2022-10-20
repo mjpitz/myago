@@ -209,8 +209,8 @@ github.com/mitchellh/copystructure v1.2.0 h1:vpKXTN4ewci03Vljg/q9QvCGUDttBOGBIa1
 github.com/mitchellh/copystructure v1.2.0/go.mod h1:qLl+cE2AmVv+CoeAwDPye/v+N2HKCj9FbZEVFJRxO9s=
 github.com/mitchellh/reflectwalk v1.0.2 h1:G2LzWKi524PWgd3mLHV8Y5k7s6XUvT0Gef6zxSIeXaQ=
 github.com/mitchellh/reflectwalk v1.0.2/go.mod h1:mSTlrgnPZtwu0c4WaC2kGObEpuNDbx0jmZXqmk4esnw=
-github.com/mjpitz/myago v0.0.0-20211229025657-71e8b0e2e3f9 h1:/6rXSTA/myJjzd5SqDAkE5RmwRljikomiXz4gJOQAYc=
-github.com/mjpitz/myago v0.0.0-20211229025657-71e8b0e2e3f9/go.mod h1:mn74CuqypahqrdL0I/+uJkvpjhsHJqoiU29aWTpGN30=
+go.pitz.tech/lib v0.0.0-20211229025657-71e8b0e2e3f9 h1:/6rXSTA/myJjzd5SqDAkE5RmwRljikomiXz4gJOQAYc=
+go.pitz.tech/lib v0.0.0-20211229025657-71e8b0e2e3f9/go.mod h1:mn74CuqypahqrdL0I/+uJkvpjhsHJqoiU29aWTpGN30=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

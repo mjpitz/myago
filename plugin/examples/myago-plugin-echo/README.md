@@ -4,7 +4,7 @@
 
 
 ```
-go install github.com/mjpitz/myago/plugin/examples/myago-plugin-echo@latest
+go install go.pitz.tech/lib/plugin/examples/myago-plugin-echo@latest
 ```
 
 ## Usage

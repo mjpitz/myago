@@ -21,7 +21,7 @@ import (
 
 	"github.com/hashicorp/yamux"
 
-	"github.com/mjpitz/myago/encoding"
+	"go.pitz.tech/lib/encoding"
 )
 
 // Option defines an generic way to configure clients and servers.

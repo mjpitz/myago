@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/lazy"
+	"go.pitz.tech/lib/lazy"
 )
 
 type Test struct{}

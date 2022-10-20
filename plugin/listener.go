@@ -20,7 +20,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/mjpitz/myago/yarpc"
+	"go.pitz.tech/lib/yarpc"
 )
 
 // Listen returns a yarpc.Listener that treats a processes stdin and stdout as a connection.

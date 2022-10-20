@@ -19,7 +19,7 @@ import (
 	"context"
 	"encoding/binary"
 
-	"github.com/mjpitz/myago/clocks"
+	"go.pitz.tech/lib/clocks"
 )
 
 // NewGenerator constructs a generator using the provided skew and fill.

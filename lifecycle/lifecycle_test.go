@@ -20,7 +20,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/mjpitz/myago/lifecycle"
+	"go.pitz.tech/lib/lifecycle"
 )
 
 func TestLifeCycle(t *testing.T) {

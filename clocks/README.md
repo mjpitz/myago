@@ -3,7 +3,7 @@
 Package clocks provides code for setting up and managing clocks on contexts.
 
 ```go
-import github.com/mjpitz/myago/clocks
+import go.pitz.tech/lib/clocks
 ```
 
 ## Usage

@@ -20,8 +20,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/mjpitz/myago/cmd/em/internal/index"
-	"github.com/mjpitz/myago/zaputil"
+	"go.pitz.tech/lib/cmd/em/internal/index"
+	"go.pitz.tech/lib/zaputil"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 )

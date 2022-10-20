@@ -18,9 +18,9 @@ package commands
 import (
 	"fmt"
 
-	"github.com/mjpitz/myago/cmd/em/internal/index"
-	"github.com/mjpitz/myago/cmd/em/internal/jenkins"
-	"github.com/mjpitz/myago/flagset"
+	"go.pitz.tech/lib/cmd/em/internal/index"
+	"go.pitz.tech/lib/cmd/em/internal/jenkins"
+	"go.pitz.tech/lib/flagset"
 	"github.com/urfave/cli/v2"
 )
 

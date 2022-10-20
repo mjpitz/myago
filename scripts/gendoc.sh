@@ -15,8 +15,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-for pkg in $(go list ./... | egrep -v '^github.com/mjpitz/myago$'); do
-  output="${pkg#"github.com/mjpitz/myago/"}/README.md"
+for pkg in $(go list ./... | egrep -v '^go.pitz.tech/lib$'); do
+  output="${pkg#"go.pitz.tech/lib/"}/README.md"
 
   godocdown -template ./templates/docs/README.md.tmpl "$pkg" > "$output"
 done

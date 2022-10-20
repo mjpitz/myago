@@ -1,7 +1,7 @@
 # paxos
 
 --
-import "github.com/mjpitz/myago/paxos"
+import "go.pitz.tech/lib/paxos"
 
 Package paxos implements the paxos algorithm. The logic is mostly ported from
 mjpitz/paxos, but with a few modifications. First, I didn't continue using gRPC

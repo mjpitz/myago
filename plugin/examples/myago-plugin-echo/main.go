@@ -18,8 +18,8 @@ package main
 import (
 	"log"
 
-	"github.com/mjpitz/myago/plugin"
-	"github.com/mjpitz/myago/yarpc"
+	"go.pitz.tech/lib/plugin"
+	"go.pitz.tech/lib/yarpc"
 )
 
 func main() {

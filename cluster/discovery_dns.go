@@ -20,7 +20,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/mjpitz/myago/clocks"
+	"go.pitz.tech/lib/clocks"
 )
 
 // DNSDiscovery uses DNS to resolve cluster membership. Currently, this implementation uses the default DNS resolver

@@ -4,7 +4,7 @@ Package encoding provides common Encoding and associated interfaces for Encoder
 and Decoder logic.
 
 ```go
-import github.com/mjpitz/myago/encoding
+import go.pitz.tech/lib/encoding
 ```
 
 ## Usage

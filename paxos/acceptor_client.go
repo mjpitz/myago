@@ -23,7 +23,7 @@ import (
 
 	"github.com/cenkalti/backoff/v4"
 
-	"github.com/mjpitz/myago/cluster"
+	"go.pitz.tech/lib/cluster"
 )
 
 type MultiAcceptorClient struct {

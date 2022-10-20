@@ -21,7 +21,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/livetls"
+	"go.pitz.tech/lib/livetls"
 )
 
 type TestCase struct {

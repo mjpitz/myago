@@ -1,7 +1,7 @@
 # authors
 
 ```go
-import github.com/mjpitz/myago/authors
+import go.pitz.tech/lib/authors
 ```
 
 ## Usage

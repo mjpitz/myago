@@ -18,7 +18,7 @@ package auth
 import (
 	"strings"
 
-	"github.com/mjpitz/myago/headers"
+	"go.pitz.tech/lib/headers"
 )
 
 const authorization = "authorization"

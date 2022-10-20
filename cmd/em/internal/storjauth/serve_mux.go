@@ -27,10 +27,10 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
 
-	oidcauth "github.com/mjpitz/myago/auth/oidc"
-	"github.com/mjpitz/myago/lazy"
-	"github.com/mjpitz/myago/ulid"
-	"github.com/mjpitz/myago/zaputil"
+	oidcauth "go.pitz.tech/lib/auth/oidc"
+	"go.pitz.tech/lib/lazy"
+	"go.pitz.tech/lib/ulid"
+	"go.pitz.tech/lib/zaputil"
 
 	"storj.io/common/base58"
 )

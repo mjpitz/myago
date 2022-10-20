@@ -20,11 +20,12 @@ import (
 	"crypto/tls"
 	"time"
 
-	"github.com/mjpitz/myago/clocks"
+	"go.pitz.tech/lib/clocks"
 )
 
 // New construct a tls.Config that will periodically reload the configured certificate.
-// nolint:cyclop
+//
+//nolint:cyclop
 func New(ctx context.Context, config Config) (*tls.Config, error) {
 	if !config.Enable {
 		return nil, nil

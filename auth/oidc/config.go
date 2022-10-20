@@ -24,7 +24,7 @@ import (
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/urfave/cli/v2"
 
-	"github.com/mjpitz/myago/livetls"
+	"go.pitz.tech/lib/livetls"
 )
 
 // Issuer defines data needed to establish a connection to an issuer.

@@ -25,8 +25,8 @@ import (
 	"github.com/cenkalti/backoff/v4"
 	"github.com/hashicorp/yamux"
 
-	"github.com/mjpitz/myago/encoding"
-	"github.com/mjpitz/myago/zaputil"
+	"go.pitz.tech/lib/encoding"
+	"go.pitz.tech/lib/zaputil"
 )
 
 // DialContext initializes a new client connection to the target server.

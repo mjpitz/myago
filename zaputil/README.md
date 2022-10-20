@@ -5,7 +5,7 @@ convenient space for putting custom logger implementations for plugging into
 various locations.
 
 ```go
-import github.com/mjpitz/myago/zaputil
+import go.pitz.tech/lib/zaputil
 ```
 
 ## Usage

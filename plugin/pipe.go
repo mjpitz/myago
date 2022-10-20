@@ -22,7 +22,8 @@ import (
 )
 
 // Pipe returns a pseudo-async io.ReadWriteCloser.
-// nolint:revive
+//
+//nolint:revive
 func Pipe() *pipe {
 	done := make(chan bool, 1)
 	done <- false

@@ -31,9 +31,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/mjpitz/myago/cluster"
-	"github.com/mjpitz/myago/paxos"
-	"github.com/mjpitz/myago/yarpc"
+	"go.pitz.tech/lib/cluster"
+	"go.pitz.tech/lib/paxos"
+	"go.pitz.tech/lib/yarpc"
 )
 
 // nolint:funlen // idc about length for tests

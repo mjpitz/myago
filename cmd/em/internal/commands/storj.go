@@ -21,7 +21,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/mjpitz/myago/flagset"
+	"go.pitz.tech/lib/flagset"
 
 	"storj.io/common/uuid"
 )

@@ -4,7 +4,7 @@
 
 
 ```go
-import github.com/mjpitz/myago/auth/http
+import go.pitz.tech/lib/auth/http
 ```
 
 ## Usage

@@ -6,7 +6,7 @@ CSV, but most components contain an interface that _should_ make it rather easy
 to swap out implementations.
 
 ```go
-import github.com/mjpitz/myago/auth
+import go.pitz.tech/lib/auth
 ```
 
 ## Usage

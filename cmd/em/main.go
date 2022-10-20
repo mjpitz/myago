@@ -23,11 +23,11 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/mjpitz/myago/lifecycle"
+	"go.pitz.tech/lib/lifecycle"
 
-	"github.com/mjpitz/myago/cmd/em/internal/commands"
-	"github.com/mjpitz/myago/flagset"
-	"github.com/mjpitz/myago/zaputil"
+	"go.pitz.tech/lib/cmd/em/internal/commands"
+	"go.pitz.tech/lib/flagset"
+	"go.pitz.tech/lib/zaputil"
 )
 
 type GlobalConfig struct {

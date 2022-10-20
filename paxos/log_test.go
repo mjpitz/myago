@@ -22,8 +22,8 @@ import (
 	"github.com/dgraph-io/badger/v3"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/paxos"
-	"github.com/mjpitz/myago/zaputil"
+	"go.pitz.tech/lib/paxos"
+	"go.pitz.tech/lib/zaputil"
 )
 
 // nolint:funlen // idc about length for tests

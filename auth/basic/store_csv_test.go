@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	basicauth "github.com/mjpitz/myago/auth/basic"
+	basicauth "go.pitz.tech/lib/auth/basic"
 )
 
 type testUser struct {

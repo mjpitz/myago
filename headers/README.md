@@ -5,7 +5,7 @@ from different sources. A default HTTP middleware handler is provided and will
 ensure that the headers are appropriately translated and passed along.
 
 ```go
-import github.com/mjpitz/myago/headers
+import go.pitz.tech/lib/headers
 ```
 
 ## Usage

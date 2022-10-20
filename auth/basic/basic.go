@@ -20,8 +20,8 @@ import (
 	"encoding/base64"
 	"strings"
 
-	"github.com/mjpitz/myago/auth"
-	"github.com/mjpitz/myago/headers"
+	"go.pitz.tech/lib/auth"
+	"go.pitz.tech/lib/headers"
 )
 
 // Basic implements a basic access authentication handler function.

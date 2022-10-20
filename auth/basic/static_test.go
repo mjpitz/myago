@@ -21,9 +21,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/auth"
-	basicauth "github.com/mjpitz/myago/auth/basic"
-	"github.com/mjpitz/myago/headers"
+	"go.pitz.tech/lib/auth"
+	basicauth "go.pitz.tech/lib/auth/basic"
+	"go.pitz.tech/lib/headers"
 )
 
 func TestStatic(t *testing.T) {

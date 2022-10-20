@@ -18,7 +18,7 @@ package headers
 import (
 	"context"
 
-	"github.com/mjpitz/myago"
+	"go.pitz.tech/lib"
 )
 
 const contextKey = myago.ContextKey("headers")

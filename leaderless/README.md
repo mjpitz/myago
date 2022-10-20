@@ -12,7 +12,7 @@ This package is loosely inspired by Uber's ringpop system which seems like it's
 used quite extensively.
 
 ```go
-import github.com/mjpitz/myago/leaderless
+import go.pitz.tech/lib/leaderless
 ```
 
 ## Usage

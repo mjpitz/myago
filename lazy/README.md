@@ -1,7 +1,7 @@
 # lazy
 
 ```go
-import github.com/mjpitz/myago/lazy
+import go.pitz.tech/lib/lazy
 ```
 
 ## Usage

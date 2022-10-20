@@ -1,4 +1,4 @@
-module github.com/mjpitz/myago
+module go.pitz.tech/lib
 
 go 1.17
 

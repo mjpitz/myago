@@ -23,7 +23,7 @@ import (
 	"github.com/jonboulle/clockwork"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/mjpitz/myago/cluster"
+	"go.pitz.tech/lib/cluster"
 )
 
 // Config contains configurable elements of Paxos.

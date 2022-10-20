@@ -26,7 +26,7 @@ import (
 
 	"github.com/spf13/afero"
 
-	"github.com/mjpitz/myago/vfs"
+	"go.pitz.tech/lib/vfs"
 )
 
 // OpenReader opens a new read-only handle to the target file.

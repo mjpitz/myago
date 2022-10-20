@@ -20,7 +20,7 @@ import (
 
 	"github.com/jonboulle/clockwork"
 
-	"github.com/mjpitz/myago"
+	"go.pitz.tech/lib"
 )
 
 var contextKey = myago.ContextKey("clocks")

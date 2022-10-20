@@ -22,8 +22,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/mjpitz/myago/cluster"
-	"github.com/mjpitz/myago/leaderless"
+	"go.pitz.tech/lib/cluster"
+	"go.pitz.tech/lib/leaderless"
 )
 
 func TestDirector(t *testing.T) {
