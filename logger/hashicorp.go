@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package zaputil
+package logger
 
 import (
 	"io"
@@ -67,7 +67,7 @@ func HashicorpStdLogger(logger *zap.Logger) *log.Logger {
 	return HashiCorpStdLogger(logger)
 }
 
-// HashiCorpStdLogger wraps the provided logger with a golang logger to log messages at the appropriate level using the
+// HashiCorpStdLogger wraps the provided badgerLogger with a golang badgerLogger to log messages at the appropriate level using the
 // HashiCorp log format. Useful for replacing serf and membership loggers.
 func HashiCorpStdLogger(logger *zap.Logger) *log.Logger {
 	w := &hashiWriter{

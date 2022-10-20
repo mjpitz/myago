@@ -16,10 +16,9 @@
 // Package wal provides a simple write-ahead log implementation inspired by Indeed's BasicRecordFile implementation.
 // Each record in the file is stored using the following format:
 //
-//    [length - varint][record content][checksum]
+//	[length - varint][record content][checksum]
 //
 // Unlike the reference implementation, the record length is written as a varint to help conserve space. The checksum is
 // a simple CRC32 checksum. Reference:
 // https://github.com/indeedeng/lsmtree/blob/master/recordlog/src/main/java/com/indeed/lsmtree/recordlog/BasicRecordFile.java
-//
 package wal

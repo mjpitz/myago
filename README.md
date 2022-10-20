@@ -19,8 +19,10 @@ them.
 - [`headers`](headers) provides logic for handling headers in a semi-agnostic way.
 - [`lazy`](lazy) provides code for lazy loading values until success.
 - [`leaderless`](leaderless) forms a `farm128` consistent hash ring to coordinate work within a cluster without the need for election.
+- [`libctx`](libctx) is a collection of common context utilities.
 - [`lifecycle`](lifecycle) provides hooks into the lifecycle of an application.
 - [`livetls`](livetls) provides a `tls.Config` that periodically reloads the underlying configuration.
+- [`logger`](logger) is a collection of logging utilities for zap.
 - [`paxos`](paxos) provides a paxos implementation.
 - [`plugin`](plugin) provides code for writing command-line based plugins.
 - [`ulid`](ulid) provides code for generating variable length unique, lexigraphic identifiers (ULID) with programmable fills.
@@ -28,7 +30,6 @@ them.
 - [`vue`](vue) contains helpers for VueJS applications.
 - [`wal`](wal) provides a minimal write-ahead log.
 - [`yarpc`](yarpc) is yet another RPC framework, built on top of Hashicorp Yamux with the simplicity of `http`.
-- [`zaputil`](zaputil) is a collection of logging utilities for zap.
 
 ## Tooling
 

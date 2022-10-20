@@ -10,12 +10,12 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
+	"go.pitz.tech/lib/logger"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
 
 	"go.pitz.tech/lib/lazy"
 	"go.pitz.tech/lib/ulid"
-	"go.pitz.tech/lib/zaputil"
 )
 
 // TokenCallback is invoked by the OIDCServeMux endpoint when we've successfully received and validated the
@@ -85,7 +85,7 @@ func ServeMux(cfg Config, callback TokenCallback) *http.ServeMux {
 
 	mux.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		logger := zaputil.Extract(ctx)
+		log := logger.Extract(ctx)
 
 		config, configErr := configOnce.Get(ctx)
 		verifier, verifierErr := verifierOnce.Get(ctx)
@@ -107,7 +107,7 @@ func ServeMux(cfg Config, callback TokenCallback) *http.ServeMux {
 
 		oauth2Token, err := config.(*oauth2.Config).Exchange(ctx, query.Get("code"))
 		if err != nil {
-			logger.Error("failed to exchange code for auth info", zap.Error(err))
+			log.Error("failed to exchange code for auth info", zap.Error(err))
 			http.Error(w, "", http.StatusInternalServerError)
 
 			return
@@ -117,7 +117,7 @@ func ServeMux(cfg Config, callback TokenCallback) *http.ServeMux {
 
 		idToken, err := verifier.(*oidc.IDTokenVerifier).Verify(ctx, rawIDToken.(string))
 		if err != nil {
-			logger.Error("failed to verify id token", zap.Error(err))
+			log.Error("failed to verify id token", zap.Error(err))
 			http.Error(w, "", http.StatusInternalServerError)
 
 			return
@@ -125,7 +125,7 @@ func ServeMux(cfg Config, callback TokenCallback) *http.ServeMux {
 
 		err = idToken.VerifyAccessToken(oauth2Token.AccessToken)
 		if err != nil {
-			logger.Error("failed to verify access token token", zap.Error(err))
+			log.Error("failed to verify access token token", zap.Error(err))
 			http.Error(w, "", http.StatusUnauthorized)
 
 			return

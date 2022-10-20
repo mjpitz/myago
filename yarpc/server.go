@@ -29,7 +29,7 @@ import (
 	"github.com/pkg/errors"
 
 	"go.pitz.tech/lib/encoding"
-	"go.pitz.tech/lib/zaputil"
+	"go.pitz.tech/lib/logger"
 )
 
 type Listener interface {
@@ -176,7 +176,7 @@ func (s *Server) Serve(listener Listener, opts ...Option) error {
 		}
 
 		yamuxcfg := *o.yamux
-		yamuxcfg.Logger = zaputil.HashiCorpStdLogger(zaputil.Extract(o.context))
+		yamuxcfg.Logger = logger.HashiCorpStdLogger(logger.Extract(o.context))
 		yamuxcfg.LogOutput = nil
 
 		session, err := yamux.Server(conn, o.yamux)

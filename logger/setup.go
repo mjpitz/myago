@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package zaputil
+package logger
 
 import (
 	"context"
@@ -25,6 +25,7 @@ import (
 
 // DefaultConfig returns the default configuration for zap to use. By default, it logs at an info level and infers the
 // log format based on the stdout device. If it looks like a terminal session, then it uses the console format.
+// Otherwise, JSON logging is used.
 func DefaultConfig() Config {
 	format := "json"
 	if fileInfo, _ := os.Stdout.Stat(); (fileInfo.Mode() & os.ModeCharDevice) != 0 {
@@ -62,6 +63,8 @@ func Setup(ctx context.Context, cfg Config) context.Context {
 	if err != nil {
 		panic(err)
 	}
+
+	zap.ReplaceGlobals(logger)
 
 	return ToContext(ctx, logger)
 }

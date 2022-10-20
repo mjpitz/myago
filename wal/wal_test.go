@@ -22,7 +22,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
 	"go.pitz.tech/lib/wal"
 )
 

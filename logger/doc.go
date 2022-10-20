@@ -13,29 +13,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package zaputil
-
-import (
-	"context"
-
-	"go.uber.org/zap"
-)
-
-var contextKey = libctx.Key("zap")
-
-var defaultLogger = zap.NewNop()
-
-// Extract pulls the logger from the provided context. If no logger is found, then the defaultLogger is returned.
-func Extract(ctx context.Context) *zap.Logger {
-	log := ctx.Value(contextKey)
-	if log == nil {
-		return defaultLogger
-	}
-
-	return log.(*zap.Logger)
-}
-
-// ToContext sets the logger on the provided context.
-func ToContext(ctx context.Context, logger *zap.Logger) context.Context {
-	return context.WithValue(ctx, contextKey, logger)
-}
+/*
+Package logger contains common code for passing a zap logger around. It's a convenient space for putting custom logger
+implementations for plugging into various locations.
+*/
+package logger

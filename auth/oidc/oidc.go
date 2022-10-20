@@ -7,13 +7,13 @@ import (
 	"context"
 
 	"github.com/coreos/go-oidc/v3/oidc"
+	"go.pitz.tech/lib/logger"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
 
 	"go.pitz.tech/lib/auth"
 	"go.pitz.tech/lib/headers"
 	"go.pitz.tech/lib/lazy"
-	"go.pitz.tech/lib/zaputil"
 )
 
 // OIDC returns a HandlerFunc who authenticates a user with the provided issuer using an access_token attached to the
@@ -26,18 +26,18 @@ func OIDC(cfg Issuer) auth.HandlerFunc {
 
 	return func(ctx context.Context) (context.Context, error) {
 		header := headers.Extract(ctx)
-		logger := zaputil.Extract(ctx)
+		log := logger.Extract(ctx)
 
 		accessToken, err := auth.Get(header, "bearer")
 		if err != nil {
-			logger.Error("failed to obtain bearer token", zap.Error(err))
+			log.Error("failed to obtain bearer token", zap.Error(err))
 
 			return ctx, nil
 		}
 
 		provider, err := provider.Get(ctx)
 		if err != nil {
-			logger.Error("error establishing connection with provider", zap.Error(err))
+			log.Error("error establishing connection with provider", zap.Error(err))
 
 			return nil, errInternal
 		}
@@ -51,7 +51,7 @@ func OIDC(cfg Issuer) auth.HandlerFunc {
 		// return unauthenticated error here to trigger re-authentication
 		userInfo, err := provider.(*oidc.Provider).UserInfo(ctx, tokenSource)
 		if err != nil {
-			logger.Error("error fetching user information given access token", zap.Error(err))
+			log.Error("error fetching user information given access token", zap.Error(err))
 
 			return nil, errUnauthorized
 		}

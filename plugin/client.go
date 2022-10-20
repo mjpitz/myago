@@ -27,8 +27,8 @@ import (
 
 	"go.uber.org/zap"
 
+	"go.pitz.tech/lib/logger"
 	"go.pitz.tech/lib/yarpc"
-	"go.pitz.tech/lib/zaputil"
 )
 
 // DialContext returns a ClientConn whose dialer forks a process for the specified binary.
@@ -99,7 +99,7 @@ func (d *dialer) DialContext(ctx context.Context) (io.ReadWriteCloser, error) {
 
 		body, _ := ioutil.ReadAll(stderr)
 		if len(body) > 0 {
-			zaputil.Extract(ctx).Error("plugin execution failed",
+			logger.Extract(ctx).Error("plugin execution failed",
 				zap.String("plugin", d.Binary),
 				zap.String("error", strings.TrimSpace(string(body))))
 		}

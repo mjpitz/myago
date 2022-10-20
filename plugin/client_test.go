@@ -24,8 +24,8 @@ import (
 	"go.uber.org/zap"
 
 	"go.pitz.tech/lib/lifecycle"
+	"go.pitz.tech/lib/logger"
 	"go.pitz.tech/lib/plugin"
-	"go.pitz.tech/lib/zaputil"
 )
 
 //go:generate go install ./examples/myago-plugin-echo
@@ -41,7 +41,7 @@ func TestEchoClient(t *testing.T) {
 	defer lifecycle.Resolve(ctx)
 
 	log, _ := zap.NewDevelopment()
-	ctx = zaputil.ToContext(ctx, log)
+	ctx = logger.ToContext(ctx, log)
 
 	clientConn := plugin.DialContext(ctx, "myago-plugin-echo")
 
@@ -70,7 +70,7 @@ func TestFailureClient(t *testing.T) {
 	defer lifecycle.Resolve(ctx)
 
 	log, _ := zap.NewDevelopment()
-	ctx = zaputil.ToContext(ctx, log)
+	ctx = logger.ToContext(ctx, log)
 
 	clientConn := plugin.DialContext(ctx, "myago-plugin-failure")
 

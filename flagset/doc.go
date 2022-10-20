@@ -29,6 +29,5 @@ line flags. The following details the various tags that can be specified on a pr
 - `required` - `bool` - Specifies that the flag must be specified.
 
 Nested structures are supported, making application configuration composable and portable between systems.
-
 */
 package flagset

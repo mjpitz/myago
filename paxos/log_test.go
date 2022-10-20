@@ -21,9 +21,9 @@ import (
 
 	"github.com/dgraph-io/badger/v3"
 	"github.com/stretchr/testify/require"
+	"go.pitz.tech/lib/logger"
 
 	"go.pitz.tech/lib/paxos"
-	"go.pitz.tech/lib/zaputil"
 )
 
 // nolint:funlen // idc about length for tests
@@ -161,11 +161,11 @@ func TestBadger(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	log := zaputil.Extract(ctx)
+	log := logger.Extract(ctx)
 
 	opts := badger.DefaultOptions(t.TempDir()).
 		WithSyncWrites(true).
-		WithLogger(zaputil.Badger(log))
+		WithLogger(logger.BadgerLogger(log))
 
 	db, err := badger.Open(opts)
 	require.NoError(t, err)

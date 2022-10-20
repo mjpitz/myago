@@ -22,8 +22,8 @@ BaseGenerator's Generate method, otherwise the skew and timestamp bits won't be 
 Unlike the canonical [ULID](https://github.com/ulid/spec), this version holds a placeholder byte for major clock skews
 which can often occur in distributed systems. The wire format is as follows: `[ skew ][ millis ][ payload ]`
 
- - `skew` - 1 byte used to handle major clock skews (reserved, unused)
- - `millis` - 6 bytes of a unix timestamp (should give us until the year 10k or so)
- - `payload` - N bytes for the payload
+  - `skew` - 1 byte used to handle major clock skews (reserved, unused)
+  - `millis` - 6 bytes of a unix timestamp (should give us until the year 10k or so)
+  - `payload` - N bytes for the payload
 */
 package ulid

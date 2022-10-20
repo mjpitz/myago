@@ -26,7 +26,7 @@ import (
 	"github.com/hashicorp/yamux"
 
 	"go.pitz.tech/lib/encoding"
-	"go.pitz.tech/lib/zaputil"
+	"go.pitz.tech/lib/logger"
 )
 
 // DialContext initializes a new client connection to the target server.
@@ -97,7 +97,7 @@ func (c *ClientConn) obtainSession(ctx context.Context) (*yamux.Session, error) 
 				}
 
 				yamuxcfg := *c.options.yamux
-				yamuxcfg.Logger = zaputil.HashiCorpStdLogger(zaputil.Extract(ctx))
+				yamuxcfg.Logger = logger.HashiCorpStdLogger(logger.Extract(ctx))
 				yamuxcfg.LogOutput = nil
 
 				c.session, err = yamux.Client(conn, &yamuxcfg)

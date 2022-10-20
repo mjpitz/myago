@@ -19,8 +19,7 @@ import (
 	"context"
 
 	"github.com/hashicorp/serf/serf"
-
-	"go.pitz.tech/lib/zaputil"
+	"go.pitz.tech/lib/logger"
 )
 
 // GossipDiscovery uses HashiCorp's Serf library to discover nodes within the cluster. It requires both TCP and UDP
@@ -59,11 +58,11 @@ func (g *GossipDiscovery) Start(ctx context.Context, membership *Membership) err
 	eventCh := make(chan serf.Event, 16)
 	defer close(eventCh)
 
-	logger := zaputil.HashiCorpStdLogger(zaputil.Extract(ctx))
+	log := logger.HashiCorpStdLogger(logger.Extract(ctx))
 
 	g.Config.EventCh = eventCh
-	g.Config.Logger = logger
-	g.Config.MemberlistConfig.Logger = logger
+	g.Config.Logger = log
+	g.Config.MemberlistConfig.Logger = log
 
 	serfClient, err := serf.Create(g.Config)
 	if err != nil {

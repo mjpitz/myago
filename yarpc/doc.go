@@ -17,7 +17,7 @@
 Package yarpc implements "yet another RPC framework" on top of HashiCorp's yamux library. I wanted something with the
 simplicity of Go's HTTP library and the ability to easily manage connections like gRPC.
 
-Why? gRPC comes with a rather large foot print and in many of these cases, I wanted a slimmer package for passing
+Why? gRPC comes with a rather large foot-print and in many of these cases, I wanted a slimmer package for passing
 messages between processes.
 
 Example Server:
@@ -58,6 +58,5 @@ Example ClientConn:
 		stat.Name // "uptime"
 		stat.Name // "uptime"
 	}
-
 */
 package yarpc

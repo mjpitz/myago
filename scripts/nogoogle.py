@@ -61,7 +61,8 @@ for file in glob.iglob("**/go.mod", recursive=True):
                 module = module + '/' + key
                 cwd = cwd + '/' + key
 
-            result = subprocess.run(["go", "mod", "why", dependency], cwd=cwd, stdout=subprocess.PIPE, universal_newlines=True)
+            result = subprocess.run(["go", "mod", "why", dependency], cwd=cwd, stdout=subprocess.PIPE,
+                                    universal_newlines=True)
 
             usages = []
             current = []
