@@ -1,0 +1,7 @@
+# lingering files from main
+**/*.key
+**/*.crt
+**/*.srl
+**/*.csr
+
+.coverprofile
