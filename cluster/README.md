@@ -177,7 +177,8 @@ func (m *Membership) Remove(peers []string)
 ```
 
 Remove deletes the provided active from the cluster's peer list. Operation
-should be `O( m log(n) )` where `m = len(peers)` and `n = len(m.active) + len(m.left)`.
+should be `O( m log(n) )` where `m = len(peers)` and `n = len(m.active) +
+len(m.left)`.
 
 #### func (\*Membership) Snapshot
 

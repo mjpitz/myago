@@ -17,6 +17,7 @@ package logger
 
 import (
 	"fmt"
+	"strings"
 
 	"go.uber.org/zap"
 )
@@ -42,19 +43,19 @@ type badgerLogger struct {
 }
 
 func (l *badgerLogger) Errorf(s string, i ...interface{}) {
-	l.log.Error(fmt.Sprintf(s, i...))
+	l.log.Error(fmt.Sprintf(strings.TrimSpace(s), i...))
 }
 
 func (l *badgerLogger) Warningf(s string, i ...interface{}) {
-	l.log.Warn(fmt.Sprintf(s, i...))
+	l.log.Warn(fmt.Sprintf(strings.TrimSpace(s), i...))
 }
 
 func (l *badgerLogger) Infof(s string, i ...interface{}) {
-	l.log.Info(fmt.Sprintf(s, i...))
+	l.log.Info(fmt.Sprintf(strings.TrimSpace(s), i...))
 }
 
 func (l *badgerLogger) Debugf(s string, i ...interface{}) {
-	l.log.Debug(fmt.Sprintf(s, i...))
+	l.log.Debug(fmt.Sprintf(strings.TrimSpace(s), i...))
 }
 
 var _ Badger = &badgerLogger{}
