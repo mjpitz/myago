@@ -76,6 +76,7 @@ func main() {
 		{"em", "go.pitz.tech/em", "https://github.com/mjpitz/em", "git"},
 		{"lib", "go.pitz.tech/lib", "https://github.com/mjpitz/myago", "git"},
 		{"okit", "go.pitz.tech/okit", "https://code.pitz.tech/mya/okit", "git"},
+		{"units", "go.pitz.tech/units", "https://github.com/mjpitz/units", "git"},
 		{filepath.Join("gorm", "encryption"), "go.pitz.tech/gorm/encryption", "https://github.com/mjpitz/gorm-encryption", "git"},
 	}
 
