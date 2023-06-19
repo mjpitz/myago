@@ -234,8 +234,32 @@ func (f Extractor) formatBoolFlag(common *common, fieldValue reflect.Value) (fla
 	return flag, nil
 }
 
+// formatFloatFlag creates a cli.Float64Flag for the given common configuration and value.
+func (f Extractor) formatFloatFlag(common *common, fieldValue reflect.Value) (flag *cli.Float64Flag, err error) {
+	flag = &cli.Float64Flag{
+		Name:        common.FlagName,
+		Aliases:     common.Aliases,
+		Usage:       common.Usage,
+		EnvVars:     common.EnvVars,
+		Required:    common.Required,
+		Hidden:      common.Hidden,
+		Destination: fieldValue.Addr().Interface().(*float64),
+	}
+
+	if !fieldValue.IsZero() {
+		flag.Value = fieldValue.Float()
+	} else if common.Default != "" {
+		flag.Value, err = strconv.ParseFloat(common.Default, 64)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return flag, nil
+}
+
 // formatFlag attempts to create a cli.Flag based on the type of the value.
-func (f Extractor) formatFlag(common *common, value reflect.Value) (flag cli.Flag, err error) {
+func (f Extractor) formatFlag(common *common, value reflect.Value) (cli.Flag, error) {
 	switch value.Interface().(type) {
 	case time.Duration:
 		return f.formatDurationFlag(common, value)
@@ -251,6 +275,8 @@ func (f Extractor) formatFlag(common *common, value reflect.Value) (flag cli.Fla
 			return f.formatIntFlag(common, value)
 		case reflect.Bool:
 			return f.formatBoolFlag(common, value)
+		case reflect.Float64:
+			return f.formatFloatFlag(common, value)
 		}
 	}
 

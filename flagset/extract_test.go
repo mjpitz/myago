@@ -35,6 +35,7 @@ type Options struct {
 	EnableSSL   bool          `json:"enable_ssl"  alias:"s" usage:"enable encryption between processes" default:"false"`
 	Temperature int           `json:"temperature" alias:"t" default:"50"`
 	Interval    time.Duration `json:"interval"    alias:"i" default:"5m"`
+	Percentage  float64       `json:"percentage" default:"5.0"`
 }
 
 type Full struct {
@@ -121,6 +122,7 @@ func TestExtract(t *testing.T) {
 			EnableSSL:   true,
 			Temperature: 100,
 			Interval:    10 * time.Minute,
+			Percentage:  10.0,
 		},
 		Features:    cli.NewStringSlice("awe yeah"),
 		Percentiles: cli.NewIntSlice(75, 90, 95, 97, 99),
@@ -136,6 +138,7 @@ func TestExtract(t *testing.T) {
 			{"options_enable_ssl", "s", "OPTIONS_ENABLE_SSL", "enable encryption between processes", false, false, false},
 			{"options_temperature", "t", "OPTIONS_TEMPERATURE", "", 50, false, false},
 			{"options_interval", "i", "OPTIONS_INTERVAL", "", 5 * time.Minute, false, false},
+			{"options_percentage", "", "OPTIONS_PERCENTAGE", "", 5.0, false, false},
 			{"features", "f", "FEATURES", "", cli.NewStringSlice(), false, false},
 			{"percentiles", "", "PERCENTILES", "", cli.NewIntSlice(), false, false},
 			{"tagged", "", "TAGGED", "", "", true, true},
@@ -145,6 +148,7 @@ func TestExtract(t *testing.T) {
 			{"options_enable_ssl", "s", "OPTIONS_ENABLE_SSL", "enable encryption between processes", true, false, false},
 			{"options_temperature", "t", "OPTIONS_TEMPERATURE", "", 100, false, false},
 			{"options_interval", "i", "OPTIONS_INTERVAL", "", 10 * time.Minute, false, false},
+			{"options_percentage", "", "OPTIONS_PERCENTAGE", "", 10.0, false, false},
 			{"features", "f", "FEATURES", "", fromStruct.Features, false, false},
 			{"percentiles", "", "PERCENTILES", "", fromStruct.Percentiles, false, false},
 			{"tagged", "", "TAGGED", "", "", true, true},
