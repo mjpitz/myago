@@ -113,3 +113,32 @@ func (flags FlagSet) Filter(allow Filter) FlagSet
 ```
 
 Filter returns a new FlagSet that contains flags allowed by the provided Filter.
+
+#### type Slice
+
+```go
+type Slice[T any] []T
+```
+
+Slice provides a configuration file (YAML, JSON, TOML) friendly variant of the
+cli.StringSlice value. It also supports parsing JSON configuration from
+environment variables.
+
+#### func (\*Slice[T]) Set
+
+```go
+func (s *Slice[T]) Set(value string) (err error)
+```
+
+Set appends the provided value to the underlying slice. If the value appears to
+be a JSON string, then we attempt to unmarshal the JSON before appending the
+resulting values to the underlying slice. Currently, this mechanism only
+supports primitive structures.
+
+#### func (\*Slice[T]) String
+
+```go
+func (s *Slice[T]) String() string
+```
+
+String serializes the Slice as a json string.
