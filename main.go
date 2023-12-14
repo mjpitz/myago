@@ -78,7 +78,7 @@ func main() {
 		{"okit", "go.pitz.tech/okit", "https://code.pitz.tech/mya/okit", "git"},
 		{"units", "go.pitz.tech/units", "https://github.com/mjpitz/units", "git"},
 		{filepath.Join("gorm", "encryption"), "go.pitz.tech/gorm/encryption", "https://github.com/mjpitz/gorm-encryption", "git"},
-		{"spdx-to-md", "go.pitz.tech/spdx-to-md", "https://github.com/mjpitz/spdx-to-md", "git"},
+		{"spdx-fmt", "go.pitz.tech/spdx-fmt", "https://github.com/mjpitz/spdx-fmt", "git"},
 	}
 
 	for _, generate := range generates {
